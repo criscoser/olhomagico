@@ -1,0 +1,37 @@
+PEDIDO DE ACESSO À INFORMAÇÃO (Lei nº 12.527/2011)
+Destinatário: Município de Videira/SC
+Canal sugerido: e-SIC / Ouvidoria do Portal da Transparência (videira.atende.net/transparencia)
+
+(Preencha os campos de identificação exigidos pelo e-SIC. A lei não exige que você explique o motivo do pedido.)
+
+----------------------------------------------------------------------
+
+Assunto: Inclusão de dados de pessoal, pagamentos e diárias na API de Dados Abertos
+
+Prezados,
+
+Com base na Lei nº 12.527/2011 (Lei de Acesso à Informação), em especial nos artigos 7º e 8º, que tratam da transparência ativa e da divulgação de informações em formatos abertos, estruturados e legíveis por máquina (art. 8º, § 3º, incisos II e III), solicito:
+
+1. Que sejam disponibilizadas, na API de Dados Abertos do Portal da Transparência (https://videira.atende.net/api/WCPDadosAbertos/), as seguintes informações, que já são publicadas em telas de consulta do portal, mas não em formato aberto:
+
+   a) Relação de servidores e agentes públicos com cargo, lotação, competência (mês/ano) e remuneração (proventos, descontos e valor líquido), hoje disponível na tela "Relação Funcionário x Salário";
+
+   b) Pagamentos individualizados, com data, credor, valor, número do empenho, histórico/objeto da despesa e número e modalidade da licitação, hoje disponíveis na tela "Pagamentos";
+
+   c) Empenhos, com número, data, credor, valor, órgão/unidade, elemento de despesa e histórico;
+
+   d) Diárias e passagens concedidas, com beneficiário, cargo, destino, período, motivo/finalidade e valor.
+
+2. Caso a inclusão na API não seja possível no momento, solicito que as mesmas informações sejam fornecidas em arquivo de formato aberto (CSV ou planilha), referentes ao exercício de 2026 até a data da resposta, e que seja informado se há previsão de disponibilização periódica nesse formato.
+
+3. Solicito ainda que seja informado se as telas de consulta "Pagamentos" e "Relação Funcionário x Salário" possuem alguma forma oficial de acesso automatizado (API, webservice ou exportação), já que a verificação anti-robô (captcha) dessas telas impede a reutilização dos dados por ferramentas de cidadania.
+
+4. O Portal da Transparência já oferece a API de Pessoal (https://videira.atende.net/api/transparencia-pessoal-funcionarios), que informa cargo e salário-base dos servidores. Solicito que essa API passe a incluir também a remuneração mensal completa (proventos, descontos e valor líquido, por competência) e os agentes políticos (prefeito, vice-prefeito e secretários municipais), caso não estejam incluídos, a exemplo do que já ocorre com a consulta "Relação Funcionário x Salário".
+
+Justificativa (opcional): a Lei de Acesso à Informação determina que os sítios oficiais possibilitem a gravação de relatórios em formatos abertos e o acesso automatizado por sistemas externos (art. 8º, § 3º, II e III). As informações solicitadas já são públicas; o pedido trata apenas do formato em que são disponibilizadas.
+
+Solicito que a resposta seja enviada pelo próprio sistema e-SIC, no prazo legal de 20 dias, prorrogável por mais 10 (art. 11).
+
+Atenciosamente,
+[seu nome, conforme cadastro no e-SIC]
+[data]

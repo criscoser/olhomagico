@@ -1,0 +1,18 @@
+{
+  "_comentario": "Identificação do município. Para usar o Olho Mágico em outra cidade, troque estes valores (todos conferidos em fontes oficiais).",
+  "nome": "Videira",
+  "uf": "SC",
+  "codigo_ibge": "4219309",
+  "codigo_tce_sc": "421930",
+  "codigo_siope": "421930",
+  "codigo_tesouro_transferencias": "8379",
+  "codigo_uf_tesouro_transferencias": "24",
+  "cnpj": "83039842000184",
+  "portal_atende": "https://videira.atende.net",
+  "siconfi": "https://apidatalake.tesouro.gov.br/ords/siconfi/tt",
+  "pncp": "https://pncp.gov.br",
+  "tesouro_transferencias": "https://apiapex.tesouro.gov.br/aria/v1/transferencias_constitucionais/custom",
+  "siope": "https://www.fnde.gov.br/olinda-ide/servico/DADOS_ABERTOS_SIOPE/versao/v1/odata",
+  "cgu": "https://api.portaldatransparencia.gov.br/api-de-dados",
+  "camara_api": "https://www.camaravideira.sc.gov.br/jsonweb/web-aplicativo.php"
+}

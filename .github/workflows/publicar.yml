@@ -1,0 +1,80 @@
+# ROBÔ DE PUBLICAÇÃO DO OLHO MÁGICO: roda no GitHub, de graça.
+# Todo dia (e sempre que você mudar o código), ele:
+#   1) roda os testes (se algum falhar, NÃO publica);
+#   2) recupera os arquivos de dados que já estão no site (a última versão válida de cada fonte);
+#   3) atualiza cada fonte SEPARADAMENTE (se uma falhar, a versão anterior dela é mantida);
+#   4) publica o site no GitHub Pages.
+# Os dados NÃO são guardados no repositório: vão só para o site publicado (sem histórico de cópias antigas).
+name: Atualizar e publicar o site
+
+on:
+  schedule:
+    - cron: "17 9 * * *"   # todo dia às 09:17 UTC = 06:17 em Brasília
+  workflow_dispatch:        # cria o botão "Run workflow" na aba Actions
+  push:
+    branches: [main]        # publica de novo quando você muda o código
+
+# Permissões mínimas: ler o código e publicar no Pages. Nada além disso.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:              # nunca duas publicações ao mesmo tempo
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+    steps:
+      # As ações abaixo estão FIXADAS pelo código exato (SHA) de cada versão: assim ninguém consegue
+      # trocar o conteúdo delas por baixo. Para atualizar, troque o SHA pelo da versão nova.
+      - name: Baixar o código do site
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false   # não deixa a senha temporária do GitHub guardada na máquina do robô
+
+      - name: Rodar os testes (site e robôs)
+        run: |
+          node testes/rodar_testes.js
+          python3 -m unittest discover -s testes -p "test_*.py"
+
+      - name: Recuperar a última versão publicada dos dados
+        # Baixa do próprio site os arquivos de ontem. Se uma fonte falhar hoje, o de ontem continua valendo.
+        run: |
+          mkdir -p dados
+          SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          for f in pessoal.js siconfi.js pncp.js transferencias.js dca.js entregas.js siope.js cgu.js camara.js situacao.js; do
+            if curl -fsSL --max-time 60 "$SITE/dados/$f" -o "dados/$f.tmp" && grep -q "window.OBS_" "dados/$f.tmp"; then
+              mv "dados/$f.tmp" "dados/$f"; echo "Recuperado: $f"
+            else
+              rm -f "dados/$f.tmp"; echo "Sem versão anterior de $f (normal na primeira publicação)"
+            fi
+          done
+
+      - name: Atualizar as fontes de dados (cada uma separadamente)
+        # As chaves vêm do cofre do GitHub (Settings -> Secrets and variables -> Actions).
+        # O GitHub esconde o valor delas no registro; o robô também troca qualquer chave por *** nas mensagens.
+        # Se uma chave não estiver cadastrada, a fonte dela é só pulada.
+        env:
+          CGU_CHAVE: ${{ secrets.CGU_CHAVE }}
+          CAMARA_TOKEN: ${{ secrets.CAMARA_TOKEN }}
+        run: python3 ferramentas/atualizar.py || echo "::warning::Alguma fonte falhou hoje; a versão anterior dela foi mantida. Veja o resumo acima."
+
+      - name: Montar a pasta do site (só o que vai para o ar)
+        run: |
+          mkdir _site
+          cp -r index.html css js dados _site/
+
+      - name: Enviar a pasta para o GitHub Pages
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: _site
+
+      - name: Publicar
+        id: publicacao
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<!-- ESTRUTURA DA PÁGINA: só o "esqueleto" (textos e caixas). O visual fica em css/estilo.css
+     e o comportamento em js/. Os scripts são carregados NA ORDEM abaixo, porque um depende do outro. -->
+<html lang="pt-BR" data-tema="escuro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- POLÍTICA DE SEGURANÇA (CSP): o navegador só aceita scripts e estilos deste próprio site (mais a fonte do Google)
+     e só conversa com a API oficial de Videira. Se alguém conseguir injetar código, ele não roda. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://videira.atende.net; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Olho Mágico — Para onde vai o dinheiro público de Videira?</title>
+<!-- DESCRIÇÃO e PRÉVIA DE COMPARTILHAMENTO: é o texto que aparece no Google e quando o link
+     é enviado no WhatsApp/Facebook. Se trocar o nome do site, troque aqui também. -->
+<meta name="description" content="Olho Mágico: portal independente que mostra, em palavras simples, quanto a Prefeitura de Videira/SC pagou, a quem, e quem trabalha nela. Dados de fontes públicas oficiais.">
+<meta property="og:title" content="Olho Mágico — Para onde vai o dinheiro público de Videira?">
+<meta property="og:description" content="Quanto a Prefeitura de Videira pagou, a quem e por qual secretaria, em linguagem simples.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta name="theme-color" content="#0b1a30">
+<!-- ÍCONE DA ABA: a lente do "olho mágico" (âmbar e ciano), desenhada no próprio arquivo (sem imagem extra). -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23f4c55a'/%3E%3Ccircle cx='20' cy='20' r='11' fill='%230b1a30'/%3E%3Ccircle cx='20' cy='20' r='4.5' fill='%233fd0e0'/%3E%3C/svg%3E">
+<!-- FONTES: "Atkinson Hyperlegible" no texto (criada para ser fácil de ler) e "Sora" nos títulos e números.
+     Se não carregarem, o navegador usa outras parecidas. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+<!-- Aviso para quem estiver com JavaScript desligado (sem ele o site não consegue buscar os dados). -->
+<noscript><p class="sem-js">Este site precisa de JavaScript ligado para buscar os dados. Você também pode consultar direto o <a href="https://videira.atende.net/transparencia/">Portal da Transparência de Videira</a>.</p></noscript>
+
+<!-- Atalho para quem usa teclado: pula o menu e vai direto ao conteúdo. -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- ESTRUTURA GERAL (AppShell): menu lateral à esquerda (no computador) e conteúdo à direita.
+     No celular e no tablet, o menu vira uma barra no topo com o botão "Menu". -->
+<div class="app">
+  <!-- MENU LATERAL (Sidebar): no computador fica recolhido (só os ícones) e abre ao passar o mouse,
+       ao chegar nele pelo teclado (Tab) ou ao tocar em "Manter o menu aberto". No celular vira uma barra com o botão "Menu". -->
+  <aside class="lateral" id="lateral" aria-label="Menu do site">
+    <div class="lateral-topo">
+      <!-- MARCA: o "olho mágico" da porta (lente redonda). Desenho feito no próprio HTML, sem imagem extra. -->
+      <h1 class="marca"><a href="#inicio">
+        <svg class="lente" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <circle cx="20" cy="20" r="18" class="lente-aro"/><circle cx="20" cy="20" r="11" class="lente-vidro"/>
+          <circle cx="20" cy="20" r="4.5" class="lente-pupila"/><circle cx="16.5" cy="16" r="2" class="lente-brilho"/>
+        </svg><span class="marca-texto rotulo"><span id="nomeSite">Olho Mágico</span><small>Transparência pública</small></span></a></h1>
+      <!-- Botão do menu: só aparece em telas menores. aria-expanded diz ao leitor de tela se o menu está aberto. -->
+      <button type="button" class="btn-menu" id="btnMenu" aria-expanded="false" aria-controls="lateralCorpo">Menu</button>
+    </div>
+    <div class="lateral-corpo" id="lateralCorpo">
+      <!-- MENU: cada link muda o fim do endereço (#inicio, #gastos...); o arquivo js/rotas.js mostra a tela certa.
+           Os ícones são só enfeite (aria-hidden); o nome de cada seção está sempre no texto do link. -->
+      <nav class="menu" id="menuPrincipal" aria-label="Seções do site">
+        <a class="aba" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="rotulo">Visão geral</span></a>
+        <a class="aba" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span class="rotulo">Despesas públicas</span></a>
+        <a class="aba" href="#servidores"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span class="rotulo">Servidores</span></a>
+        <a class="aba" href="#contratos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 13h8M9 17h6"/></svg><span class="rotulo">Licitações e contratos</span></a>
+        <a class="aba" href="#contas"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg><span class="rotulo">Contas e transferências</span></a>
+        <a class="aba" href="#camara"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M2 21h20"/><path d="M9 21v-6h6v6"/><path d="M12 2v2"/></svg><span class="rotulo">Câmara de Vereadores</span></a>
+        <a class="aba" href="#sobre"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="rotulo">Fontes e metodologia</span></a>
+      </nav>
+      <!-- RODAPÉ DO MENU: apoio (só aparece com chave Pix em js/config.js), tema claro/escuro e fixar o menu aberto. -->
+      <div class="lateral-rodape">
+        <button type="button" class="item-lateral oculto" id="btnApoio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="rotulo">Apoie o projeto</span></button>
+        <button type="button" class="item-lateral" id="btnTema" aria-pressed="false"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><span class="rotulo" id="btnTemaTexto">Usar tema claro</span></button>
+        <button type="button" class="item-lateral so-computador" id="btnFixar" aria-pressed="false"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg><span class="rotulo">Manter o menu aberto</span></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <!-- CABEÇALHO DA PÁGINA: contexto, pesquisa geral e data da última atualização das cópias. -->
+    <header class="topo">
+      <div class="topo-texto">
+        <p class="topo-titulo">Portal de transparência: Videira / SC</p>
+        <p class="topo-sub">Dados públicos organizados para consulta e verificação</p>
+      </div>
+      <!-- PESQUISA GERAL: procura ao mesmo tempo em servidores, fornecedores, contratos e licitações. -->
+      <form class="busca-topo" id="formBusca" role="search">
+        <label for="campoBusca" class="visualmente-oculto">Pesquisar em servidores, fornecedores, contratos e licitações</label>
+        <input type="search" id="campoBusca" placeholder="Nome, empresa, CNPJ ou contrato" autocomplete="off" enterkeyhint="search">
+        <button type="submit">Pesquisar</button>
+      </form>
+      <a class="atualizacao" id="atualizacao" href="#sobre/situacao">Atualização: verificando</a>
+    </header>
+
+<main class="wrap" id="conteudo" tabindex="-1">
+  <!-- AVISO DE INDEPENDÊNCIA (texto definido no guia do projeto). -->
+  <p class="aviso-independente" role="note"><strong>Portal independente.</strong> Os dados são organizados a partir de fontes públicas oficiais. Consulte sempre os documentos originais.</p>
+  <!-- ================= INÍCIO: painel com os principais números (cada quadro só aparece se houver dado) ================= -->
+  <div id="aba-inicio">
+    <h2 class="titulo-pagina">Visão geral</h2>
+    <p class="sub">Acompanhe os dados disponíveis e consulte as fontes oficiais. Cada número mostra o período e a origem.</p>
+
+    <!-- COMPETÊNCIA: o mês dos indicadores de despesa logo abaixo (consulta ao vivo no portal da Prefeitura). -->
+    <form class="controles competencia" id="formCompetencia">
+      <div><label for="mesVisao">Mês das despesas</label><select id="mesVisao"></select></div>
+      <div><label for="anoVisao">Ano</label><select id="anoVisao"></select></div>
+      <button type="submit">Atualizar indicadores</button>
+    </form>
+    <div id="kpiEstado"></div>
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grade-visao">
+      <!-- EVOLUÇÃO: gráfico só aparece depois que a série de 12 meses for consultada e validada. -->
+      <section aria-labelledby="t-evol-visao" id="sec-evolucao-visao">
+        <h2 id="t-evol-visao">Evolução das despesas</h2>
+        <p class="sub" id="evolVisaoTexto">Valor pago em cada um dos 12 meses até o mês escolhido. São 12 consultas ao portal, feitas uma de cada vez.</p>
+        <p><button type="button" class="sec" id="btnEvolVisao">Carregar os 12 meses</button></p>
+        <p class="meta" id="evolVisaoEstado" role="status" aria-live="polite"></p>
+        <div id="evolVisao"></div>
+      </section>
+      <!-- ACESSO RÁPIDO: atalhos para as consultas mais usadas. -->
+      <section aria-labelledby="t-acesso" class="acesso-rapido">
+        <h2 id="t-acesso">Acesso rápido</h2>
+        <ul>
+          <li><a href="#gastos"><strong>Consultar despesas</strong><span>Por mês, secretaria, unidade, origem e credor</span></a></li>
+          <li><a href="#servidores/lista"><strong>Pesquisar servidor</strong><span>Ficha com cargo, vínculo e salário-base</span></a></li>
+          <li><a href="#contratos"><strong>Licitações e contratos</strong><span>Fornecedores e registros oficiais do PNCP</span></a></li>
+          <li><a href="#sobre"><strong>Ver fontes oficiais</strong><span>Origem, metodologia e atualização</span></a></li>
+        </ul>
+      </section>
+    </div>
+
+    <h2 class="titulo-secao">Outros indicadores</h2>
+    <div id="inicioEstado" role="status" aria-live="polite"></div>
+    <div class="quadros" id="quadros"></div>
+  </div>
+
+  <!-- ================= PESQUISA GERAL (resultado) ================= -->
+  <div id="vista-busca" class="oculto">
+    <h2 id="buscaTitulo" class="titulo-pagina">Pesquisa</h2>
+    <div class="sub" id="buscaResumoGeral" aria-live="polite"></div>
+    <div id="buscaResultados"></div>
+  </div>
+
+  <!-- ================= FICHA DE DETALHE (servidor, fornecedor ou contrato), montada por js/fichas.js ================= -->
+  <div id="vista-ficha" class="oculto"></div>
+
+  <!-- ================= GASTOS DA PREFEITURA (busca ao vivo na API de despesas) ================= -->
+  <div id="aba-gastos" class="oculto">
+  <h2 class="titulo-pagina">Gastos do mês</h2>
+  <!-- FORMULÁRIO: o cidadão escolhe o mês. O JavaScript (main.js) escuta o envio. -->
+  <!-- Duas listas (mês e ano) em vez do campo de calendário: o campo "month" não funciona no Firefox nem no Safari. -->
+  <form class="controles" id="form">
+    <div>
+      <label for="selMes">Mês</label>
+      <select id="selMes"></select>
+    </div>
+    <div>
+      <label for="selAno">Ano</label>
+      <select id="selAno"></select>
+    </div>
+    <button type="submit">Ver os gastos</button>
+  </form>
+
+  <!-- MENSAGENS: "carregando", "erro" e "sem dados" aparecem aqui. aria-live faz leitores de tela anunciarem. -->
+  <div id="estado" role="status" aria-live="polite">Escolha um mês e toque em “Ver os gastos”.</div>
+
+  <!-- RESULTADO: começa escondido e só aparece quando há dados. -->
+  <div id="resultado" class="oculto">
+    <!-- RESUMO: a frase principal e a fonte logo abaixo. (O "valor por morador" foi removido por decisão do projeto.) -->
+    <p class="frase" id="frase"></p>
+    <p class="nota" id="notaFrase"></p>
+    <p class="fonte-linha" id="fonteLinha"></p>
+    <!-- ORIGEM DA INFORMAÇÃO (componente js/origem.js) e botão para baixar a planilha. -->
+    <div id="origemGastos"></div>
+    <p class="acoes"><button type="button" class="sec" id="baixarCsv">Baixar estes dados (planilha CSV)</button></p>
+    <p class="dica">Dica: toque em uma secretaria ou em um nome para ver os detalhes.</p>
+
+    <!-- 1) SECRETARIAS: lista clicável. Ao tocar, abre quem recebeu, setores e origem do dinheiro. -->
+    <section aria-labelledby="t-orgaos">
+      <h2 id="t-orgaos">Para onde foi o dinheiro?</h2>
+      <p class="sub">Quanto cada secretaria ou setor da Prefeitura pagou no mês. A porcentagem mostra a fatia de cada uma no total.</p>
+      <ul class="lista" id="orgaos"></ul>
+    </section>
+
+    <!-- EVOLUÇÃO: os 12 meses até o mês escolhido (uma consulta por mês, só quando a pessoa pedir). -->
+    <section aria-labelledby="t-evolucao" id="sec-evolucao">
+      <h2 id="t-evolucao">Como foi nos meses anteriores?</h2>
+      <p class="sub">Compare o mês escolhido com os 11 anteriores. São 12 consultas ao portal, feitas uma de cada vez: pode levar um minuto.</p>
+      <div class="filtros">
+        <div><label for="etapaEvolucao">Etapa</label>
+          <select id="etapaEvolucao"><option value="pago">Pago</option><option value="liquidado">Liquidado</option><option value="empenhado">Empenhado</option></select></div>
+        <div class="filtro-botao"><button type="button" id="btnEvolucao">Carregar os 12 meses</button></div>
+      </div>
+      <p class="meta" id="evolucaoEstado" role="status" aria-live="polite"></p>
+      <div id="evolucaoConteudo"></div>
+    </section>
+
+    <!-- 2) CREDORES: lista clicável, com busca e filtro por secretaria. -->
+    <section aria-labelledby="t-credores" id="secCredores">
+      <h2 id="t-credores">Quem recebeu?</h2>
+      <p class="sub">“Credor” é quem recebe o pagamento (empresa, entidade ou pessoa). Vai do maior valor para o menor. Estar no topo não quer dizer que algo está errado: só indica o maior valor.</p>
+      <div class="busca">
+        <label for="filtro">Procurar um nome</label>
+        <input type="search" id="filtro" autocomplete="off">
+      </div>
+      <!-- Aparece quando a pessoa escolhe "ver todos os credores desta secretaria". -->
+      <p class="chip oculto" id="chipOrgao"><span id="chipTexto"></span> <button type="button" class="sec mini" id="limparOrgao">Ver todas as secretarias</button></p>
+      <ul class="lista" id="credores"></ul>
+      <p><button type="button" class="sec" id="maisCredores">Mostrar mais</button></p>
+    </section>
+
+    <!-- REGISTROS DO MÊS: cada linha da fonte, com filtros combináveis (FilterBar) e tabela paginada (DataTable).
+         A planilha baixada respeita os filtros escolhidos. -->
+    <section aria-labelledby="t-registros" id="sec-registros">
+      <h2 id="t-registros">Registros do mês</h2>
+      <p class="sub">Cada linha é um total publicado pela fonte para uma combinação de secretaria, setor, origem do dinheiro e credor. Combine os filtros e baixe só o que ficou na tela.</p>
+      <div class="filtros">
+        <div><label for="regOrgao">Secretaria (órgão)</label><select id="regOrgao"><option value="">Todas</option></select></div>
+        <div><label for="regUnidade">Setor (unidade)</label><select id="regUnidade"><option value="">Todos</option></select></div>
+        <div><label for="regFonte">Origem do dinheiro</label><select id="regFonte"><option value="">Todas</option></select></div>
+        <div><label for="regCredor">Credor (nome ou CNPJ)</label><input type="search" id="regCredor" autocomplete="off"></div>
+        <div class="filtro-botao"><button type="button" class="sec" id="regLimpar">Limpar filtros</button></div>
+      </div>
+      <div class="chips" id="regChips"></div>
+      <div id="regTabela"></div>
+      <p><button type="button" class="sec" id="regCsv">Baixar os registros filtrados (planilha CSV)</button></p>
+    </section>
+
+    <!-- 3) ORIGEM DO DINHEIRO: fontes de recurso. -->
+    <section aria-labelledby="t-fontes">
+      <h2 id="t-fontes">De onde veio o dinheiro?</h2>
+      <p class="sub">A Prefeitura usa dinheiro de “caixas” diferentes: impostos da cidade, verbas que vêm do Estado ou da União para saúde e educação, e outras. Aqui está quanto saiu de cada uma.</p>
+      <ul class="lista" id="fontes"></ul>
+      <p><button type="button" class="sec" id="maisFontes">Mostrar todas</button></p>
+    </section>
+
+    <!-- 4) EXPLICAÇÃO DOS 3 PASSOS (empenhado, liquidado, pago) + ajustes. -->
+    <section aria-labelledby="t-etapas">
+      <h2 id="t-etapas">Como o dinheiro público é gasto?</h2>
+      <p class="sub">Todo gasto passa por 3 passos. O mesmo gasto aparece nos três, por isso <strong>não some os valores</strong>. Um gasto pode ser reservado num mês e pago em outro, então às vezes o valor pago é maior que o reservado.</p>
+      <div class="etapas" id="etapas"></div>
+      <!-- AJUSTES: dois campos que a fonte também publica (anulado e retido), exibidos para não escondermos nada. -->
+      <h3>Ajustes que a fonte também publica</h3>
+      <div class="etapas" id="ajustes"></div>
+    </section>
+
+    <!-- ATALHOS PARA O PORTAL: o detalhe (pagamento por pagamento, salários) existe no portal oficial,
+         mas é protegido contra acesso automático. Então levamos a pessoa até lá, com um passo a passo. -->
+    <section aria-labelledby="t-detalhes">
+      <h2 id="t-detalhes">Quer ver mais detalhes?</h2>
+      <p class="sub">Alguns detalhes só podem ser consultados direto no portal oficial. Veja como encontrar.</p>
+
+      <h3>Em que cada pagamento foi feito</h3>
+      <p>Lista pagamento por pagamento, com o número do empenho e da licitação.</p>
+      <ol class="passos">
+        <li>Abra a tela de <a id="lnkPagamentos" target="_blank" rel="noopener">Pagamentos no portal oficial</a>.</li>
+        <li>Em “Data” e “Até”, escolha o período (por exemplo, o mês que você consultou aqui).</li>
+        <li>Toque em consultar e procure o nome do credor na lista.</li>
+      </ol>
+
+      <h3>Quanto ganha cada servidor</h3>
+      <p>A aba <a href="#servidores">Servidores</a> mostra nome, cargo, setor e salário-base de quem trabalha na Prefeitura. O valor completo de cada mês (com gratificações e descontos) está no portal oficial:</p>
+      <ol class="passos">
+        <li>Abra a <a id="lnkSalarios" target="_blank" rel="noopener">Relação Funcionário x Salário no portal oficial</a>.</li>
+        <li>Escolha o mês (competência) e, se quiser, filtre pelo nome ou pelo cargo.</li>
+      </ol>
+
+      <p class="meta">Por que não mostramos isso aqui? O portal protege essas duas telas contra acesso automático, e este site respeita essa proteção. Por isso, vamos pedir à Prefeitura, pela Lei de Acesso à Informação, que publique esses dados em formato aberto.</p>
+    </section>
+
+    <section aria-labelledby="t-fonte">
+      <h2 id="t-fonte">De onde vêm esses dados?</h2>
+      <p id="fonte"></p>
+      <h3>O que esta página ainda não mostra</h3>
+      <p>Só as despesas do mês escolhido. Ainda não aparecem: o que a Prefeitura arrecada (receitas), o orçamento previsto, os “restos a pagar” e as diárias de viagem. Parte disso pode ser consultada no portal oficial (veja “Quer ver mais detalhes?”). Salários-base, contratos e licitações estão nas abas <a href="#servidores">Servidores</a> e <a href="#contratos">Contratos</a>.</p>
+      <h3>O que significam essas palavras?</h3>
+      <details><summary>Credor</summary>
+        <p>É quem tem a receber: uma empresa, uma entidade ou uma pessoa que prestou serviço ou vendeu algo à Prefeitura.</p></details>
+      <details><summary>Órgão (secretaria)</summary>
+        <p>É o setor da Prefeitura que fez o gasto, como a Secretaria de Saúde ou a de Educação.</p></details>
+      <details><summary>Empenhado</summary>
+        <p>É a reserva do dinheiro. Exemplo: a Prefeitura decide reformar uma escola e separa o valor no orçamento.</p></details>
+      <details><summary>Liquidado</summary>
+        <p>É quando o serviço foi feito (ou o produto chegou) e foi conferido. Exemplo: a reforma ficou pronta e foi aprovada.</p></details>
+      <details><summary>Pago</summary>
+        <p>É quando o dinheiro realmente saiu da conta da Prefeitura. Exemplo: a empresa da reforma recebeu o valor.</p></details>
+      <details><summary>Anulado e retido</summary>
+        <p>Anulado é uma reserva de dinheiro que foi cancelada. Retido é uma parte do valor que ficou separada (em geral, impostos). Para ver cada caso, consulte o portal oficial.</p></details>
+      <details><summary>Fonte de recurso</summary>
+        <p>É a “caixa” de onde saiu o dinheiro: impostos da cidade, verbas da saúde enviadas pela União, recursos da educação etc. Algumas fontes só podem ser usadas para fins específicos.</p></details>
+      <details><summary>Dotação</summary>
+        <p>É o valor que o orçamento aprovado reserva para cada tipo de gasto no ano. Esta página ainda não mostra dotações.</p></details>
+      <details><summary>Restos a pagar</summary>
+        <p>São despesas que foram reservadas num ano e só foram pagas depois. A fonte tem uma consulta separada para elas, que ainda não está nesta página.</p></details>
+      <details><summary>Por que alguns CPFs aparecem incompletos?</summary>
+        <p>Para proteger dados pessoais, mostramos só parte do número de pessoas físicas. O dado completo está no portal oficial.</p></details>
+    </section>
+  </div>
+  </div><!-- fim da aba de gastos -->
+
+  <!-- ================= SERVIDORES (cópia diária da lista oficial, feita pelo robô) =================
+       Os dados vêm de dados/pessoal.js, gerado uma vez por dia por ferramentas/fontes/pessoal.py. -->
+  <div id="aba-servidores" class="oculto">
+    <h2 class="titulo-pagina">Servidores e remunerações</h2>
+    <div id="pessoalEstado" role="status" aria-live="polite"></div>
+    <div id="pessoalDesatualizado"></div>
+    <div id="pessoalConteudo" class="oculto">
+      <!-- PESQUISA DE SERVIDOR (EmployeeSearch): busca sem diferença de acentos e maiúsculas, filtros e tabela paginada.
+           Cada nome abre a ficha do registro. -->
+      <section aria-labelledby="t-busca" id="sec-lista" class="pesquisa-servidor">
+        <h2 id="t-busca">Pesquisar servidor</h2>
+        <form class="linha-busca" id="formServidor" role="search">
+          <label for="buscaServidor" class="visualmente-oculto">Nome, cargo ou setor do servidor</label>
+          <input type="search" id="buscaServidor" placeholder="Digite o nome, o cargo ou o setor" autocomplete="off">
+          <button type="submit">Pesquisar</button>
+        </form>
+        <div class="filtros">
+          <div><label for="filtroCargo">Cargo</label><select id="filtroCargo"><option value="">Todos</option></select></div>
+          <div><label for="filtroVinculo">Vínculo</label><select id="filtroVinculo"><option value="">Todos</option></select></div>
+          <div><label for="filtroSetor">Setor (lotação)</label><select id="filtroSetor"><option value="">Todos</option></select></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparFiltros">Limpar filtros</button></div>
+        </div>
+        <div class="chips" id="chipsServidores"></div>
+        <!-- O id NÃO pode ser "servidores": o link #servidores pularia direto para esta lista. -->
+        <div id="listaServidores"></div>
+      </section>
+
+      <p class="frase" id="pessoalFrase"></p>
+      <p class="nota" id="pessoalNota"></p>
+      <div id="origemPessoal"></div>
+      <!-- NÚMEROS-RESUMO: montados por js/pessoal-tela.js -->
+      <div class="numeros" id="pessoalNumeros"></div>
+
+      <!-- DESTAQUE: prefeito, vice e secretários. Só aparece se esses cargos estiverem na lista. -->
+      <section aria-labelledby="t-politicos" id="secPoliticos" class="oculto">
+        <h2 id="t-politicos">Cargos de prefeito, vice-prefeito e secretário municipal</h2>
+        <p class="sub">Registros cujo cargo, na lista oficial, tem um desses nomes. O filtro olha só o nome do cargo. Toque no nome para abrir a ficha.</p>
+        <div id="politicos"></div>
+      </section>
+
+      <div class="duas-colunas">
+        <!-- VÍNCULOS: efetivo, temporário, comissionado... -->
+        <section aria-labelledby="t-vinculos">
+          <h2 id="t-vinculos">Tipos de vínculo</h2>
+          <p class="sub">Efetivos, temporários, cargos de indicação e outros. Toque em “Ver na lista” para filtrar.</p>
+          <ul class="lista" id="vinculos"></ul>
+        </section>
+        <!-- DISTRIBUIÇÃO DOS SALÁRIOS-BASE: quantos registros em cada faixa. -->
+        <section aria-labelledby="t-faixas">
+          <h2 id="t-faixas">Quantos registros em cada faixa de salário-base</h2>
+          <p class="sub">Cada coluna é uma faixa de valor. Salário-base não é o que a pessoa recebe no mês.</p>
+          <div id="faixasSalario"></div>
+        </section>
+      </div>
+
+      <!-- COMISSIONADOS: cargos de indicação, agrupados por setor (lista clicável). -->
+      <section aria-labelledby="t-comissionados">
+        <h2 id="t-comissionados">Cargos de indicação (comissionados) por setor</h2>
+        <p class="sub" id="comissionadosResumo"></p>
+        <ul class="lista" id="comissionados"></ul>
+      </section>
+
+      <section aria-labelledby="t-sobre-lista">
+        <h2 id="t-sobre-lista">Sobre esta lista</h2>
+        <h3>O que é salário-base?</h3>
+        <p>É o valor-base do cargo. O que a pessoa recebe de fato no mês pode ser maior (gratificações, adicionais, horas extras) ou menor (descontos). O valor completo está na <a id="lnkSalarios2" target="_blank" rel="noopener">Relação Funcionário x Salário do portal oficial</a>.</p>
+        <h3>O que não mostramos, e por quê</h3>
+        <p>A fonte também publica CPF parcial, matrícula, horário, local de trabalho e se a pessoa está afastada. Não mostramos esses dados: eles não ajudam a fiscalizar e poderiam servir para localizar alguém ou revelar uma licença de saúde. Por isso também não há planilha para baixar com a lista inteira.</p>
+        <h3>Quem não está aqui</h3>
+        <p id="pessoalAusentes"></p>
+      </section>
+    </div>
+  </div><!-- fim da aba de servidores -->
+
+  <!-- ================= CONTRATOS E LICITAÇÕES (PNCP, cópia diária) ================= -->
+  <div id="aba-contratos" class="oculto">
+    <h2 class="titulo-pagina">Contratos e licitações</h2>
+    <div id="contratosEstado" role="status" aria-live="polite"></div>
+    <div id="contratosDesatualizado"></div>
+    <div id="contratosConteudo" class="oculto">
+      <p class="frase" id="contratosFrase"></p>
+      <p class="nota" id="contratosNota"></p>
+      <div id="origemContratos"></div>
+      <div class="numeros" id="contratosNumeros"></div>
+
+      <div class="duas-colunas">
+        <section aria-labelledby="t-fornecedores" id="sec-fornecedores">
+          <h2 id="t-fornecedores">Quem mais tem contratos</h2>
+          <p class="sub">Soma do “valor global” (o valor total previsto no contrato, que não é o que já foi pago). Estar no topo não indica irregularidade. Toque no nome para abrir a ficha.</p>
+          <div id="listaFornecedores"></div>
+        </section>
+        <section aria-labelledby="t-modalidades">
+          <h2 id="t-modalidades">Como foi a escolha do fornecedor</h2>
+          <p class="sub">Licitações e compras por modalidade. Dispensa e inexigibilidade são compras sem disputa entre fornecedores, que a lei permite em casos específicos.</p>
+          <div id="graficoModalidades"></div>
+        </section>
+      </div>
+
+      <section aria-labelledby="t-lista-contratos" id="sec-contratos">
+        <h2 id="t-lista-contratos">Contratos</h2>
+        <div class="filtros">
+          <div><label for="buscaContrato">Fornecedor, CNPJ ou objeto</label><input type="search" id="buscaContrato" autocomplete="off"></div>
+          <div><label for="filtroOrgaoContrato">Órgão</label><select id="filtroOrgaoContrato"><option value="">Todos</option></select></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparContratos">Limpar filtros</button></div>
+        </div>
+        <div class="chips" id="chipsContratos"></div>
+        <div id="listaContratos"></div>
+        <p><button type="button" class="sec" id="csvContratos">Baixar estes contratos (planilha CSV)</button></p>
+      </section>
+
+      <section aria-labelledby="t-compras" id="sec-compras">
+        <h2 id="t-compras">Licitações e compras</h2>
+        <div class="filtros">
+          <div><label for="buscaCompra">Objeto</label><input type="search" id="buscaCompra" autocomplete="off"></div>
+          <div><label for="filtroModalidade">Modalidade</label><select id="filtroModalidade"><option value="">Todas</option></select></div>
+          <div><label for="filtroOrgaoCompra">Órgão</label><select id="filtroOrgaoCompra"><option value="">Todos</option></select></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparCompras">Limpar filtros</button></div>
+        </div>
+        <div class="chips" id="chipsCompras"></div>
+        <div id="listaCompras"></div>
+        <p><button type="button" class="sec" id="csvCompras">Baixar estas licitações (planilha CSV)</button></p>
+      </section>
+    </div>
+  </div><!-- fim da aba de contratos -->
+
+  <!-- ================= CONTAS PÚBLICAS (Tesouro Nacional e FNDE, cópias diárias) =================
+       Cada seção só aparece se a fonte dela tiver dados. Nenhuma depende do mês escolhido em "Gastos do mês". -->
+  <div id="aba-contas" class="oculto">
+    <h2 class="titulo-pagina">Contas públicas</h2>
+    <p class="nota">Relatórios que o próprio município envia ao Governo Federal. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos do mês”.</p>
+    <nav class="sumario oculto" id="contasSumario" aria-label="Seções desta página"></nav>
+    <div id="contasEstado" role="status" aria-live="polite"></div>
+    <div id="contasDesatualizado"></div>
+
+    <section aria-labelledby="t-lrf" id="sec-pessoal" class="oculto">
+      <h2 id="t-lrf">Gasto com pessoal e os limites da LRF</h2>
+      <p class="sub">A Lei de Responsabilidade Fiscal limita quanto da receita a Prefeitura e a Câmara podem gastar com pessoal (salários, encargos, aposentadorias).</p>
+      <div id="contasConteudo" class="duas-colunas"></div>
+      <details><summary>O que significam os limites?</summary>
+        <p>A conta é feita sobre a “receita corrente líquida”, que é o dinheiro que entra de forma regular (impostos e repasses), descontadas algumas transferências.</p>
+        <ul>
+          <li><strong>Limite de alerta:</strong> o Tribunal de Contas avisa o município.</li>
+          <li><strong>Limite prudencial:</strong> o município passa a ter restrições, como não poder criar cargos ou dar aumentos.</li>
+          <li><strong>Limite máximo:</strong> o município precisa reduzir o gasto e pode sofrer sanções.</li>
+        </ul>
+        <p class="meta">Os percentuais e limites são os que o próprio município declarou ao Tesouro Nacional no Relatório de Gestão Fiscal. O site não recalcula.</p>
+      </details>
+    </section>
+
+    <section aria-labelledby="t-transf" id="sec-transferencias" class="oculto">
+      <h2 id="t-transf">Dinheiro que a União repassa ao município</h2>
+      <p class="sub">Transferências obrigatórias pela Constituição, como o Fundo de Participação dos Municípios (FPM) e o FUNDEB. Não incluem convênios nem emendas parlamentares.</p>
+      <div class="filtros">
+        <div><label for="anoTransf">Ano</label><select id="anoTransf"></select></div>
+        <div><label for="tipoTransf">Tipo</label><select id="tipoTransf"><option value="">Todos os tipos</option></select></div>
+      </div>
+      <p class="frase-media" id="transfFrase"></p>
+      <div id="transfGrafico"></div>
+      <h3>Por tipo de transferência</h3>
+      <div id="transfTabela"></div>
+      <p><button type="button" class="sec" id="csvTransf">Baixar este ano (planilha CSV)</button></p>
+      <div id="transfOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-convenios" id="sec-convenios" class="oculto">
+      <h2 id="t-convenios">Convênios com o Governo Federal</h2>
+      <p class="sub">Acordos em que um órgão federal repassa dinheiro para um projeto em Videira (obras, equipamentos, programas). “Valor” é o total combinado; “liberado” é quanto já saiu. Os dois não se somam.</p>
+      <div class="numeros" id="conveniosNumeros"></div>
+      <div class="filtros">
+        <div><label for="buscaConvenio">Objeto, órgão ou convenente</label><input type="search" id="buscaConvenio" autocomplete="off"></div>
+        <div><label for="situacaoConvenio">Situação</label><select id="situacaoConvenio"><option value="">Todas</option></select></div>
+      </div>
+      <div class="chips" id="chipsConvenios"></div>
+      <div id="conveniosTabela"></div>
+      <p><button type="button" class="sec" id="csvConvenios">Baixar os convênios filtrados (planilha CSV)</button></p>
+      <div id="conveniosOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-beneficios" id="sec-beneficios" class="oculto">
+      <h2 id="t-beneficios">Benefícios federais pagos em Videira</h2>
+      <p class="sub">Total pago por mês às famílias de Videira pelo Bolsa Família e pelo Benefício de Prestação Continuada (BPC). São totais do município: nenhuma pessoa é identificada.</p>
+      <div class="filtros"><div><label for="programaBeneficio">Programa</label><select id="programaBeneficio"></select></div></div>
+      <p class="frase-media" id="beneficioFrase"></p>
+      <div id="beneficioGrafico"></div>
+      <details><summary>Ver os números de cada mês</summary><div id="beneficioTabela"></div></details>
+      <div id="beneficiosOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-areas" id="sec-areas" class="oculto">
+      <h2 id="t-areas">Em que áreas o dinheiro foi gasto no ano</h2>
+      <p class="sub">Despesa por “função” (a grande área: saúde, educação, urbanismo...), das contas anuais enviadas ao Tesouro. Toque em uma área para ver como ela se divide.</p>
+      <div class="filtros">
+        <div><label for="anoDca">Ano</label><select id="anoDca"></select></div>
+        <div><label for="etapaDca">Etapa</label><select id="etapaDca"><option value="empenhado">Empenhado</option><option value="liquidado">Liquidado</option><option value="pago">Pago</option></select></div>
+      </div>
+      <p class="frase-media" id="dcaFrase"></p>
+      <ul class="lista" id="dcaLista"></ul>
+      <p><button type="button" class="sec" id="csvDca">Baixar este ano (planilha CSV)</button></p>
+      <div id="dcaOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-educacao" id="sec-educacao" class="oculto">
+      <h2 id="t-educacao">Gastos com educação</h2>
+      <p class="sub">Indicadores que o município declara ao FNDE (Ministério da Educação) no SIOPE. Quando há um mínimo exigido por lei, ele aparece ao lado.</p>
+      <div id="siopeDestaques" class="numeros"></div>
+      <details><summary>Ver todos os indicadores</summary><div id="siopeTabela"></div></details>
+      <div id="siopeOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-entregas" id="sec-entregas" class="oculto">
+      <h2 id="t-entregas">Relatórios enviados ao Tesouro</h2>
+      <p class="sub">Quando a Prefeitura e a Câmara enviaram, pela última vez, cada relatório obrigatório. O site mostra só o que a fonte informa: não avalia se o envio foi no prazo.</p>
+      <div id="entregasTabela"></div>
+      <div id="entregasOrigem"></div>
+    </section>
+  </div><!-- fim da aba de contas -->
+
+  <!-- ================= CÂMARA DE VEREADORES (API de dados abertos da Câmara, cópia diária) ================= -->
+  <div id="aba-camara" class="oculto">
+    <h2 class="titulo-pagina">Câmara de Vereadores</h2>
+    <p class="sub">Quem são os vereadores de Videira e o que a Câmara colocou em pauta. Dados publicados pela própria Câmara.</p>
+    <div id="camaraEstado" role="status" aria-live="polite"></div>
+    <div id="camaraDesatualizado"></div>
+    <div id="camaraConteudo" class="oculto">
+      <div id="origemCamara"></div>
+      <section aria-labelledby="t-vereadores" id="sec-vereadores">
+        <h2 id="t-vereadores">Vereadores em exercício</h2>
+        <p class="sub" id="vereadoresResumo"></p>
+        <ul class="cartoes-pessoas" id="listaVereadores"></ul>
+        <p class="meta">Salários e folha de pagamento da Câmara: <a id="lnkFolhaCamara" target="_blank" rel="noopener noreferrer">folhas publicadas pela Câmara</a> (arquivos da própria Câmara).</p>
+      </section>
+      <section aria-labelledby="t-pautas" id="sec-pautas">
+        <h2 id="t-pautas">Pautas das sessões</h2>
+        <div class="filtros">
+          <div><label for="buscaPauta">Procurar na pauta</label><input type="search" id="buscaPauta" autocomplete="off"></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparPauta">Limpar</button></div>
+        </div>
+        <div id="listaPautas"></div>
+      </section>
+    </div>
+  </div><!-- fim da aba da Câmara -->
+
+  <!-- ================= SOBRE E METODOLOGIA =================
+       Texto fixo: explica o projeto, como ler os números, como cada um é calculado e de onde vem. -->
+  <div id="aba-sobre" class="oculto">
+    <h2 class="titulo-pagina">Sobre e metodologia</h2>
+    <section aria-labelledby="t-sobre">
+      <h2 id="t-sobre">Sobre o Olho Mágico</h2>
+      <p>O Olho Mágico é um portal <strong>independente</strong> e gratuito que organiza informações públicas da Prefeitura de Videira (SC) para que qualquer pessoa consiga entendê-las e conferi-las.</p>
+      <ul>
+        <li>Não é um site oficial da Prefeitura nem da Câmara.</li>
+        <li>Todos os dados vêm de fontes públicas oficiais. Em caso de diferença, <strong>a fonte oficial prevalece</strong>.</li>
+        <li>Pode haver atraso entre a publicação oficial e o que aparece aqui.</li>
+        <li>O projeto busca ser imparcial: mostra fatos e fontes, sem julgar pessoas.</li>
+        <li>O código do site é aberto: qualquer pessoa pode conferir como cada número é calculado.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-interpretar">
+      <h2 id="t-interpretar">Como interpretar os dados</h2>
+      <ul>
+        <li><strong>Valor alto não é irregularidade.</strong> Uma folha de pagamento ou um hospital custam muito por natureza. Os números mostram fatos, não culpa.</li>
+        <li><strong>Empenhado, liquidado e pago são etapas da mesma despesa.</strong> Não some os três.</li>
+        <li><strong>Salário-base não é o que a pessoa recebe no mês.</strong> O valor recebido pode ser maior (gratificações, adicionais) ou menor (descontos).</li>
+        <li><strong>Um mês sozinho conta pouco.</strong> Alguns pagamentos se concentram em certos meses (13º salário, etapas de obras). Compare meses diferentes antes de tirar conclusões.</li>
+        <li><strong>Na dúvida, confira na fonte.</strong> Toda informação tem a caixa “Origem da informação”, com o link oficial.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-metodo">
+      <h2 id="t-metodo">Metodologia</h2>
+      <h3>Gastos da Prefeitura</h3>
+      <ul>
+        <li>A consulta é feita <strong>na hora</strong>, pelo seu navegador, na API de Dados Abertos (Contabilidade), para o mês escolhido (do dia 1 ao último dia).</li>
+        <li>A API entrega totais por órgão, unidade, fonte de recurso e credor. Os totais do site são a <strong>soma simples</strong> desses valores, sem nenhum ajuste.</li>
+        <li>Um credor que aparece em vários órgãos é somado <strong>pelo CPF ou CNPJ</strong> (ou pelo nome, quando não há documento). Nomes parecidos não são juntados.</li>
+        <li>Linhas com valores que não são números são <strong>ignoradas e contadas</strong>: o site avisa quantas foram.</li>
+        <li>As porcentagens são calculadas sobre o total <strong>pago</strong> no mês.</li>
+      </ul>
+      <h3>Servidores e salários</h3>
+      <ul>
+        <li>A lista vem da API de Pessoal e é <strong>copiada uma vez por dia</strong> por um robô (código em <code>ferramentas/atualizar_pessoal.py</code>). A data da cópia aparece na aba.</li>
+        <li>Inclui quem está trabalhando ou afastado (opção padrão da API). Cada <strong>registro é um vínculo (matrícula)</strong>: quem tem dois cargos aparece duas vezes.</li>
+        <li>Mostramos o <strong>salário-base</strong> publicado pela fonte. A soma dos salários-base não é o custo da folha.</li>
+        <li>O destaque de prefeito, vice-prefeito e secretário municipal é filtrado <strong>só pelo nome do cargo</strong> na lista oficial.</li>
+      </ul>
+      <h3>Contratos e licitações</h3>
+      <ul>
+        <li>Cópia diária do PNCP: licitações e compras publicadas com o código IBGE de Videira (4219309) nos últimos 12 meses, e os contratos do CNPJ de cada órgão que apareceu nelas.</li>
+        <li>Itens repetidos são removidos pelo número de controle do PNCP. Cada item tem link para o registro oficial.</li>
+        <li>“Maiores fornecedores” soma o <strong>valor global</strong> (previsto) dos contratos, juntando pelo CNPJ. Não é o valor pago.</li>
+      </ul>
+      <h3>Contas públicas</h3>
+      <ul>
+        <li><strong>Gasto com pessoal:</strong> cópia diária do Relatório de Gestão Fiscal (RGF) enviado pelo município ao SICONFI (Tesouro Nacional), para a Prefeitura e para a Câmara.</li>
+        <li><strong>Repasses da União:</strong> cópia diária das transferências constitucionais (FPM, FUNDEB, ITR e outras) publicadas pelo Tesouro Nacional, por mês e por tipo. A comparação com o ano anterior usa sempre os mesmos meses. Valores negativos (ajustes) entram como a fonte publica.</li>
+        <li><strong>Despesa por área:</strong> Declaração de Contas Anuais (DCA, Anexo I-E). Empenhado, liquidado e pago aparecem separados; as porcentagens são sobre a soma das áreas na mesma etapa.</li>
+        <li><strong>Educação:</strong> indicadores declarados ao SIOPE (FNDE). O mínimo legal só aparece quando o nome do indicador deixa claro qual é (25% em manutenção e desenvolvimento do ensino; 70% do FUNDEB na remuneração dos profissionais).</li>
+        <li><strong>Relatórios enviados:</strong> extrato de entregas do SICONFI. O site não avalia prazos.</li>
+        <li>Mostramos os percentuais e limites como estão no relatório. A faixa (abaixo ou acima do alerta, do prudencial e do máximo) é uma comparação direta com esses limites.</li>
+        <li>Fontes diferentes podem mostrar valores diferentes, porque usam períodos e critérios contábeis diferentes. Isso não indica, por si só, erro ou irregularidade.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-fichas">
+      <h2 id="t-fichas">Fichas e pesquisa geral</h2>
+      <ul>
+        <li>A <strong>ficha de servidor</strong> é de um <strong>registro</strong> (vínculo) da lista oficial, não de uma pessoa. O endereço dela é montado com nome, cargo e mês de admissão; se a pessoa mudar de cargo, o endereço muda.</li>
+        <li>A <strong>ficha de fornecedor</strong> junta os contratos do PNCP e os pagamentos da Prefeitura <strong>só pelo CNPJ</strong>. Nomes parecidos nunca são juntados, e pessoas físicas não têm os pagamentos procurados.</li>
+        <li>Cada ficha diz o que existe nela, o que está só no portal oficial e o que não tem fonte aberta.</li>
+        <li>A pesquisa geral procura, ao mesmo tempo, em servidores, fornecedores, contratos e licitações. Nome igual não quer dizer mesma pessoa ou empresa.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-situacao" id="sec-situacao">
+      <h2 id="t-situacao">Situação das fontes</h2>
+      <p class="sub">Quando cada conjunto de dados foi copiado pela última vez. Cada fonte é atualizada separadamente: se uma falhar, as outras seguem normais.</p>
+      <ul id="listaSituacao"></ul>
+    </section>
+
+    <section aria-labelledby="t-fontes-oficiais">
+      <h2 id="t-fontes-oficiais">Fontes oficiais usadas</h2>
+      <ul>
+        <li><a href="https://videira.atende.net/transparencia/item/api-de-dados-abertos-contabilidade" target="_blank" rel="noopener">API de Dados Abertos (Contabilidade)</a>: gastos por mês.</li>
+        <li><a href="https://videira.atende.net/api/transparencia-pessoal-funcionarios" target="_blank" rel="noopener">API de Pessoal</a>: lista de servidores, cargos e salários-base.</li>
+        <li><a href="https://pncp.gov.br" target="_blank" rel="noopener">PNCP: Portal Nacional de Contratações Públicas</a>: licitações, compras e contratos (cada item com link para o registro oficial).</li>
+        <li><a href="https://siconfi.tesouro.gov.br/" target="_blank" rel="noopener">SICONFI (Tesouro Nacional)</a>: Relatório de Gestão Fiscal (gasto com pessoal e limites da LRF), contas anuais (despesa por área) e extrato de entregas.</li>
+        <li><a href="https://www.tesourotransparente.gov.br/" target="_blank" rel="noopener">Tesouro Nacional, transferências constitucionais</a>: repasses obrigatórios da União ao município.</li>
+        <li><a href="https://www.fnde.gov.br/siope" target="_blank" rel="noopener">SIOPE (FNDE)</a>: indicadores de gastos com educação.</li>
+        <li><a href="https://portaldatransparencia.gov.br/" target="_blank" rel="noopener">Portal da Transparência do Governo Federal (CGU)</a>: convênios federais com Videira e totais mensais do Bolsa Família e do BPC (consulta com chave de acesso, guardada só no robô).</li>
+        <li><a href="https://www.camaravideira.sc.gov.br/dadosabertos" target="_blank" rel="noopener">Dados abertos da Câmara de Videira</a>: vereadores em exercício e pautas das sessões (consulta com token, guardado só no robô).</li>
+        <li><a href="https://videira.atende.net/transparencia/item/pagamentos" target="_blank" rel="noopener">Consulta de Pagamentos</a>: cada pagamento, com empenho e licitação (só no portal oficial).</li>
+        <li><a href="https://videira.atende.net/transparencia/item/relacao-funcionario-x-salario" target="_blank" rel="noopener">Relação Funcionário x Salário</a>: remuneração completa de cada mês (só no portal oficial).</li>
+      </ul>
+      <p class="meta">As duas consultas “só no portal oficial” são protegidas contra acesso automático, e este site respeita essa proteção.</p>
+    </section>
+
+    <section aria-labelledby="t-privacidade">
+      <h2 id="t-privacidade">Privacidade</h2>
+      <p>Pagamentos da Prefeitura e nomes, cargos e salários de servidores são <strong>informações públicas</strong> pela Lei de Acesso à Informação (Lei 12.527/2011). Mesmo assim, mostramos só o necessário:</p>
+      <ul>
+        <li>CPF de pessoa física aparece mascarado. Matrícula, horário, local de trabalho e afastamentos não são mostrados nem guardados.</li>
+        <li>O site não tem cadastro, não usa cookies de rastreamento e não guarda o que você pesquisa.</li>
+        <li>A fonte de letra vem do Google Fonts; por isso, o Google recebe o endereço de internet de quem abre o site.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-falta">
+      <h2 id="t-falta">O que ainda não está aqui</h2>
+      <p>Remuneração mensal completa e diárias de cada servidor (só no portal oficial, com proteção contra acesso automático), receitas próprias, orçamento previsto, restos a pagar, obras, emendas parlamentares, e os projetos de lei e votações da Câmara. Só vão aparecer quando houver uma fonte oficial que possa ser consultada e conferida, sem números inventados.</p>
+    </section>
+  </div><!-- fim da aba sobre -->
+</main>
+    <footer><div class="wrap">
+  Sem banco de dados. Os gastos são buscados na hora e ficam só na memória do seu navegador. Servidores, contratos e contas são cópias das fontes oficiais, refeitas uma vez por dia (veja a situação de cada uma na aba Sobre).
+</div></footer>
+  </div><!-- fim .principal -->
+</div><!-- fim .app -->
+
+<!-- CAIXA DE APOIO (Pix): elemento <dialog> nativo, já acessível (teclado, Esc fecha, foco preso). -->
+<dialog id="dlgApoio" aria-labelledby="tApoio">
+  <h2 id="tApoio">Apoie o projeto</h2>
+  <p>Este site é gratuito e independente. Se ele te ajudou, contribua com qualquer valor por Pix. O dinheiro ajuda a pagar domínio e hospedagem.</p>
+  <p class="meta">A contribuição é voluntária e não dá acesso a nada nem influencia o conteúdo do site.</p>
+  <p class="meta">Chave Pix:</p>
+  <code id="pixChave"></code>
+  <p><button type="button" id="copiarPix">Copiar chave</button> <button type="button" class="sec" id="fecharApoio">Fechar</button></p>
+  <p class="meta" id="pixMsg" role="status"></p>
+</dialog>
+
+
+
+<!-- SCRIPTS (ordem importa): config -> utilitários -> fontes -> regras (sem tela) -> componentes -> telas -> rotas -> início -->
+<script src="js/config.js"></script>
+<script src="js/utilitarios.js"></script>
+<script src="js/fontes/despesas.js"></script>
+<script src="js/fontes/arquivos.js"></script>
+<script src="js/fontes/pessoal.js"></script>
+<script src="js/agregacao.js"></script>
+<script src="js/pessoal-regras.js"></script>
+<script src="js/contratos-regras.js"></script>
+<script src="js/contas-regras.js"></script>
+<script src="js/transferencias-regras.js"></script>
+<script src="js/busca-regras.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/origem.js"></script>
+<script src="js/exportar.js"></script>
+<script src="js/interface.js"></script>
+<script src="js/componentes/graficos.js"></script>
+<script src="js/componentes/tabela.js"></script>
+<script src="js/componentes/filtros.js"></script>
+<script src="js/componentes/blocos.js"></script>
+<script src="js/componentes/menu.js"></script>
+<script src="js/apoio.js"></script>
+<script src="js/pessoal-tela.js"></script>
+<script src="js/contratos-tela.js"></script>
+<script src="js/contas-tela.js"></script>
+<script src="js/inicio-tela.js"></script>
+<script src="js/busca-tela.js"></script>
+<script src="js/fichas.js"></script>
+<script src="js/camara-tela.js"></script>
+<script src="js/situacao-tela.js"></script>
+<script src="js/rotas.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

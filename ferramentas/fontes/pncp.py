@@ -111,6 +111,7 @@ def coletar(municipio, pausa=2.5, avisar=print, hoje=None):   # PNCP limita cons
 
     compras = {}
     for mod in MODALIDADES:
+        avisar(f"  pncp: licitações da modalidade {mod} de {len(MODALIDADES)}")   # mostra que não travou
         url = lambda p, mod=mod: (f"{base}/api/consulta/v1/contratacoes/publicacao?dataInicial={ini}&dataFinal={fim}"
                                   f"&codigoModalidadeContratacao={mod}&codigoMunicipioIbge={municipio['codigo_ibge']}"
                                   f"&pagina={p}&tamanhoPagina={POR_PAGINA}")
@@ -123,7 +124,8 @@ def coletar(municipio, pausa=2.5, avisar=print, hoje=None):   # PNCP limita cons
     # Contratos: consultamos o CNPJ do município e o de cada órgão que apareceu nas compras (fundos, autarquias...).
     cnpjs = sorted({municipio["cnpj"]} | {c["orgaoCnpj"] for c in compras.values() if c["orgaoCnpj"]})
     contratos = {}
-    for cnpj in cnpjs:
+    for i, cnpj in enumerate(cnpjs, 1):
+        avisar(f"  pncp: contratos do órgão {i} de {len(cnpjs)} (CNPJ {cnpj[:2]}.{cnpj[2:5]}...)")   # mostra que não travou
         url = lambda p, cnpj=cnpj: (f"{base}/api/consulta/v1/contratos?dataInicial={ini}&dataFinal={fim}"
                                     f"&cnpjOrgao={cnpj}&pagina={p}")
         for c in _paginas(url, None, pausa):

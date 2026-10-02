@@ -1,77 +1,98 @@
-# Olho Mágico
+# 👁️ Olho Mágico
 
-Portal independente de transparência de Videira/SC.
+> Portal independente de transparência de Videira/SC.
 
-Site independente que mostra, em linguagem simples:
-- **Gastos da Prefeitura**: quanto foi pago, a quem, por qual secretaria e de onde veio o dinheiro (busca ao vivo).
-- **Servidores**: quem trabalha na Prefeitura, vínculo, cargo, setor e salário-base (cópia diária da API de Pessoal).
-- **Contratos**: licitações, compras e contratos publicados no PNCP, com link para cada registro oficial (cópia diária).
-- **Contas e limites**: gasto com pessoal × limites da Lei de Responsabilidade Fiscal, da Prefeitura e da Câmara (cópia diária do SICONFI).
+![GitHub Repo Size](https://shields.io)
+![Python](https://shields.io)
+![JavaScript](https://shields.io)
+![HTML5](https://shields.io)
+![CSS3](https://shields.io)
 
-Nada de banco de dados. Os gastos são buscados na hora. A lista de servidores é copiada uma vez por dia
-por um robô e publicada junto com o site, sem guardar cópias antigas.
+Site independente que mostra, em linguagem simples e acessível à população, dados cruciais da administração pública local.
 
-## Como abrir
-Dê duplo clique em `index.html`. Para ter as abas Servidores, Contratos e Contas no seu computador, rode antes
-`python ferramentas/atualizar.py` (atualiza todas as fontes; leva alguns minutos). Para publicar: `docs/COMO_PUBLICAR.md`.
+- **Gastos da Prefeitura**: Quanto foi pago, a quem, por qual secretaria e de onde veio o dinheiro (busca ao vivo).
+- **Servidores**: Quem trabalha na Prefeitura, vínculo, cargo, setor e salário-base (cópia diária da API de Pessoal).
+- **Contratos**: Licitações, compras e contratos publicados no PNCP, com link para cada registro oficial (cópia diária).
+- **Contas e limites**: Gasto com pessoal × limites da Lei de Responsabilidade Fiscal, da Prefeitura e da Câmara (cópia diária do SICONFI).
 
-## Pastas e arquivos
-- `index.html` — textos e estrutura (abas Gastos e Servidores)
-- `css/estilo.css` — cores e visual (paleta uva e vinho; mude as cores em `:root`)
-- `js/config.js` — configurações (nome, APIs, Pix, privacidade, explicações, vínculos)
-- `js/utilitarios.js` — funções pequenas (dinheiro, CPF mascarado, datas, endereço amigável)
-- `js/fontes/` — `despesas.js` (API de despesas, ao vivo), `arquivos.js` (carrega `dados/*.js`), `pessoal.js`
-- **Regras (sem tela, testadas):** `agregacao.js` (gastos), `pessoal-regras.js`, `contratos-regras.js`,
-  `contas-regras.js` (LRF, despesa por área, educação, entregas), `transferencias-regras.js`,
-  `busca-regras.js` (pesquisa geral), `historico.js` (vários meses de despesas, uma consulta por vez)
-- `js/dados.js` — carrega e prepara cada conjunto de dados uma vez só, para todas as telas
-- **Componentes:** `componentes/menu.js` (menu lateral e do celular), `componentes/blocos.js` (avisos de estado, cartões de indicador, abas da ficha), `componentes/graficos.js` (barras, colunas, histograma, medidor, vigência, sem biblioteca externa),
-  `componentes/tabela.js` (tabela ordenável, com paginação e modo cartão no celular),
-  `componentes/filtros.js` (chips de filtro e números-resumo), `origem.js` ("Origem da informação"), `exportar.js` (planilhas CSV)
-- **Telas:** `inicio-tela.js` (painel), `interface.js` (Gastos do mês), `pessoal-tela.js`, `contratos-tela.js`,
-  `contas-tela.js`, `camara-tela.js`, `busca-tela.js` (pesquisa geral), `fichas.js` (servidor, fornecedor, contrato), `situacao-tela.js`
-- `js/rotas.js` — navegação pelo endereço: `#inicio`, abas, `#gastos/2026-09`, `#contas/transferencias`, `#busca/termo`,
-  `#servidor/ID`, `#fornecedor/CNPJ`, `#contrato/ID`
-- `js/apoio.js` — botão e caixa de doação por Pix
-- `js/main.js` — liga tudo
-- `ferramentas/atualizar.py` — coordenador dos robôs: atualiza cada fonte separadamente e grava `dados/situacao.js`
-- `ferramentas/fontes/` — um adaptador por fonte: `pessoal.py`, `siconfi.py`, `pncp.py`, `transferencias.py`, `dca.py`, `entregas.py`, `siope.py`, `cgu.py` (chave `CGU_CHAVE`), `camara.py` (token `CAMARA_TOKEN`)
-- `ferramentas/comum.py` — peças comuns (download com novas tentativas, detecção de captcha, gravação segura)
-- `ferramentas/municipio.json` — identificação do município (IBGE, CNPJ, endereços): troque para usar em outra cidade
-- `ferramentas/atualizar_pessoal.py` — atalho antigo (só a lista de servidores)
-- `.github/workflows/publicar.yml` — roda testes + robô + publicação no GitHub, todo dia
-- `dados/` — onde o robô grava um arquivo por fonte (veja `dados/LEIA-ME.txt`)
-- `testes/` — `testes.html` (navegador), `rodar_testes.js` (`node testes/rodar_testes.js`) e `test_robos.py`
-  (`python -m unittest discover -s testes -p "test_*.py"`, com servidor simulado)
-- `docs/` — relatório do guia de front-end (`RELATORIO_GUIA_FRONTEND.md`), como publicar, relatório da auditoria (`AUDITORIA.md`), matriz de fontes oficiais (`FONTES.md`) e o pedido pela Lei de Acesso à Informação
+🚀 **Arquitetura Sem Banco de Dados:** Os gastos são buscados em tempo real diretamente das APIs oficiais. A lista de servidores é extraída uma vez por dia por uma automação de raspagem (robô) e disponibilizada estaticamente junto com o site, sem armazenamento de históricos passados.
 
-## Fontes de dados
-- Despesas: `https://videira.atende.net/api/WCPDadosAbertos/despesas` (API de Dados Abertos - Contabilidade)
-- Servidores: `https://videira.atende.net/api/transparencia-pessoal-funcionarios` (API de Pessoal)
-- Contratos: PNCP (`https://pncp.gov.br/api/consulta/v1/...`)
-- Contas: SICONFI (`https://apidatalake.tesouro.gov.br/ords/siconfi/tt/`: `rgf`, `dca`, `extrato_entregas`)
-- Repasses da União: Tesouro (`https://apiapex.tesouro.gov.br/aria/v1/transferencias_constitucionais/custom/`)
-- Educação: SIOPE/FNDE (`https://www.fnde.gov.br/olinda-ide/servico/DADOS_ABERTOS_SIOPE/versao/v1/odata/`)
-- Situação de todas as fontes investigadas: `docs/FONTES.md`
+---
 
-## Privacidade (decisões do projeto)
-- Gastos: CPF de pessoa física aparece mascarado. Para esconder também o nome, use
-  `MOSTRAR_NOME_PESSOA_FISICA: false` em `js/config.js`.
-- Servidores: mostramos nome, cargo, função, setor, vínculo, forma de ingresso, mês/ano de admissão,
-  horas por mês e salário-base. **Não** guardamos nem mostramos CPF, matrícula, horário,
-  local de trabalho nem a situação "afastado" (poderia revelar licença de saúde).
+## 🛠️ Como Abrir e Executar
 
-## Trocar o nome do site
-`NOME_SITE` em `js/config.js`, mais o `<title>` e as tags `og:` no `index.html`.
+1. **Visualização Local Básica:** Dê um duplo clique no arquivo `index.html`.
+2. **Atualizar Fontes Locais:** Para popular as abas de _Servidores_, _Contratos_ e _Contas_ no seu ambiente local, execute o script de sincronização no seu terminal:
+   ```bash
+   python ferramentas/atualizar.py
+   ```
+   _(Este processo consolida todas as fontes externas e pode levar alguns minutos)._
+3. **Guia de Deploy:** Para instruções detalhadas de publicação, consulte o documento `docs/COMO_PUBLICAR.md`.
 
-## Doações (Pix)
-`PIX_CHAVE` em `js/config.js` está com a chave FALSA `123456789`. **Troque antes de divulgar.**
-Se deixar vazio (''), o botão some. O site não guarda nenhum dado de quem doa.
+---
 
-## Explicações automáticas
-`EXPLICACOES` (credores) e `PESSOAL.VINCULOS` (tipos de vínculo) em `js/config.js`.
-Só acrescente regras que sejam certas pelo próprio nome.
+## 📁 Estrutura de Pastas e Arquivos
 
-## Próximas fontes
-- Câmara (vereadores, projetos, pautas, folhas): API da Câmara, que exige token.
-  O token nunca vai no site nem no GitHub; precisa de um intermediário (função serverless).
+| Arquivo / Diretório     | Descrição e Responsabilidade Técnica                                                                                                                                                                                                          |
+| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📄 `index.html`         | Textos base, casca da aplicação e estrutura de abas (_Gastos_ e _Servidores_).                                                                                                                                                                |
+| 🎨 `css/estilo.css`     | Identidade visual do projeto. Paleta em tons **Uva e Vinho** configurada nas variáveis `:root`.                                                                                                                                               |
+| ⚙️ `js/config.js`       | Configurações globais (Nome do site, Endereços de APIs, Chave Pix, Chaves de privacidade).                                                                                                                                                    |
+| 🧰 `js/utilitarios.js`  | Funções utilitárias globais (Formatação de moeda, Máscaras de CPF, Datas e slugs de URL).                                                                                                                                                     |
+| 🔌 `js/fontes/`         | Scripts de ingestão de dados da camada client-side (`despesas.js`, `arquivos.js`, `pessoal.js`).                                                                                                                                              |
+| 🧠 `js/...-regras.js`   | Motores de regras de negócio sem interface física, totalmente validados por testes unitários (`agregacao.js`, `pessoal-regras.js`, `contratos-regras.js`, `contas-regras.js`, `transferencias-regras.js`, `busca-regras.js`, `historico.js`). |
+| 📦 `js/dados.js`        | Inicializa, faz o cache e prepara cada dataset uma única vez na memória para compartilhamento entre telas.                                                                                                                                    |
+| 🧩 `js/componentes/`    | Blocos modulares reutilizáveis de interface (`menu.js`, `blocos.js`, `graficos.js` nativos, `tabela.js` paginada/ordenável, `filtros.js`, `origem.js`, `exportar.js` para planilhas CSV).                                                     |
+| 📺 `js/...-tela.js`     | Controladores de renderização e comportamento visual das visões da aplicação (`inicio-tela.js`, `interface.js`, `fichas.js`, `situacao-tela.js`, etc.).                                                                                       |
+| 🗺️ `js/rotas.js`        | Mecanismo de roteamento client-side baseado em hashes de URL (`#inicio`, `#servidor/ID`, etc.).                                                                                                                                               |
+| 🤝 `js/apoio.js`        | Gerenciador do componente de arrecadação financeira e exibição do QR Code Pix.                                                                                                                                                                |
+| 🎬 `js/main.js`         | Ponto de entrada (Bootstrap) que inicializa e orquestra todo o ecossistema do front-end.                                                                                                                                                      |
+| 🤖 `ferramentas/`       | Scripts de automação em Python (`atualizar.py`, adaptadores em `fontes/`, utilitários comuns em `comum.py` e metadados geográficos em `municipio.json`).                                                                                      |
+| 🚀 `.github/workflows/` | Pipeline de Integração Contínua (CI) que roda os testes unitários, dispara os robôs de atualização e publica a build estável de forma automatizada e diária no GitHub Pages.                                                                  |
+| 💾 `dados/`             | Diretório de destino onde os robôs persistem os outputs consolidados em formatos estáticos de dados.                                                                                                                                          |
+| 🧪 `testes/`            | Suite de testes automatizados web (`testes.html`), de runtime Node.js (`rodar_testes.js`) e testes Python de integração com servidores simulados (`test_robos.py`).                                                                           |
+| 📚 `docs/`              | Documentação arquitetural, guias de front-end, relatórios de auditoria, matriz de fontes legais de dados e registros da LAI.                                                                                                                  |
+
+---
+
+## 📡 Fontes de Dados Utilizadas
+
+- **Despesas Públicas:** API de Dados Abertos de Contabilidade (`https://videira.atende.net/api/WCPDadosAbertos/despesas`)
+- **Quadro de Servidores:** API de Gestão de Pessoal (`https://videira.atende.net/api/transparencia-pessoal-funcionarios`)
+- **Contratos e Licitações:** API Oficial do Portal Nacional de Contratações Públicas (`https://pncp.gov.br/api/consulta/v1/...`)
+- **Contabilidade Fiscal:** API Data Lake do SICONFI/Tesouro Nacional (`rgf`, `dca`, `extrato_entregas`)
+- **Transferências da União:** API Apex de Transferências Constitucionais do Tesouro
+- **Recursos da Educação:** OData Service do SIOPE/FNDE
+- _Mapeamento Técnico Detalhado:_ Acesse o arquivo interno em `docs/FONTES.md`.
+
+---
+
+## 🔒 Diretrizes de Privacidade e LGPD
+
+O projeto adota premissas rígidas para proteger informações sensíveis de cidadãos e servidores:
+
+- **Fluxo Financeiro:** CPFs de pessoas físicas passam por processos de mascaramento em tela. Para anonimização completa de nomes civis de CPFs, altere a flag `MOSTRAR_NOME_PESSOA_FISICA: false` em `js/config.js`.
+- **Recursos Humanos:** São públicos os dados corporativos: Nome, Cargo, Função, Setor, Vínculo, Tipo de Ingresso, Data de Admissão, Carga Horária e Salário-Base. **Não são armazenados ou exibidos** CPFs, Matrículas internas, Registros de Ponto Eletrônico ou Status de Afastamentos Médicos/Licenças.
+
+---
+
+## ✏️ Customização e Deploy em Outras Cidades
+
+### 1. Alteração do Nome da Aplicação
+
+Modifique a constante `NOME_SITE` no arquivo `js/config.js` e atualize as tags estáticas estruturais `<title>` e os metadados de compartilhamento Open Graph (`og:`) diretamente no `index.html`.
+
+### 2. Configuração de Chave Pix (Arrecadação)
+
+Preencha a propriedade `PIX_CHAVE` em `js/config.js`. Caso a string permaneça vazia (`''`), o componente visual de doação será completamente ocultado da interface final automaticamente.
+
+### 3. Dicionários e Regras de Negócio
+
+Para expandir ou refinar termos legais, utilize os dicionários estruturados `EXPLICACOES` (para indexação de credores) e `PESSOAL.VINCULOS` (mapeamento de tipos de contratação de RH) contidos em `js/config.js`.
+
+---
+
+## 🔮 Futuras Implementações e Extensões
+
+- **Câmara Municipal:** Integração de folhas de pagamento, projetos de lei e dados de vereadores via API do legislativo.
+  - _Nota de Segurança:_ Como a API da Câmara requer autenticação via Token privado, a credencial **nunca** deve trafegar no client-side ou ser exposta publicamente no repositório. O fluxo necessitará do desenvolvimento de uma camada intermediária segura usando funções assíncronas _Serverless_.

@@ -22,8 +22,8 @@ OBS.config = {
   CAMARA_FOLHAS: 'https://www.camaravideira.sc.gov.br/imprensa/transparencia/0/4/0/644262',
   // CHAVE PIX para doações. Deixe '' (vazio) e o botão "Apoie o projeto" fica ESCONDIDO.
   // Recomendado: uma chave aleatória, para não expor CPF/e-mail como chave.
-  // ATENÇÃO: '123456789' é uma chave FALSA, só para testar o botão. TROQUE antes de divulgar o site.
-  PIX_CHAVE: '123456789',
+  // Vazio por enquanto: o botão fica escondido até a chave verdadeira ser colocada aqui (nunca publicar chave falsa).
+  PIX_CHAVE: '',
 
   // EXPLICAÇÕES AUTOMÁTICAS: quando o nome do credor bate com o padrão, aparece um texto explicando.
   // Só coloque aqui o que for CERTO pelo próprio nome (não adivinhe). link: 'salarios' mostra o atalho do portal.

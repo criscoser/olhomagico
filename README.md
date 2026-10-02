@@ -2,8 +2,8 @@
 
 > Portal Independente de Transparência Fiscal e Administrativa (Videira/SC)
 
-[![Stack - JavaScript](https://shields.io)](https://mozilla.org)
-[![Stack - Python](https://shields.io)](https://python.org)
+[(https://shields.io)](https://mozilla.org)
+[(https://shields.io)](https://python.org)
 [![Architecture - Serverless](https://shields.io)](#arquitetura-e-fluxo-de-dados)
 [![License - MIT](https://shields.io)](LICENSE)
 

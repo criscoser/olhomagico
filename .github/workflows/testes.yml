@@ -1,0 +1,29 @@
+# TESTES EM PULL REQUEST: roda os mesmos testes da publicação sempre que alguém abre ou atualiza um PR.
+# Serve para a regra da branch "main" (Settings -> Rules -> Rulesets): com "Require status checks to pass"
+# apontando para o teste "testes", nada entra na main sem os testes verdes.
+# Este workflow NÃO publica nada e NÃO tem acesso a segredos.
+name: Testes
+
+on:
+  pull_request:
+  workflow_dispatch:        # cria o botão "Run workflow" na aba Actions
+
+# Só lê o código. Nada além disso.
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    name: testes            # nome da verificação que aparece no PR (é este que a regra da main exige)
+    runs-on: ubuntu-latest
+    steps:
+      # Ação FIXADA pelo código exato (SHA), igual à do workflow de publicação.
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Rodar os testes (site e robôs)
+        run: |
+          node testes/rodar_testes.js
+          python3 -m unittest discover -s testes -p "test_*.py"

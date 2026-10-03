@@ -1,5 +1,5 @@
 {
-  "_comentario": "Identificação do município. Para usar o Olho Mágico em outra cidade, troque estes valores (todos conferidos em fontes oficiais).",
+  "_comentario": "Identificação do município. Para usar o Olho Mágico em outra cidade, troque estes valores (todos conferidos em fontes oficiais). Passo a passo: docs/ADAPTAR_PARA_SUA_CIDADE.md",
   "nome": "Videira",
   "uf": "SC",
   "codigo_ibge": "4219309",

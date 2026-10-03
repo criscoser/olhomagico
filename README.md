@@ -54,6 +54,12 @@ _Nota: Este comando aciona o ecossistema de robôs em Python para atualizar as b
 
 O fluxo de deploy está documentado em diretrizes estritas no arquivo `docs/COMO_PUBLICAR.md`.
 
+### Use na sua cidade
+
+Quer montar um portal como este para o seu município? O passo a passo (códigos a trocar, como conferir cada
+um, fontes nacionais × locais e as regras de privacidade) está em
+[`docs/ADAPTAR_PARA_SUA_CIDADE.md`](docs/ADAPTAR_PARA_SUA_CIDADE.md).
+
 ---
 
 ## Estrutura Arquitetural do Repositório

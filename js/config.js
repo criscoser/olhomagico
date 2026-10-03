@@ -1,4 +1,5 @@
 /* CONFIGURAÇÕES: tudo que você pode querer mudar sem mexer na lógica.
+   QUER USAR O OLHO MÁGICO NA SUA CIDADE? Veja o passo a passo em docs/ADAPTAR_PARA_SUA_CIDADE.md.
    Criamos um "espaço de nomes" chamado OBS (window.OBS) para guardar todas as funções do projeto
    num lugar só, evitando misturar com variáveis soltas do navegador. */
 window.OBS = window.OBS || {};

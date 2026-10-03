@@ -278,6 +278,18 @@
     <section aria-labelledby="t-areas" id="sec-areas" class="oculto">
       <h2 id="t-areas">No ano fechado: em que áreas o dinheiro foi gasto</h2>
       <p class="sub">Despesa por “função” (a grande área: saúde, educação, urbanismo...), das contas anuais enviadas ao Tesouro. Toque em uma área para ver como ela se divide.</p>
+      <!-- Explica a diferença entre os números do mês (API de despesas) e os do ano por área (DCA). Fatos conferidos na
+           auditoria de 03/10/2026: a soma de 2025 da API, sem os pagamentos intraorçamentários, bate ao centavo com a DCA. -->
+      <details class="explica-diferenca">
+        <summary>Por que o total do mês e o total do ano por área não batem?</summary>
+        <p>São dois jeitos de olhar o mesmo dinheiro, e os números não precisam bater:</p>
+        <ul>
+          <li><strong>Agrupamento diferente.</strong> No mês, o gasto aparece por <em>órgão</em> (por exemplo, Fundo Municipal de Saúde). No ano, por <em>área</em> (por exemplo, Saúde). Um órgão pode gastar em mais de uma área.</li>
+          <li><strong>Pagamentos entre os próprios órgãos.</strong> O total do mês inclui pagamentos de um órgão do município para outro (por exemplo, contribuições das secretarias ao instituto de previdência). O total por área do ano não inclui esses pagamentos internos.</li>
+          <li><strong>Momento diferente.</strong> O total do mês é uma cópia diária da contabilidade. O do ano é a declaração entregue ao Tesouro depois que o ano fecha.</li>
+        </ul>
+        <p>Conferimos com os dados de 2025: somando os 12 meses e tirando os pagamentos entre os próprios órgãos, o valor pago bate ao centavo com o declarado ao Tesouro (R$ 339.350.747,32).</p>
+      </details>
       <div class="filtros">
         <div><label for="anoDca">Ano</label><select id="anoDca"></select></div>
         <div><label for="etapaDca">Etapa</label><select id="etapaDca"><option value="empenhado">Empenhado</option><option value="liquidado">Liquidado</option><option value="pago">Pago</option></select></div>

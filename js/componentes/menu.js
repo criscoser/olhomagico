@@ -21,14 +21,18 @@ OBS.menu = (function () {
     $('btnMenu').textContent = sim ? 'Fechar' : 'Menu';
   }
 
-  /* Tema: "escuro" (padrão) ou "claro". */
+  /* Tema: "claro" (padrão), "escuro", ou null = segue o modo do celular/computador (prefers-color-scheme).
+     O CSS já resolve a cor sozinho; aqui só marcamos a escolha da pessoa e acertamos o texto do botão. */
+  const sistemaEscuro = window.matchMedia('(prefers-color-scheme: dark)');
+  let escolhido = null;
+  const temaEfetivo = () => escolhido || (sistemaEscuro.matches ? 'escuro' : 'claro');
   function aplicarTema(tema) {
-    document.documentElement.dataset.tema = tema;
-    const claro = tema === 'claro';
-    $('btnTema').setAttribute('aria-pressed', String(claro));
+    escolhido = tema === 'claro' || tema === 'escuro' ? tema : null;
+    if (escolhido) document.documentElement.dataset.tema = escolhido; else delete document.documentElement.dataset.tema;
+    const claro = temaEfetivo() === 'claro';
     $('btnTemaTexto').textContent = claro ? 'Usar tema escuro' : 'Usar tema claro';
-    const cor = document.querySelector('meta[name="theme-color"]');
-    if (cor) cor.content = claro ? '#f3f6fa' : '#0b1a30';
+    // Cor da barra do navegador no celular: a mesma do fundo da página.
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = claro ? '#FAF8F5' : '#16111D'; });
   }
 
   /* Menu fixo aberto (só no computador). */
@@ -38,12 +42,14 @@ OBS.menu = (function () {
   }
 
   function iniciar() {
-    aplicarTema(lembrado('tema') === 'claro' ? 'claro' : 'escuro');
+    aplicarTema(lembrado('tema'));
     fixar(lembrado('menu-fixo') === 'sim');
     $('btnTema').addEventListener('click', () => {
-      const novo = document.documentElement.dataset.tema === 'claro' ? 'escuro' : 'claro';
+      const novo = temaEfetivo() === 'claro' ? 'escuro' : 'claro';
       aplicarTema(novo); lembrar('tema', novo);
     });
+    // Sem escolha guardada, acompanha a troca de modo do sistema (ex.: celular que escurece à noite).
+    sistemaEscuro.addEventListener('change', () => { if (!escolhido) aplicarTema(null); });
     $('btnFixar').addEventListener('click', () => {
       const sim = !document.body.classList.contains('menu-fixo');
       fixar(sim); lembrar('menu-fixo', sim ? 'sim' : 'nao');

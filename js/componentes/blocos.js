@@ -35,6 +35,30 @@ OBS.kpi = function (o) {
   return caixa;
 };
 
+/* CARTÃO-PERGUNTA (página inicial): a pergunta, a frase-resposta (camada 1), o valor exato, um extra opcional
+   (gráfico pequeno), o período e a fonte, e o link "Ver os detalhes".
+   O LINK é só o texto "Ver os detalhes" (com nome completo para leitores de tela), mas a área de toque é o cartão
+   inteiro (via CSS). Sem dado: o cartão continua, com um aviso, para a pergunta não sumir.
+   o = { pergunta, frase, exato, extra, periodo, fonte, href, indisponivel } */
+OBS.cartaoPergunta = function (o) {
+  const { el } = OBS;
+  const art = el('article', 'cartao-pergunta' + (o.indisponivel ? ' indisponivel' : ''));
+  art.append(el('h2', 'cartao-pergunta-titulo', o.pergunta));
+  if (o.frase) art.append(el('p', 'frase-resposta', o.frase));
+  if (o.exato) art.append(el('p', 'valor-exato', o.exato));
+  if (o.extra) art.append(o.extra);
+  const meta = [o.periodo && `Período: ${o.periodo}`, o.fonte && `Fonte: ${o.fonte}`].filter(Boolean).join(' · ');
+  if (meta) art.append(el('p', 'cartao-pergunta-meta', meta));
+  const seguro = OBS.urlSegura(o.href);
+  if (seguro) {
+    const a = el('a', 'cartao-pergunta-link', 'Ver os detalhes');
+    a.href = seguro;
+    a.setAttribute('aria-label', `Ver os detalhes: ${o.pergunta}`);
+    art.append(a);
+  }
+  return art;
+};
+
 /* ABAS INTERNAS (padrão "tablist" do WAI-ARIA): setas esquerda/direita trocam de aba, Home/End vão às pontas.
    abas = [{ id, titulo, montar: (painel) => {...} }]. Cada painel é montado só quando aberto pela 1ª vez. */
 OBS.abasInternas = function (prefixo, abas, rotulo) {

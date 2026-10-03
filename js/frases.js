@@ -83,10 +83,13 @@ OBS.frases = (function () {
       `O limite máximo da lei é ${pct(p.limiteMaximoPct)}.`;
   }
 
-  /* Pauta mais recente publicada pela Câmara. */
-  function pautaCamara(p) {
+  /* Pauta mais recente publicada pela Câmara. Data futura = sessão "marcada para"; passada = "de". */
+  function pautaCamara(p, hoje = new Date()) {
     const data = OBS.dataBR(p.data);
-    return `A pauta mais recente publicada pela Câmara é “${p.titulo}”${data ? `, de ${data}` : ''}.`;
+    if (!data) return `A pauta mais recente publicada pela Câmara é “${p.titulo}”.`;
+    const hojeIso = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+    const futura = String(p.data).slice(0, 10) > hojeIso;
+    return `A pauta mais recente publicada pela Câmara é “${p.titulo}”, ${futura ? 'marcada para' : 'de'} ${data}.`;
   }
 
   return { PROIBIDAS, opiniao, reais, pct, gastoDoMes, transferencias, pessoal, contratos, limitePessoal, pautaCamara };

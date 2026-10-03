@@ -588,3 +588,22 @@ abbr.sigla:hover, abbr.sigla[aria-expanded="true"] { text-decoration-style:solid
 .glossario-item p { margin:0 0 .35rem; }
 .glossario-item p:last-child { margin-bottom:0; }
 .glossario-nome { font-weight:700; }
+
+/* ---------- Página inicial: cartões-pergunta ----------
+   Um cartão por pergunta. O link é só "Ver os detalhes", mas o cartão inteiro é tocável (o ::after do link cobre o
+   cartão). Com o teclado, o contorno de foco aparece no cartão todo. Sem dado: borda tracejada e um aviso. */
+.cartoes-pergunta { display:grid; gap:var(--esp-4); grid-template-columns:repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); margin:var(--esp-5) 0 var(--esp-6); }
+.cartao-pergunta { position:relative; display:flex; flex-direction:column; gap:var(--esp-2); padding:var(--esp-5); background:var(--cartao);
+  border:1px solid var(--borda); border-radius:var(--raio); box-shadow:var(--sombra-1); }
+.cartao-pergunta:hover { border-color:var(--marca); }
+.cartao-pergunta:has(.cartao-pergunta-link:focus-visible) { outline:3px solid var(--foco); outline-offset:2px; }
+.cartao-pergunta-titulo { margin:0; font-size:var(--letra-h3); color:var(--marca); }
+.frase-resposta { margin:0; font-size:clamp(1.125rem, 1.02rem + .5vw, 1.375rem); line-height:1.35; font-weight:700; }
+.valor-exato, .cartao-pergunta-meta { margin:0; color:var(--texto-2); font-size:var(--letra-legenda); }
+.cartao-pergunta-link { margin-top:auto; padding-top:var(--esp-2); font-weight:700; }
+.cartao-pergunta-link::after { content:""; position:absolute; inset:0; border-radius:var(--raio); }
+.cartao-pergunta-link:focus-visible { outline:none; }
+.cartao-pergunta .colunas { --alt-colunas:4.5rem; margin:var(--esp-1) 0; }
+.cartao-pergunta .medidor { margin:var(--esp-1) 0; }
+.cartao-pergunta.indisponivel { border-style:dashed; background:var(--fundo); box-shadow:none; }
+.cartao-pergunta.indisponivel .frase-resposta { font-weight:400; font-size:var(--letra-corpo); color:var(--texto-2); }

@@ -103,42 +103,12 @@
   <p class="aviso-independente" role="note"><strong>Portal independente.</strong> Os dados são organizados a partir de fontes públicas oficiais. Consulte sempre os documentos originais.</p>
   <!-- ================= INÍCIO: painel com os principais números (cada quadro só aparece se houver dado) ================= -->
   <div id="aba-inicio">
-    <h1 class="titulo-pagina">Visão geral</h1>
-    <p class="sub">Acompanhe os dados disponíveis e consulte as fontes oficiais. Cada número mostra o período e a origem.</p>
-
-    <!-- COMPETÊNCIA: o mês dos indicadores de despesa logo abaixo (consulta ao vivo no portal da Prefeitura). -->
-    <form class="controles competencia" id="formCompetencia">
-      <div><label for="mesVisao">Mês das despesas</label><select id="mesVisao"></select></div>
-      <div><label for="anoVisao">Ano</label><select id="anoVisao"></select></div>
-      <button type="submit">Atualizar indicadores</button>
-    </form>
-    <div id="kpiEstado"></div>
-    <div class="kpis" id="kpis"></div>
-
-    <div class="grade-visao">
-      <!-- EVOLUÇÃO: gráfico só aparece depois que a série de 12 meses for consultada e validada. -->
-      <section aria-labelledby="t-evol-visao" id="sec-evolucao-visao">
-        <h2 id="t-evol-visao">Evolução das despesas</h2>
-        <p class="sub" id="evolVisaoTexto">Valor pago pelo Município em cada um dos 12 meses até o mês escolhido.</p>
-        <p><button type="button" class="sec" id="btnEvolVisao">Atualizar o gráfico</button></p>
-        <p class="meta" id="evolVisaoEstado" role="status" aria-live="polite"></p>
-        <div id="evolVisao"></div>
-      </section>
-      <!-- ACESSO RÁPIDO: atalhos para as consultas mais usadas. -->
-      <section aria-labelledby="t-acesso" class="acesso-rapido">
-        <h2 id="t-acesso">Acesso rápido</h2>
-        <ul>
-          <li><a href="#gastos"><strong>Consultar despesas</strong><span>Por mês, secretaria, unidade, origem e credor</span></a></li>
-          <li><a href="#pessoal/lista"><strong>Pesquisar servidor</strong><span>Ficha com cargo, vínculo e salário-base</span></a></li>
-          <li><a href="#contratos"><strong>Licitações e contratos</strong><span>Fornecedores e registros oficiais do PNCP</span></a></li>
-          <li><a href="#sobre"><strong>Ver fontes oficiais</strong><span>Origem, metodologia e atualização</span></a></li>
-        </ul>
-      </section>
-    </div>
-
-    <h2 class="titulo-secao">Outros indicadores</h2>
+    <h1 class="titulo-pagina">Videira em 6 perguntas</h1>
+    <p class="sub">Respostas curtas, cada uma com o período e a fonte oficial. Toque em uma pergunta para ver os detalhes e os números exatos.</p>
     <div id="inicioEstado" role="status" aria-live="polite"></div>
-    <div class="quadros" id="quadros"></div>
+    <!-- CARTÕES-PERGUNTA (js/inicio-tela.js): um por pergunta, na mesma ordem do menu. Usam só as cópias diárias
+         (arquivos pequenos): a página inicial não consulta a API de ~800 KB. -->
+    <div class="cartoes-pergunta" id="cartoesPergunta"></div>
   </div>
 
   <!-- ================= PESQUISA GERAL (resultado) ================= -->

@@ -271,6 +271,11 @@
     'No 2º quadrimestre de 2026, a Prefeitura declarou ao Tesouro um gasto com pessoal de 43,77% da receita corrente líquida. O limite máximo da lei é 54%.');
   teste('frases: pessoal do Município, com aposentados e pensionistas', F.pessoal({ registros: 3049, comissionados: 110, inativos: 663 }),
     'A lista de pessoal do Município tem 3.049 registros, incluindo 663 de aposentados e pensionistas. 110 são cargos de indicação (comissionados).');
+  teste('frases: pauta futura é "marcada para", passada é "de"', [
+    F.pautaCamara({ titulo: 'Pauta da 31ª Sessão', data: '2026-10-06 19:15:00' }, new Date(2026, 9, 3)),
+    F.pautaCamara({ titulo: 'Pauta da 30ª Sessão', data: '2026-09-29 19:15:00' }, new Date(2026, 9, 3))],
+    ['A pauta mais recente publicada pela Câmara é “Pauta da 31ª Sessão”, marcada para 06/10/2026.',
+     'A pauta mais recente publicada pela Câmara é “Pauta da 30ª Sessão”, de 29/09/2026.']);
   teste('frases: detector de opinião', [F.opiniao('o gasto foi muito alto'), F.opiniao('Só R$ 2 mil'), F.opiniao('alta de 12,4%'), F.opiniao('pagou R$ 2 mil')],
     ['muito', 'só', null, null]);
   teste('frases: NENHUMA frase gerada tem palavra de opinião', [

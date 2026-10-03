@@ -105,9 +105,25 @@ OBS.fichas = (function () {
               `${qtd(comp.menores)} menor e ${qtd(comp.iguais - 1)} igual.`),
             OBS.graficos.colunas(serie, { destaque: minha, formatar: (n) => `${qtd(n)} registros`,
               descricao: `Distribuição do salário-base entre os ${comp.total} registros com o cargo ${s.cargo}.` }),
-            el('p', 'meta', 'Unidade: quantidade de registros por faixa de salário-base (em reais). Legenda: a coluna azul é a faixa deste registro. ' +
+            el('p', 'meta', 'Unidade: quantidade de registros por faixa de salário-base (em reais). Legenda: a coluna dourada é a faixa deste registro. ' +
               'Diferenças podem vir de tempo de serviço, nível na carreira ou carga horária; não indicam irregularidade.'));
         }
+        // O QUE ESTA FICHA NÃO TEM (antes eram duas abas que só diziam "não temos"): uma lista curta e direta.
+        const falta = el('ul', 'disponibilidade');
+        const item = (titulo, texto, link) => {
+          const li = el('li', link ? 'disp-portal' : '');
+          li.append(el('strong', '', titulo));
+          const p = el('p', '', texto + ' ');
+          if (link) p.append(OBS.ui.link(link[0], link[1]));
+          li.append(p); falta.append(li);
+        };
+        item('Remuneração do mês (bruto, descontos e líquido)', 'Só no portal oficial, que protege a consulta contra acesso automático.',
+          ['Abrir a Relação Funcionário x Salário', OBS.config.PORTAL_SALARIOS]);
+        item('Diárias de viagem', 'Ainda não há uma fonte aberta de diárias integrada a este site. Quando houver, uma diária só aparecerá aqui se a fonte ' +
+          'trouxer um identificador que comprove que é deste registro: nome parecido não é prova.');
+        item('Histórico de cargos e salários', `A fonte mostra só a situação atual (cópia de ${copia}) e este site não guarda cópias antigas.` +
+          (s.desde ? ` Admissão: ${s.desde}.` : ''));
+        painel.append(el('h3', '', 'O que esta ficha não tem'), falta);
       } },
       { id: 'remuneracao', titulo: 'Remuneração', montar: (painel) => {
         // Cada valor no seu campo: salário-base NUNCA substitui remuneração bruta nem líquido.
@@ -124,16 +140,6 @@ OBS.fichas = (function () {
           OBS.status('indisponivel', 'Remuneração bruta, descontos e líquido de cada mês',
             'O portal oficial mostra esses valores, mas protege a consulta contra acesso automático. Este site respeita essa proteção e pediu, pela Lei de Acesso à Informação, que sejam publicados em formato aberto.',
             ['Abrir a Relação Funcionário x Salário', OBS.config.PORTAL_SALARIOS]));
-      } },
-      { id: 'diarias', titulo: 'Diárias', montar: (painel) => {
-        painel.append(OBS.status('nao-integrado', 'Diárias de viagem',
-          'Ainda não há uma fonte aberta de diárias integrada a este site. Quando houver, uma diária só aparecerá nesta ficha se a fonte trouxer um identificador ' +
-          'que comprove que é deste registro. Nome parecido não é prova.', ['Consultar no Portal da Transparência', OBS.config.PORTAL]));
-      } },
-      { id: 'historico', titulo: 'Histórico', montar: (painel) => {
-        painel.append(dados([['Cópia disponível', `Situação em ${copia}`], ['Admissão (mês/ano)', s.desde]]),
-          OBS.status('indisponivel', 'Histórico de cargos e salários',
-            'A fonte mostra só a situação atual, e este site não guarda cópias antigas. Por isso não há linha do tempo deste registro.'));
       } },
       { id: 'origem', titulo: 'Origem dos dados', montar: (painel) => {
         const o = OBS.origem({

@@ -126,9 +126,9 @@ h1.marca { margin:0; font-size:1.05rem; line-height:1.1; }
 h1.marca a { display:inline-flex; align-items:center; gap:.7rem; color:var(--menu-texto); text-decoration:none; }
 .marca-texto { display:flex; flex-direction:column; white-space:nowrap; }
 .marca-texto small { font-family:var(--font); font-size:var(--letra-legenda); font-weight:400; letter-spacing:.02em; opacity:.8; }
-/* A lente do olho mágico: aro âmbar, vidro marinho, pupila ciano e um brilho. */
-.lente { width:2rem; height:2rem; flex:none; }
-.lente-aro { fill:#f4c55a; } .lente-vidro { fill:#0b1a30; } .lente-pupila { fill:#3fd0e0; } .lente-brilho { fill:#ffffff; }
+/* Logo V3: uvas lilás (o menu é escuro nos dois temas), aro dourado e lente uva. */
+.logo { width:2rem; height:2rem; flex:none; }
+.logo-uva { fill:#CDB6F0; } .logo-aro { fill:var(--menu-marcador); } .logo-lente { fill:#3B1F5C; }
 .btn-menu { background:transparent; color:var(--menu-texto); border:1px solid var(--menu-texto-2); min-height:var(--alvo); }
 .lateral-corpo { display:flex; flex-direction:column; }
 nav.menu { display:flex; flex-direction:column; gap:2px; padding:var(--esp-2) var(--esp-3); }
@@ -169,7 +169,7 @@ button.item-lateral[aria-pressed="true"] { color:var(--menu-marcador); }
 @media (max-width: 64rem) {        /* até 1024 px: barra no topo e menu que abre e fecha */
   .lateral { position:sticky; top:0; z-index:20; }
   .lateral-topo { padding:var(--esp-2) var(--esp-4); }
-  .lente { width:1.7rem; height:1.7rem; }
+  .logo { width:1.75rem; height:1.75rem; }
   .so-computador { display:none !important; }
   .lateral-corpo { display:none; }
   .lateral.aberto .lateral-corpo { display:flex; border-top:1px solid var(--menu-linha); max-height:calc(100vh - 3.5rem); overflow-y:auto; }

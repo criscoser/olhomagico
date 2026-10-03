@@ -68,7 +68,7 @@ jobs:
       - name: Montar a pasta do site (só o que vai para o ar)
         run: |
           mkdir _site
-          cp -r index.html css js dados _site/
+          cp -r index.html css js dados img _site/
 
       - name: Conferir o Pix que vai para o ar
         # ÚLTIMO passo antes de enviar: compara o código Pix de _site com a impressão digital guardada FORA do

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <!-- Olho Mágico (logo V3, versão simplificada para 16/32 px): cacho de uvas em pontos e um olho mágico dourado.
+       Uvas roxas em aba clara; lilás em aba escura (para não sumirem no fundo escuro). -->
+  <style>.uva{fill:#3B1F5C}.lente{fill:#3B1F5C}@media (prefers-color-scheme: dark){.uva{fill:#CDB6F0}}</style>
+  <g class="uva">
+    <circle cx="8" cy="4.6" r="2.2"/><circle cx="12.2" cy="4.6" r="2.2"/>
+    <circle cx="5.9" cy="8.4" r="2.2"/><circle cx="10.1" cy="8.4" r="2.2"/>
+    <circle cx="8" cy="12.2" r="2.2"/>
+  </g>
+  <circle cx="3.8" cy="4.6" r="2.6" fill="#F4B940"/>
+  <circle class="lente" cx="3.8" cy="4.6" r="1.2"/>
+</svg>

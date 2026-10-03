@@ -3,12 +3,13 @@
 
      #inicio                  painel com os principais números
      #gastos/2026-09          despesas de um mês (o período fica no endereço)
-     #gastos, #servidores, #contratos, #contas, #camara, #sobre      abas
+     #gastos, #servidores, #contratos, #contas, #camara, #siglas, #sobre      abas
+     #siglas/sigla-fpm        aba de siglas, já na explicação de uma sigla
      #contas/transferencias   aba + seção (rola até a seção "sec-transferencias")
      #busca/termo             resultado da pesquisa geral
      #servidor/ID, #fornecedor/CHAVE, #contrato/ID           fichas de detalhe */
 OBS.rotas = (function () {
-  const ABAS = ['inicio', 'gastos', 'servidores', 'contratos', 'contas', 'camara', 'sobre'];
+  const ABAS = ['inicio', 'gastos', 'servidores', 'contratos', 'contas', 'camara', 'siglas', 'sobre'];
   const FICHAS = { servidor: 'servidores', fornecedor: 'contratos', contrato: 'contratos' };  // ficha -> aba "mãe" no menu
   const VISTAS = [...ABAS.map((a) => `aba-${a}`), 'vista-busca', 'vista-ficha'];
   let primeira = true;
@@ -68,7 +69,7 @@ OBS.rotas = (function () {
       await OBS.abrirMes(resto);
       return;
     }
-    const abrir = { inicio: OBS.inicioTela, servidores: OBS.pessoalTela, contratos: OBS.contratosTela, contas: OBS.contasTela, camara: OBS.camaraTela, sobre: OBS.situacaoTela }[aba];
+    const abrir = { inicio: OBS.inicioTela, servidores: OBS.pessoalTela, contratos: OBS.contratosTela, contas: OBS.contasTela, camara: OBS.camaraTela, siglas: OBS.siglasTela, sobre: OBS.situacaoTela }[aba];
     if (resto) {
       if (abrir) await abrir.abrir();
       const secao = OBS.$(`sec-${resto}`);

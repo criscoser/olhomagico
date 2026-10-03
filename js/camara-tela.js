@@ -14,7 +14,11 @@ OBS.camaraTela = (function () {
       const nome = v.link ? OBS.ui.link(v.nome, v.link) : el('span', '', v.nome);
       nome.classList.add('cartao-nome');
       li.append(nome);
-      if (v.partido) li.append(el('span', 'cartao-selo', v.partido));
+      if (v.partido) {
+        const selo = el('span', 'cartao-selo', v.partido);
+        OBS.siglas.marcar(selo, { todas: true });   // partido vira tocável (ex.: PL = Partido Liberal), sem mudar o texto
+        li.append(selo);
+      }
       if (v.funcao) li.append(el('span', 'cartao-detalhe', v.funcao));
       return li;
     }));

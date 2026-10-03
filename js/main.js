@@ -67,5 +67,6 @@ OBS.consultar = async function (anoMes) {
   OBS.buscaTela.ligar();   // caixa de pesquisa do topo
   OBS.menu.iniciar();      // menu lateral / menu do celular
   OBS.menu.mostrarAtualizacao();
+  OBS.siglas.iniciar();    // siglas tocáveis em todas as telas (explicação num balão)
   OBS.rotas.iniciar();     // mostra a tela indicada no endereço (#inicio, #gastos, uma ficha...)
 })();

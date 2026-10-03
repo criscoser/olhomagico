@@ -5,6 +5,7 @@
 <body style="font-family:sans-serif"><h1>Testes</h1><ul id="saida"></ul>
 <script src="../js/config.js"></script>
 <script src="../js/utilitarios.js"></script>
+<script src="../js/siglas.js"></script>
 <script src="../js/fontes/despesas.js"></script>
 <script src="../js/agregacao.js"></script>
 <script src="../js/pessoal-regras.js"></script>
@@ -210,4 +211,20 @@
   teste('rota de despesas com mês', OBS.rotas.ler('#gastos/2026-09'), { nome: 'gastos', resto: '2026-09' });
   teste('CSV de despesas registra os filtros', OBS.exportar.csvDespesas([], { ini: '01/09/2026', fim: '30/09/2026' },
     { url: 'https://x', consultadoEm: new Date(2026, 9, 1), descartadas: 0, filtros: 'secretaria = SAUDE' }).includes('"Filtros aplicados";"secretaria = SAUDE"'), true);
+// SIGLAS: só marca palavra inteira, nunca altera o texto e não confunde siglas curtas com nomes de empresas.
+  const siglasDe = (t, o) => OBS.siglas.encontrar(t, o).map((a) => t.slice(a.inicio, a.fim));
+  teste('siglas: acha FPM em "FPM 1%"', siglasDe('FPM 1%'), ['FPM']);
+  teste('siglas: LC e ADO25 em "LC 176/2020 (ADO25)"', siglasDe('LC 176/2020 (ADO25)'), ['LC', 'ADO25']);
+  teste('siglas: só palavra inteira', siglasDe('FUNDEBX XFPM CPFS'), []);
+  teste('siglas: várias na mesma frase', siglasDe('aplicação em MDE (mínimo de 25%) e VAAT - FUNDEB'), ['MDE', 'VAAT', 'FUNDEB']);
+  teste('siglas: MF só em "MGI/MF/CGU"', [siglasDe('Portaria Conjunta MGI/MF/CGU'), siglasDe('MF COMERCIO LTDA')], [['MGI', 'MF', 'CGU'], []]);
+  teste('siglas: LC só antes de número', siglasDe('LC TRANSPORTES LTDA'), []);
+  teste('siglas: partidos não são marcados sozinhos', siglasDe('PL MDB PSD PDT'), []);
+  teste('siglas: partidos marcados quando a tela pede', siglasDe('PL', { todas: true }), ['PL']);
+  teste('siglas: "União" nunca vira sigla', siglasDe('União', { todas: true }), []);
+  teste('siglas: siglas sem repetição', new Set(OBS.siglas.LISTA.map((s) => s.sigla)).size, OBS.siglas.LISTA.length);
+  teste('siglas: todas têm nome e explicação', OBS.siglas.LISTA.concat(OBS.siglas.TERMOS).every((s) => (s.nome || s.termo) && s.texto), true);
+  teste('siglas: busca sem acento', OBS.siglas.filtrar(OBS.siglas.TERMOS, 'inexigibilidade lei').map((t) => t.termo), ['Inexigibilidade']);
+  teste('siglas: endereço da sigla', OBS.siglas.slug('ADO 25'), 'ado-25');
+  teste('rota da aba de siglas', OBS.rotas.ler('#siglas/sigla-fpm'), { nome: 'siglas', resto: 'sigla-fpm' });
 </script></body></html>

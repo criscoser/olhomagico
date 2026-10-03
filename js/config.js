@@ -21,10 +21,16 @@ OBS.config = {
   PORTAL_SALARIOS: 'https://videira.atende.net/transparencia/item/relacao-funcionario-x-salario',
   // Página da Câmara onde ela publica as próprias folhas de pagamento (vereadores e servidores da Câmara).
   CAMARA_FOLHAS: 'https://www.camaravideira.sc.gov.br/imprensa/transparencia/0/4/0/644262',
-  // CHAVE PIX para doações. Deixe '' (vazio) e o botão "Apoie o projeto" fica ESCONDIDO.
-  // Recomendado: uma chave aleatória, para não expor CPF/e-mail como chave.
-  // Vazio por enquanto: o botão fica escondido até a chave verdadeira ser colocada aqui (nunca publicar chave falsa).
-  PIX_CHAVE: '',
+  // PIX para apoio ao projeto. Os três valores precisam combinar: o site confere o código (js/pix-regras.js)
+  // e, se algo não bater, NÃO mostra nada de Pix ("falha fechada"). Deixe PIX_CHAVE '' para esconder o botão.
+  // ATENÇÃO: trocar estes valores é a mudança mais sensível do projeto. Veja CLAUDE.md antes.
+  PIX_CHAVE: 'ec8e0fc1-33b9-437e-b64a-ff9b539bc57e',   // chave aleatória (não expõe CPF nem e-mail)
+  // Código "Pix Copia e Cola" gerado pelo banco (sem valor fixo). O QR Code é desenhado A PARTIR deste texto.
+  PIX_COPIA_E_COLA: '00020101021126580014br.gov.bcb.pix0136ec8e0fc1-33b9-437e-b64a-ff9b539bc57e5204000053039865802BR5913TIAGO C COSER6009SAO PAULO62070503***6304F8D7',
+  PIX_RECEBEDOR: 'TIAGO C COSER',                      // nome gravado no código (campo 59)
+  PIX_NOME_COMPLETO: 'Tiago Cristian Coser',           // nome que vários bancos mostram a quem paga
+  // Endereço oficial do site, mostrado na caixa de apoio (para a pessoa perceber se está num site falso).
+  SITE_OFICIAL: 'criscoser.github.io/olhomagico',
 
   // EXPLICAÇÕES AUTOMÁTICAS: quando o nome do credor bate com o padrão, aparece um texto explicando.
   // Só coloque aqui o que for CERTO pelo próprio nome (não adivinhe). link: 'salarios' mostra o atalho do portal.

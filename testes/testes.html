@@ -17,6 +17,7 @@
 <script src="../js/historico.js"></script>
 <script src="../js/componentes/graficos.js"></script>
 <script src="../js/rotas.js"></script>
+<script src="../js/pix-regras.js"></script>
 <script>
   // Compara o resultado obtido com o esperado e escreve na página.
   function teste(nome, obtido, esperado) {
@@ -245,4 +246,23 @@
   teste('siglas: busca sem acento', OBS.siglas.filtrar(OBS.siglas.TERMOS, 'inexigibilidade lei').map((t) => t.termo), ['Inexigibilidade']);
   teste('siglas: endereço da sigla', OBS.siglas.slug('ADO 25'), 'ado-25');
   teste('rota da aba de siglas', OBS.rotas.ler('#siglas/sigla-fpm'), { nome: 'siglas', resto: 'sigla-fpm' });
+  // ----- Pix: o código só vale se CRC, chave, conta, moeda, país e nome baterem (senão, falha fechada) -----
+  const PIX = OBS.config.PIX_COPIA_E_COLA;
+  const ESPERADO = { chave: OBS.config.PIX_CHAVE, recebedor: OBS.config.PIX_RECEBEDOR };
+  const comCrc = (semCrc) => semCrc + OBS.pix.crc16(semCrc);   // refaz o CRC (como faria quem quisesse enganar)
+  teste('Pix: CRC16 do exemplo do padrão ("123456789" -> 29B1)', OBS.pix.crc16('123456789'), '29B1');
+  teste('Pix: o código configurado é válido', OBS.pixCodigoValido(), { ok: true });
+  teste('Pix: o código configurado contém a chave configurada', PIX.includes(OBS.config.PIX_CHAVE), true);
+  teste('Pix: CRC alterado falha', OBS.pix.validar(PIX.slice(0, -1) + (PIX.endsWith('0') ? '1' : '0'), ESPERADO).ok, false);
+  teste('Pix: uma letra trocada no meio falha (CRC)', OBS.pix.validar(PIX.replace('SAO PAULO', 'SAO PAULA'), ESPERADO).ok, false);
+  teste('Pix: outra chave, mesmo com CRC refeito, falha',
+    OBS.pix.validar(comCrc(PIX.slice(0, -4).replace(OBS.config.PIX_CHAVE, 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')), ESPERADO).motivo,
+    'a chave do código é diferente da chave configurada');
+  teste('Pix: outro nome, mesmo com CRC refeito, falha',
+    OBS.pix.validar(comCrc(PIX.slice(0, -4).replace('5913TIAGO C COSER', '5913FULANO D TALL')), ESPERADO).motivo,
+    'o nome do recebedor é diferente do configurado');
+  teste('Pix: código cortado falha', OBS.pix.validar(PIX.slice(0, 60), ESPERADO).ok, false);
+  teste('Pix: código vazio falha', OBS.pix.validar('', ESPERADO).ok, false);
+  teste('Pix: chave configurada diferente do código falha', OBS.pix.validar(PIX, { chave: 'outra', recebedor: ESPERADO.recebedor }).ok, false);
+  teste('Pix: estrutura quebrada falha', OBS.pix.lerCampos('0002019'), null);
 </script></body></html>

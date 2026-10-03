@@ -7,8 +7,17 @@
   if (!chave) return; // sem chave configurada: o botão continua escondido
 
   const caixa = $('dlgApoio');
-  $('pixChave').textContent = chave;
   $('btnApoio').classList.remove('oculto');
+  // FALHA FECHADA: se o código, a chave e o nome não combinarem, nada de Pix aparece (só um aviso neutro).
+  const conferencia = OBS.pixCodigoValido();
+  if (!conferencia.ok) {
+    console.warn('Pix desativado: ' + conferencia.motivo);
+    $('pixDados').replaceChildren(OBS.el('p', '', 'O apoio por Pix está indisponível no momento.'));
+    $('btnApoio').addEventListener('click', () => caixa.showModal());
+    $('fecharApoio').addEventListener('click', () => caixa.close());
+    return;
+  }
+  $('pixChave').textContent = chave;
 
   /* Abre a caixa (showModal deixa o fundo escuro e prende o foco dentro dela). */
   $('btnApoio').addEventListener('click', () => { $('pixMsg').textContent = ''; caixa.showModal(); });

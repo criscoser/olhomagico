@@ -6,6 +6,8 @@ name: Testes
 
 on:
   pull_request:
+  push:
+    branches: [main]        # também a cada mudança publicada, para o resultado ficar visível na aba Actions
   workflow_dispatch:        # cria o botão "Run workflow" na aba Actions
 
 # Só lê o código. Nada além disso.
@@ -27,3 +29,30 @@ jobs:
         run: |
           node testes/rodar_testes.js
           python3 -m unittest discover -s testes -p "test_*.py"
+
+  # O QR Code do Pix tem de ser LIDO de volta igual ao código configurado, por um leitor de verdade (zbar),
+  # como faria o app de um banco. A imagem é desenhada pelo MESMO código do site (testes/qr_png.js).
+  qr:
+    name: qr-pix-legivel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Instalar o leitor de QR (zbar, do repositório do Ubuntu)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zbar-tools
+
+      - name: Ler o QR do Pix e comparar com o código configurado
+        run: |
+          ESPERADO=$(node testes/qr_png.js qr-pix.png)
+          LIDO=$(zbarimg --raw -q qr-pix.png)
+          if [ "$LIDO" = "$ESPERADO" ]; then
+            echo "QR lido e igual ao código Pix configurado."
+          else
+            echo "::error::O QR Code lido é diferente do código Pix configurado."
+            exit 1
+          fi

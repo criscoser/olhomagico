@@ -98,12 +98,25 @@ OBS.abasInternas = function (prefixo, abas, rotulo) {
   return caixa;
 };
 
-/* Preenche as listas de mês e ano (competência), do ano atual até OBS.config.ANO_INICIAL. */
+/* Quantos meses de um ano podem ser escolhidos: o ano atual só até o mês de hoje (mês futuro não tem gasto);
+   anos passados, os 12. (Função sem tela, testada.) */
+OBS.mesesDisponiveis = (ano, hoje = new Date()) => (Number(ano) === hoje.getFullYear() ? hoje.getMonth() + 1 : 12);
+
+/* Listas de MÊS e ANO (competência): anos do atual até OBS.config.ANO_INICIAL; no ano atual, só os meses que já
+   começaram. Ao trocar o ano, a lista de meses se ajusta. Devolve uma função para escolher um "AAAA-MM". */
 OBS.preencherMesAno = function (selMes, selAno, anoMes) {
-  OBS.MESES.forEach((nome, i) => { const o = OBS.el('option', '', nome); o.value = String(i + 1).padStart(2, '0'); selMes.append(o); });
-  for (let ano = new Date().getFullYear(); ano >= OBS.config.ANO_INICIAL; ano--) { const o = OBS.el('option', '', String(ano)); o.value = String(ano); selAno.append(o); }
-  const [a, m] = anoMes.split('-');
-  selMes.value = m; selAno.value = a;
+  const hoje = new Date();
+  for (let ano = hoje.getFullYear(); ano >= OBS.config.ANO_INICIAL; ano--) { const o = OBS.el('option', '', String(ano)); o.value = String(ano); selAno.append(o); }
+  function meses() {
+    const atual = selMes.value;
+    const max = OBS.mesesDisponiveis(selAno.value, hoje);
+    selMes.replaceChildren(...OBS.MESES.slice(0, max).map((nome, i) => { const o = OBS.el('option', '', nome); o.value = String(i + 1).padStart(2, '0'); return o; }));
+    selMes.value = atual && Number(atual) <= max ? atual : String(max).padStart(2, '0');
+  }
+  selAno.addEventListener('change', meses);
+  const escolher = (valor) => { const [a, m] = valor.split('-'); selAno.value = a; meses(); selMes.value = m; };
+  escolher(anoMes);
+  return escolher;
 };
 
 /* Aviso de "pode estar desatualizado" para uma fonte da cópia diária (lê dados/situacao.js).

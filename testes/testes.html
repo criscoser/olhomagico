@@ -19,6 +19,7 @@
 <script src="../js/ouvir.js"></script>
 <script src="../js/compartilhar.js"></script>
 <script src="../js/componentes/graficos.js"></script>
+<script src="../js/componentes/blocos.js"></script>
 <script src="../js/rotas.js"></script>
 <script src="../js/pix-regras.js"></script>
 <script src="../js/vendor/qrcodegen.js"></script>
@@ -309,6 +310,9 @@
   teste('ouvir: sigla vira o nome completo', fala('recebeu do FPM'), 'recebeu do Fundo de Participação dos Municípios');
   teste('ouvir: fala dividida por frases e em pedaços de até 200 letras',
     [OBS.ouvir.pedacos('Primeira frase. Segunda frase!').length, OBS.ouvir.pedacos('a'.repeat(150) + ', ' + 'b'.repeat(150)).every((p) => p.length <= 200)], [2, true]);
+  teste('mês futuro não aparece: ano atual só até o mês de hoje; anos passados com 12 meses',
+    [OBS.mesesDisponiveis(2026, new Date(2026, 9, 3)), OBS.mesesDisponiveis('2026', new Date(2026, 9, 3)), OBS.mesesDisponiveis(2025, new Date(2026, 9, 3)), OBS.mesesDisponiveis(2026, new Date(2026, 0, 1))],
+    [10, 10, 12, 1]);
   // ----- Compartilhar (WhatsApp): a mensagem se sustenta sozinha, longe do site -----
   const CP = OBS.compartilhar;
   teste('compartilhar: endereço oficial completo com o "#" da tela', CP.enderecoDaTela('#gastos/2026-09'), 'https://criscoser.github.io/olhomagico/#gastos/2026-09');

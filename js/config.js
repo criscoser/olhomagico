@@ -13,8 +13,9 @@ OBS.config = {
   PORTAL: 'https://videira.atende.net/transparencia/',
   // Página oficial que documenta a API de despesas (usada como fonte específica, em vez da página inicial do portal).
   DOC_API_DESPESAS: 'https://videira.atende.net/transparencia/item/api-de-dados-abertos-contabilidade',
-  // Primeiro ano oferecido no seletor. Se a API tiver anos mais antigos, diminua este número.
-  ANO_INICIAL: 2020,
+  // Primeiro ano oferecido no seletor: o primeiro com despesas na API (conferido em 03/10/2026: há dados desde
+  // 2001; em 2000 e antes, a API responde sem registros).
+  ANO_INICIAL: 2001,
   // Telas oficiais com o detalhe que a API aberta ainda não oferece (protegidas contra robôs,
   // por isso o site só leva a pessoa até elas, sem buscar os dados automaticamente).
   PORTAL_PAGAMENTOS: 'https://videira.atende.net/transparencia/item/pagamentos',

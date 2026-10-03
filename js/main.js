@@ -39,16 +39,8 @@ OBS.consultar = async function (anoMes) {
   const hoje = new Date();
   const esteMes = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
   const [anoPadrao, mesPadrao] = OBS.mesAnterior(hoje).split('-'); // o mês atual costuma estar incompleto
-  OBS.MESES.forEach((nome, i) => {
-    const op = document.createElement('option');
-    op.value = String(i + 1).padStart(2, '0'); op.textContent = nome; OBS.$('selMes').append(op);
-  });
-  for (let ano = hoje.getFullYear(); ano >= OBS.config.ANO_INICIAL; ano--) {
-    const op = document.createElement('option');
-    op.value = String(ano); op.textContent = String(ano); OBS.$('selAno').append(op);
-  }
-  OBS.$('selMes').value = mesPadrao;
-  OBS.$('selAno').value = anoPadrao;
+  // No ano atual, só os meses que já começaram aparecem na lista (mês futuro não tem gasto).
+  const escolherMes = OBS.preencherMesAno(OBS.$('selMes'), OBS.$('selAno'), `${anoPadrao}-${mesPadrao}`);
   OBS.$('form').addEventListener('submit', (ev) => {
     ev.preventDefault();
     const anoMes = `${OBS.$('selAno').value}-${OBS.$('selMes').value}`;
@@ -60,7 +52,7 @@ OBS.consultar = async function (anoMes) {
   OBS.abrirMes = async function (anoMes) {
     if (anoMes > esteMes) { OBS.ui.mostrarEstado('Esse mês ainda não chegou. Escolha este mês ou um mês anterior.', true); return; }
     const [a, m] = anoMes.split('-');
-    OBS.$('selAno').value = a; OBS.$('selMes').value = m;
+    escolherMes(`${a}-${m}`);
     if (OBS.ui.mesNaTela() !== anoMes) await OBS.consultar(anoMes);
   };
   OBS.ui.ligarEventos();

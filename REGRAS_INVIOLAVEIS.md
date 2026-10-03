@@ -34,6 +34,12 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
 - Bolsa Família e BPC são pagos direto às famílias: nunca apresentar como receita da Prefeitura.
 - Relatórios ao Tesouro e ao FNDE são **declarados** pelo município (usar "declarou").
 - Antes de afirmar um número novo, conferir na fonte oficial (a API de despesas de 2025 bate ao centavo com a DCA).
+- **Mínimo legal só onde a lei diz.** SIOPE: mínimo de 25% só no indicador 1.1 (MDE) e de 70% só no 1.2 (FUNDEB na
+  remuneração), conferindo código E nome. Indicador que só *cita* MDE não tem mínimo; o 1.3 é um MÁXIMO.
+- **Tipo do número pelo começo do nome:** "Valor exigido ... (Mínimo de 25%)" é dinheiro, não percentual.
+- **Valor exato inteiro:** ao extrair "R$ 46.165.401,23" de um texto, o ponto de milhar faz parte do número.
+- **A API de despesas aceita no máximo 10 consultas por minuto** (HTTP 429 acima disso): o site espera 6,5 s entre
+  consultas seguidas e o robô, 7 s. A página inicial e o gráfico de 12 meses usam o resumo diário (sem consulta ao vivo).
 
 ## Redação (linguagem simples)
 
@@ -64,7 +70,7 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
   - `python -m unittest discover -s testes -p "test_*.py"`
 - Mudança visual: conferir em 320px, com teclado e leitor de tela, nos temas claro e escuro.
 
-## Decisões de design aprovadas (Etapas 2 a 7, out/2026) — ainda em implementação
+## Decisões de design aprovadas (Etapas 2 a 7, out/2026) — implementadas
 
 - Arquitetura por perguntas: Gastos, Entradas, Pessoal, Contratos, Limites, Câmara (+ Buscar, Palavras e siglas,
   Sobre e fontes, Apoie). Barra inferior até 1024 px (Início, Gastos, Pessoal, Buscar, Mais); menu lateral aberto acima.
@@ -76,4 +82,4 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
   compartilhar (WhatsApp, copiar link, outros apps; ficha de servidor compartilhada sem nome e sem salário).
 - Identidade: nome "Olho Mágico", sem slogan por enquanto, logo V3 (cacho em pontos roxos com um olho mágico dourado),
   com versão própria para 16/32 px e versão com uvas lilás no tema escuro.
-- Plano numerado completo (itens 1–33) na conversa da Etapa 8; feitos em 03/10/2026: 1–6 e 33.
+- Plano numerado completo (itens 1–33) na conversa da Etapa 8: todos feitos em 03/10/2026.

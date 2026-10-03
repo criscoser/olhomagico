@@ -90,7 +90,7 @@ SIOPE_2024 = [{"NUM_ANO": 2024, "NUM_PERI": 6, "COD_MUNI": 421930, "COD_INDI": 1
 
 
 # CGU e Câmara (formato conferido com as chaves reais pelo script investigar_chaves.py). Valores fictícios.
-CONVENIO = lambda i: {"id": i, "dimConvenio": {"codigo": "x", "numero": f"9{i:05d}", "objeto": f"Objeto fictício {i}"},
+CONVENIO = lambda i: {"id": i, "dimConvenio": {"codigo": f"5{i:05d}", "numero": f"9{i:05d}", "objeto": f"Objeto fictício {i}"},
                       "situacao": "EM EXECUÇÃO", "tipoInstrumento": {"codigo": "1", "descricao": "Convênio", "id": 1},
                       "orgao": {"cnpj": "1", "codigoSIAFI": "2", "descricaoPoder": "E", "nome": "MINISTÉRIO EXEMPLO", "orgaoMaximo": {}, "sigla": "ME"},
                       "convenente": {"cnpjFormatado": "83.039.842/0001-84", "cpfFormatado": "", "id": 1, "nome": "MUNICIPIO EXEMPLO",
@@ -269,6 +269,7 @@ class TestCoordenador(unittest.TestCase):
             c = ler_js(dados / "cgu.js", "OBS_DADOS_CGU")
             self.assertEqual(len(c["convenios"]), 20)                   # as 2 páginas
             self.assertEqual(c["convenios"][0]["area"], "ATENÇÃO BÁSICA")
+            self.assertTrue(all(x["numeroPortal"] == "5" + x["numero"][1:] for x in c["convenios"]))  # número do portal guardado
             self.assertTrue(all("cpf" not in json.dumps(x).lower() for x in c["convenios"]))
             self.assertEqual(sum(1 for b in c["beneficios"] if b["programa"] == "BPC"), 1)
             k = ler_js(dados / "camara.js", "OBS_DADOS_CAMARA")

@@ -34,7 +34,8 @@ def resumir_convenio(c):
     sub = c.get("subfuncao") or {}
     return {
         "id": c.get("id"),
-        "numero": _sub(dim, "numero"),
+        "numero": _sub(dim, "numero"),            # número do instrumento original (ex.: "CR.NR.0195006-65")
+        "numeroPortal": _sub(dim, "codigo"),      # número que o Portal da Transparência mostra e pesquisa (ex.: "567523")
         "objeto": _sub(dim, "objeto"),
         "situacao": limpar(c.get("situacao")),
         "instrumento": _sub(c.get("tipoInstrumento"), "descricao"),

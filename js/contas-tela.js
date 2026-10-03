@@ -233,7 +233,7 @@ OBS.contasTela = (function () {
 
   function desenharConvenios(d) {
     if (!d || !Array.isArray(d.convenios) || !d.convenios.length) return false;
-    const lista = d.convenios.map((c) => Object.assign({}, c, { _busca: OBS.pessoal.normalizar([c.objeto, c.orgao, c.orgaoSigla, c.convenente, c.numero].join(' ')) }));
+    const lista = d.convenios.map((c) => Object.assign({}, c, { _busca: OBS.pessoal.normalizar([c.objeto, c.orgao, c.orgaoSigla, c.convenente, c.numero, c.numeroPortal].join(' ')) }));
     const soma = (campo) => lista.reduce((t, c) => t + (typeof c[campo] === 'number' ? c[campo] : 0), 0);
     OBS.numeros($('conveniosNumeros'), [
       { rotulo: 'Convênios', valor: qtd(lista.length) },
@@ -266,7 +266,7 @@ OBS.contasTela = (function () {
     $('csvConvenios').addEventListener('click', () => {
       OBS.exportar.baixar(OBS.exportar.csvTabela({ titulo: 'Convênios do Governo Federal com Videira', fonte: d.meta.fonte, url: d.meta.consultaConvenios,
         observacao: '"Valor" é o total combinado e "Liberado" é o que já saiu: não somar as duas colunas.' },
-      [{ titulo: 'Número', valor: (c) => c.numero }, { titulo: 'Objeto', valor: (c) => c.objeto }, { titulo: 'Órgão federal', valor: (c) => c.orgao },
+      [{ titulo: 'Número no Portal da Transparência', valor: (c) => c.numeroPortal }, { titulo: 'Número do instrumento', valor: (c) => c.numero }, { titulo: 'Objeto', valor: (c) => c.objeto }, { titulo: 'Órgão federal', valor: (c) => c.orgao },
         { titulo: 'Convenente', valor: (c) => c.convenente }, { titulo: 'CNPJ do convenente', valor: (c) => c.convenenteCnpj },
         { titulo: 'Situação', valor: (c) => c.situacao }, { titulo: 'Início da vigência', valor: (c) => dataCgu(c.inicioVigencia) },
         { titulo: 'Fim da vigência', valor: (c) => dataCgu(c.fimVigencia) }, { titulo: 'Valor', tipo: 'moeda', valor: (c) => c.valor },

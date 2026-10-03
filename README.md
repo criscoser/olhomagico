@@ -2,10 +2,13 @@
 
 > Portal Independente de Transparência Fiscal e Administrativa (Videira/SC)
 
-[(https://shields.io)](https://mozilla.org)
-[(https://shields.io)](https://python.org)
-[![Architecture - Serverless](https://shields.io)](#arquitetura-e-fluxo-de-dados)
-[![License - MIT](https://shields.io)](LICENSE)
+[![Site no ar](https://img.shields.io/badge/site-no%20ar-2ea44f)](https://criscoser.github.io/olhomagico/)
+[![Atualizar e publicar o site](https://github.com/criscoser/olhomagico/actions/workflows/publicar.yml/badge.svg)](https://github.com/criscoser/olhomagico/actions/workflows/publicar.yml)
+[![Python](https://img.shields.io/badge/Python-biblioteca%20padr%C3%A3o-3776AB?logo=python&logoColor=white)](https://python.org)
+[![JavaScript](https://img.shields.io/badge/JavaScript-puro-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
+[![Arquitetura: sem servidor](https://img.shields.io/badge/arquitetura-sem%20servidor-555)](#arquitetura-e-fluxo-de-dados)
+
+**Acesse o site:** https://criscoser.github.io/olhomagico/
 
 O **Olho Mágico** é uma plataforma independente desenvolvida para auditar, consolidar e apresentar dados públicos do município de Videira/SC de forma simplificada e auditável. O sistema processa informações financeiras, contratuais e de recursos humanos, eliminando a complexidade dos portais oficiais de transparência.
 

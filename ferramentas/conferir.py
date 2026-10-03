@@ -79,9 +79,13 @@ def main():
         print("   Conferir no Tesouro Transparente (transferências constitucionais, Videira/SC)")
     cg = carregados.get("cgu.js")
     if cg and cg["convenios"]:
-        c = random.choice(cg["convenios"])
-        print(f"\n  Convênio nº {c.get('numero')}: valor {moeda(c.get('valor'))}, liberado {moeda(c.get('valorLiberado'))}")
-        print("   Conferir em https://portaldatransparencia.gov.br/ (Convênios, pesquisar pelo número)")
+        # Sorteia entre os 10 mais recentes: convênios antigos são difíceis de achar na busca do portal.
+        recentes = sorted(cg["convenios"], key=lambda x: x.get("publicacao") or "", reverse=True)[:10]
+        c = random.choice(recentes)
+        numero = c.get("numeroPortal") or c.get("numero")
+        print(f"\n  Convênio nº {numero} ({(c.get('objeto') or '')[:60]}): valor {moeda(c.get('valor'))}, liberado {moeda(c.get('valorLiberado'))}")
+        print("   Conferir em https://portaldatransparencia.gov.br/convenios (pesquisar pelo número;")
+        print("   antes, tire o filtro 'Período da última liberação', que o portal coloca sozinho)")
     print("\n  Gastos do mês: abra a aba 'Despesas públicas' do site e compare o total pago com o portal da Prefeitura.")
     print("=" * 72)
     if faltando:

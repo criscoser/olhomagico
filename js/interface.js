@@ -42,7 +42,7 @@ OBS.ui = (function () {
 
   /* Barrinha proporcional ao maior valor da lista (só visual, leitores de tela ignoram). */
   function barra(valor, maximo) {
-    const b = el('div', 'barra'); b.setAttribute('aria-hidden', 'true');
+    const b = el('span', 'barra'); b.setAttribute('aria-hidden', 'true');   // span: pode ficar dentro de <button>
     const i = el('i'); i.style.width = maximo > 0 ? `${Math.max(1, (valor / maximo) * 100)}%` : '0%';
     b.append(i); return b;
   }

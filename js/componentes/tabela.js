@@ -45,10 +45,12 @@ OBS.tabela = function (opcoes) {
   const caixa = el('div', 'tabela-caixa');
   const rolagem = el('div', 'tabela-rolagem');
   const tabela = el('table', 'tabela');
+  tabela.setAttribute('role', 'table');   // papéis explícitos: no celular a tabela vira cartões (display:block) e continua sendo tabela para o leitor de tela
   if (opcoes.legenda) tabela.append(el('caption', 'visualmente-oculto', opcoes.legenda));
   const cabeca = el('thead'), corpo = el('tbody'), trCab = el('tr');
+  cabeca.setAttribute('role', 'rowgroup'); corpo.setAttribute('role', 'rowgroup'); trCab.setAttribute('role', 'row');
   colunas.forEach((c) => {
-    const th = el('th'); th.scope = 'col';
+    const th = el('th'); th.scope = 'col'; th.setAttribute('role', 'columnheader');
     if (['moeda', 'numero', 'pct'].includes(c.tipo)) th.className = 'num';
     if (c.ordenavel === false) { th.textContent = c.titulo; } else {
       // O título é um botão: clicar ordena; clicar de novo inverte a ordem.
@@ -85,10 +87,11 @@ OBS.tabela = function (opcoes) {
     const p = OBS.paginar(linhas.length, pagina, porPagina);
     pagina = p.pagina;
     corpo.replaceChildren(...ordenadas.slice(p.inicio, p.fim).map((l) => {
-      const tr = el('tr');
+      const tr = el('tr'); tr.setAttribute('role', 'row');
       colunas.forEach((c, i) => {
         const td = el(i === 0 ? 'th' : 'td');
         if (i === 0) td.scope = 'row';
+        td.setAttribute('role', i === 0 ? 'rowheader' : 'cell');
         td.dataset.rotulo = c.titulo;   // usado no celular: "Cargo: Professor"
         if (['moeda', 'numero', 'pct'].includes(c.tipo)) td.classList.add('num');
         const texto = formatar(c, l);

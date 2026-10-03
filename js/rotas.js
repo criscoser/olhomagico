@@ -58,8 +58,10 @@ OBS.rotas = (function () {
 
   /* Leva a pessoa ao topo da nova tela e põe o foco no título (quem usa leitor de tela ouve onde está). */
   function focarTitulo(idVista) {
-    if (primeira) { primeira = false; if (!location.hash) return; }
     const titulo = OBS.$(idVista).querySelector('h1');
+    // Título da aba do navegador = a pergunta da tela (quem usa leitor de tela ouve onde está ao trocar de aba).
+    if (titulo) document.title = idVista === 'aba-inicio' ? 'Olho Mágico: o dinheiro público de Videira em 6 perguntas' : `${titulo.textContent.trim()} · Olho Mágico`;
+    if (primeira) { primeira = false; if (!location.hash) return; }
     window.scrollTo(0, 0);
     if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
   }

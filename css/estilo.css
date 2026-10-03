@@ -238,7 +238,7 @@ ul.lista li:first-child { border-top:0; }
 .linha .nome { font-weight:700; overflow-wrap:anywhere; }
 .linha .v { font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700; }
 .meta { color:var(--texto-2); font-size:var(--letra-legenda); }
-.barra { height:6px; background:var(--marca-suave); border-radius:3px; margin-top:.35rem; }
+.barra { display:block; height:6px; background:var(--marca-suave); border-radius:3px; margin-top:.35rem; }
 .barra > i { display:block; height:100%; background:var(--marca); border-radius:3px; }
 @media (prefers-reduced-motion: no-preference) { .barra > i { transition:width .4s ease; } }
 .busca { margin:0 0 .75rem; } .busca input { width:100%; max-width:22rem; }
@@ -443,14 +443,15 @@ th[aria-sort=descending] button.ordenar::after { content:" ▼"; color:var(--mar
 
 /* ---------- Gráfico de colunas (meses, faixas de salário) ---------- */
 figure.colunas { margin:.75rem 0; --alt-colunas:9.5rem; --alt-rotulo:1.6rem; }
-.colunas-area { position:relative; display:flex; align-items:flex-end; gap:3px; }
+.colunas-area { position:relative; display:flex; align-items:flex-start; gap:3px; }
 .coluna { flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:stretch; }
 .coluna-trilho { position:relative; height:var(--alt-colunas); }
 .coluna-barra { position:absolute; left:8%; right:8%; background:var(--grafico); border-radius:3px 3px 0 0; }
 /* Valor negativo (ajuste ou devolução): listrado, para se distinguir sem usar vermelho (não é erro nem juízo). */
 .coluna-barra.negativa { background:repeating-linear-gradient(135deg, var(--grafico) 0 3px, transparent 3px 6px); outline:1px solid var(--grafico); border-radius:0 0 3px 3px; }
 .coluna.destaque .coluna-barra { background:var(--grafico-destaque); }
-.coluna-rotulo { height:var(--alt-rotulo); line-height:var(--alt-rotulo); text-align:center; font-size:var(--letra-legenda); color:var(--texto-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.coluna-rotulo { min-height:var(--alt-rotulo); padding-top:.2rem; line-height:1.2; text-align:center; font-size:var(--letra-legenda); color:var(--texto-2);
+  overflow-wrap:anywhere; }   /* sem altura fixa nem "…": o rótulo quebra em 2 linhas se precisar */
 .coluna.destaque .coluna-rotulo { color:var(--texto); font-weight:700; }
 .colunas-zero { position:absolute; left:0; right:0; height:1px; background:var(--texto-2); }
 .colunas-escala { margin:0 0 .3rem; }

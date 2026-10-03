@@ -60,7 +60,8 @@ OBS.graficos = (function () {
       col.append(trilho, el('span', 'coluna-rotulo', s.rotulo));
       area.append(col);
     });
-    const linhaZero = el('div', 'colunas-zero'); linhaZero.style.bottom = `calc(var(--alt-rotulo) + ${zero / 100} * var(--alt-colunas))`;
+    // A linha do zero é medida a partir do TOPO das colunas (os rótulos embaixo podem ter 1 ou 2 linhas).
+    const linhaZero = el('div', 'colunas-zero'); linhaZero.style.top = `calc(${(100 - zero) / 100} * var(--alt-colunas))`;
     area.append(linhaZero);
     // Escala: o maior valor aparece escrito no topo, para dar noção de grandeza.
     caixa.append(el('div', 'colunas-escala meta', `Maior valor: ${formatar(max)}`), area);

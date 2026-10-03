@@ -18,6 +18,7 @@
 <script src="../js/componentes/graficos.js"></script>
 <script src="../js/rotas.js"></script>
 <script src="../js/pix-regras.js"></script>
+<script src="../js/vendor/qrcodegen.js"></script>
 <script>
   // Compara o resultado obtido com o esperado e escreve na página.
   function teste(nome, obtido, esperado) {
@@ -265,4 +266,12 @@
   teste('Pix: código vazio falha', OBS.pix.validar('', ESPERADO).ok, false);
   teste('Pix: chave configurada diferente do código falha', OBS.pix.validar(PIX, { chave: 'outra', recebedor: ESPERADO.recebedor }).ok, false);
   teste('Pix: estrutura quebrada falha', OBS.pix.lerCampos('0002019'), null);
+  // ----- QR Code: o desenho do Pix tem de ser IDÊNTICO ao da biblioteca original (Nayuki, Python), conferido bit a bit -----
+  const qrPix = OBS.qr.gerar(PIX, 'M');
+  const linhasQr = []; let escurosQr = 0;
+  for (let y = 0; y < qrPix.tamanho; y++) { let s = ''; for (let x = 0; x < qrPix.tamanho; x++) { const m = qrPix.modulo(x, y); s += m ? '1' : '0'; if (m) escurosQr++; } linhasQr.push(s); }
+  const fnv = (texto) => { let h = 0x811c9dc5; for (let i = 0; i < texto.length; i++) { h ^= texto.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); };
+  teste('QR do Pix: versão, nível e máscara iguais aos da referência', [qrPix.versao, qrPix.nivel, qrPix.mascara, qrPix.tamanho], [8, 'M', 2, 49]);
+  teste('QR do Pix: mesmos módulos da referência (impressão digital)', [escurosQr, fnv(linhasQr.join('|'))], [1220, '2eb6f035']);
+  teste('QR: texto vazio e acentos viram bytes UTF-8 corretos', [OBS.qr.utf8(''), OBS.qr.utf8('ã€')], [[], [0xC3, 0xA3, 0xE2, 0x82, 0xAC]]);
 </script></body></html>

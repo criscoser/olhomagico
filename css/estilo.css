@@ -205,6 +205,11 @@ button.apoio-principal { width:100%; min-height:3rem; font-size:1.05rem; }
 .apoio .passos { margin:var(--esp-3) 0; }
 .aviso-recebedor { margin:var(--esp-3) 0; padding:var(--esp-3) var(--esp-4); border-left:4px solid var(--ouro); border-radius:0 var(--raio) var(--raio) 0; background:var(--aviso-bg); }
 .apoio-chave { margin-top:var(--esp-3); }
+/* QR Code: SEMPRE preto sobre branco (também no tema escuro), para qualquer app de banco conseguir ler. */
+.apoio-qr { margin:0; text-align:center; }
+.apoio-qr svg { display:block; width:15rem; max-width:100%; height:auto; margin:0 auto var(--esp-2); background:#ffffff; border-radius:var(--raio); }
+.apoio-qr-celular { margin-top:var(--esp-3); }
+.apoio-qr-celular .apoio-qr { margin-top:var(--esp-3); }
 .apoio-chave code { margin:.3rem 0 .6rem; }
 
 /* ---------- Passo a passo dos atalhos para o portal ---------- */

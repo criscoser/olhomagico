@@ -683,13 +683,19 @@
   <p>O Olho Mágico é gratuito e independente. Se ele foi útil para você, pode contribuir com qualquer valor por Pix. O apoio ajuda a manter e melhorar o projeto.</p>
   <p class="meta">O apoio é voluntário: não dá acesso a nada e não muda o que o site mostra. O site não registra quem contribuiu: não há cadastro, lista de apoiadores nem formulário.</p>
   <div id="pixDados" class="apoio-pix">
-    <!-- QR Code: desenhado no navegador a partir do código Copia e Cola (js/apoio.js). -->
-    <figure class="apoio-qr oculto" id="apoioQr"></figure>
+    <!-- QR Code: desenhado no navegador A PARTIR do código Copia e Cola (js/apoio.js): os dois nunca divergem.
+         No computador fica aqui, em destaque; no celular vai para dentro de "Vai pagar com outro celular?". -->
+    <figure class="apoio-qr oculto" id="apoioQr"><figcaption class="meta">Aponte a câmera do app do banco (Pix → Ler QR Code).</figcaption></figure>
     <div class="apoio-acoes">
       <button type="button" class="apoio-principal" id="copiarCodigo">Copiar código Pix</button>
-      <ol class="passos" id="pixPassos">
+      <ol class="passos" id="passosCelular">
         <li>Toque em “Copiar código Pix”.</li>
         <li>No app do seu banco, abra <strong>Pix</strong> e escolha <strong>Pix Copia e Cola</strong>. Cole o código.</li>
+        <li>Escolha o valor e confira o nome do recebedor.</li>
+      </ol>
+      <ol class="passos oculto" id="passosComputador">
+        <li>Abra o app do seu banco no celular.</li>
+        <li>Escolha <strong>Pix</strong> e depois <strong>Ler QR Code</strong>. Ou use “Copiar código Pix” e cole em <strong>Pix Copia e Cola</strong>.</li>
         <li>Escolha o valor e confira o nome do recebedor.</li>
       </ol>
       <p class="aviso-recebedor"><strong>Confira o nome do recebedor no app do seu banco: <span id="pixNome"></span></strong>
@@ -702,6 +708,9 @@
         <p><button type="button" class="sec" id="copiarPix">Copiar chave</button></p>
         <p class="meta">Código Pix completo (se o botão não funcionar, toque e segure para copiar):</p>
         <code id="pixCodigo"></code>
+      </details>
+      <details class="apoio-qr-celular oculto" id="qrCelular">
+        <summary>Vai pagar com outro celular? Mostrar o QR Code</summary>
       </details>
     </div>
   </div>
@@ -735,6 +744,7 @@
 <script src="js/componentes/blocos.js"></script>
 <script src="js/componentes/menu.js"></script>
 <script src="js/pix-regras.js"></script>
+<script src="js/vendor/qrcodegen.js"></script>
 <script src="js/apoio.js"></script>
 <script src="js/pessoal-tela.js"></script>
 <script src="js/contratos-tela.js"></script>

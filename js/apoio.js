@@ -31,6 +31,35 @@
   $('pixNomeCurto').textContent = cfg.PIX_RECEBEDOR;
   $('pixSite').textContent = cfg.SITE_OFICIAL;
 
+  /* QR CODE: desenhado AQUI, a partir do MESMO texto do "Copiar código Pix" (não existe imagem separada que
+     possa ser trocada). Se o gerador falhar por qualquer motivo, o QR simplesmente não aparece; o código continua. */
+  let qr = null;
+  try {
+    qr = OBS.qr.svg(OBS.qr.gerar(codigo, 'M'));
+    qr.setAttribute('role', 'img');
+    qr.setAttribute('aria-label', `QR Code do Pix. Recebedor: ${cfg.PIX_NOME_COMPLETO}.`);
+    $('apoioQr').prepend(qr);
+  } catch (e) { console.warn('QR Code não gerado: ' + e.message); }
+
+  /* Celular x computador: decidido pela tela (toque e largura), nunca pelo nome do navegador.
+     Celular: copiar o código vem primeiro e o QR fica guardado em "Vai pagar com outro celular?".
+     Computador: o QR fica em destaque, ao lado. */
+  function ajustarModo() {
+    const celular = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 640;
+    caixa.dataset.modo = celular ? 'celular' : 'computador';
+    const passosDeCelular = celular || !qr;   // sem QR, o passo a passo é sempre o do "copiar e colar"
+    $('passosCelular').classList.toggle('oculto', !passosDeCelular);
+    $('passosComputador').classList.toggle('oculto', passosDeCelular);
+    if (!qr) return;
+    const figura = $('apoioQr');
+    if (celular) { $('qrCelular').append(figura); $('qrCelular').classList.remove('oculto'); } else {
+      $('pixDados').prepend(figura); $('qrCelular').classList.add('oculto');
+    }
+    figura.classList.remove('oculto');
+  }
+  ajustarModo();
+  $('btnApoio').addEventListener('click', ajustarModo);
+
   /* Copia um texto. Primeiro o jeito moderno (só funciona em https); se falhar, um método antigo. */
   async function copiar(texto) {
     try {

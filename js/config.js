@@ -23,7 +23,7 @@ OBS.config = {
   CAMARA_FOLHAS: 'https://www.camaravideira.sc.gov.br/imprensa/transparencia/0/4/0/644262',
   // PIX para apoio ao projeto. Os três valores precisam combinar: o site confere o código (js/pix-regras.js)
   // e, se algo não bater, NÃO mostra nada de Pix ("falha fechada"). Deixe PIX_CHAVE '' para esconder o botão.
-  // ATENÇÃO: trocar estes valores é a mudança mais sensível do projeto. Veja CLAUDE.md antes.
+  // ATENÇÃO: trocar estes valores é a mudança mais sensível do projeto. Veja REGRAS_INVIOLAVEIS.md antes.
   PIX_CHAVE: 'ec8e0fc1-33b9-437e-b64a-ff9b539bc57e',   // chave aleatória (não expõe CPF nem e-mail)
   // Código "Pix Copia e Cola" gerado pelo banco (sem valor fixo). O QR Code é desenhado A PARTIR deste texto.
   PIX_COPIA_E_COLA: '00020101021126580014br.gov.bcb.pix0136ec8e0fc1-33b9-437e-b64a-ff9b539bc57e5204000053039865802BR5913TIAGO C COSER6009SAO PAULO62070503***6304F8D7',

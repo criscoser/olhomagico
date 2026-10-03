@@ -6,7 +6,7 @@
    Por que conferir? Se alguém trocar só uma parte (a chave, o nome, ou só o código), a conferência
    falha e o site NÃO mostra nada de Pix ("falha fechada"). Assim, QR, código e chave dizem sempre
    a mesma coisa. Atenção: isto NÃO impede que alguém com acesso ao repositório troque TUDO junto;
-   para isso existem as proteções do GitHub (veja docs e CLAUDE.md). */
+   para isso existem as proteções do GitHub (veja docs e REGRAS_INVIOLAVEIS.md). */
 OBS.pix = {};
 
 /* CRC16-CCITT (polinômio 0x1021, valor inicial 0xFFFF), como manda o BR Code. Devolve 4 caracteres, ex.: "F8D7". */

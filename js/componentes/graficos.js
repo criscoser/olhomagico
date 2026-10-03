@@ -37,35 +37,115 @@ OBS.graficos = (function () {
     return ul;
   }
 
-  /* COLUNAS (gráfico de barras em pé), bom para meses: [{rotulo, valor, titulo?}].
-     Aceita valores negativos: a linha do zero sobe e a coluna desce a partir dela.
-     opcoes: destaque (índice da coluna em destaque), formatar, descricao (texto para leitor de tela). */
-  function colunas(serie, { destaque = -1, formatar = moedaCurta, descricao = '' } = {}) {
-    const caixa = el('figure', 'colunas');
-    const valores = serie.map((s) => (typeof s.valor === 'number' ? s.valor : 0));
-    const max = Math.max(0, ...valores), min = Math.min(0, ...valores);
-    const faixa = max - min || 1;
-    const zero = (-min / faixa) * 100;                  // altura da linha do zero, em %
-    const area = el('div', 'colunas-area');
-    area.setAttribute('role', 'img');
-    area.setAttribute('aria-label', descricao || 'Gráfico de colunas. Os números estão na tabela logo abaixo.');
-    serie.forEach((s, i) => {
-      const col = el('div', 'coluna' + (i === destaque ? ' destaque' : ''));
-      col.title = `${s.titulo || s.rotulo}: ${moeda(valores[i])}`;   // aparece ao passar o mouse
-      const barra = el('div', 'coluna-barra' + (valores[i] < 0 ? ' negativa' : ''));
-      const altura = (Math.abs(valores[i]) / faixa) * 100;
-      barra.style.height = `${Math.max(valores[i] === 0 ? 0 : 0.8, altura)}%`;
-      barra.style.bottom = valores[i] < 0 ? `${zero - altura}%` : `${zero}%`;
-      const trilho = el('div', 'coluna-trilho'); trilho.append(barra);
-      col.append(trilho, el('span', 'coluna-rotulo', s.rotulo));
-      area.append(col);
+  /* Passo "redondo" para as linhas de referência: 1, 2, 2,5 ou 5 vezes uma potência de 10. */
+  function passoRedondo(bruto) {
+    if (!(bruto > 0)) return 1;
+    const pot = 10 ** Math.floor(Math.log10(bruto));
+    return [1, 2, 2.5, 5, 10].map((m) => m * pot).find((x) => x >= bruto);
+  }
+
+  /* Linhas de referência (eixo): de "base" até "topo", com uns 3 a 4 intervalos. Função sem tela, testada. */
+  function eixo(valores) {
+    const nums = valores.filter((v) => typeof v === 'number' && Number.isFinite(v));
+    const max = Math.max(0, ...nums), min = Math.min(0, ...nums);
+    const passo = passoRedondo((max - min) / 3 || 1);
+    const topo = Math.ceil(max / passo) * passo || passo, base = Math.floor(min / passo) * passo;
+    const marcas = [];
+    for (let v = base; v <= topo + passo / 2; v += passo) marcas.push(Math.round(v * 1e6) / 1e6);
+    return { base, topo, marcas };
+  }
+
+  /* Frase com o maior e o menor valor (fato, sem opinião). Devolve '' se não houver ao menos dois valores diferentes. */
+  function extremos(serie, formatar) {
+    const com = serie.filter((s) => typeof s.valor === 'number');
+    if (com.length < 2) return '';
+    const maior = com.reduce((a, b) => (b.valor > a.valor ? b : a)), menor = com.reduce((a, b) => (b.valor < a.valor ? b : a));
+    if (maior.valor === menor.valor) return '';
+    const nome = (s) => s.titulo || s.rotulo;
+    return `Maior valor: ${nome(maior)}, ${formatar(maior.valor)}. Menor valor: ${nome(menor)}, ${formatar(menor.valor)}.`;
+  }
+
+  /* GRÁFICO DE COLUNAS com tudo escrito (a pessoa não precisa adivinhar):
+       título, frase com o maior e o menor valor, legenda das cores, linhas de referência com valores, o valor em cima de
+       cada barra e o nome de cada coluna embaixo. Em espaço estreito (celular, cartão), o MESMO gráfico vira barras
+       deitadas, uma por linha: nome à esquerda, valor à direita (nada depende de passar o mouse).
+     serie: [{ rotulo (curto, embaixo da coluna), titulo (nome completo, ex.: "setembro de 2026"), valor, parcial? }]
+     opcoes: titulo, destaque (índice), legendaDestaque (ex.: "mês escolhido"), resumo (true = frase do maior e menor),
+             formatar (valor por extenso), formatarCurto (valor em cima da coluna), descricao (texto para leitor de tela). */
+  function colunas(serie, o = {}) {
+    // Padrão: dinheiro no mesmo formato das frases ("R$ 46,2 milhões"); em cima da coluna e no eixo, curto ("46,2 mi").
+    const formatar = o.formatar || ((n) => OBS.frases.reais(n));
+    const curto = o.formatarCurto || ((n) => (n === 0 ? '0' : String(OBS.frases.reais(n)).replace(/\u00a0/g, ' ').replace(/^(−)?R\$ ?/, '$1')
+      .replace(' milhões', ' mi').replace(' milhão', ' mi').replace(' bilhões', ' bi').replace(' bilhão', ' bi')));
+    const destaque = typeof o.destaque === 'number' ? o.destaque : -1;
+    const fig = el('figure', 'grafico');
+    if (o.titulo) fig.append(el('figcaption', 'grafico-titulo', o.titulo));
+    const resumo = o.resumo ? extremos(serie, o.formatarResumo || formatar) : '';
+    if (resumo) fig.append(el('p', 'grafico-resumo', resumo));
+    // Legenda das cores, junto do gráfico.
+    const legenda = el('p', 'grafico-legenda');
+    if (destaque >= 0 && o.legendaDestaque) {
+      legenda.append(el('span', 'amostra amostra-destaque'), ` ${o.legendaDestaque}   `, el('span', 'amostra'), ` ${o.legendaOutros || 'outros'}`);
+    }
+    if (serie.some((s) => s.parcial)) legenda.append('   ', el('span', 'amostra amostra-parcial'), ' em andamento (parcial)');
+    if (serie.some((s) => typeof s.valor === 'number' && s.valor < 0)) legenda.append('   ', el('span', 'amostra amostra-negativa'), ' negativo (ajuste ou devolução)');
+    if (legenda.childNodes.length) fig.append(legenda);
+
+    const { base, topo, marcas } = eixo(serie.map((s) => s.valor));
+    const faixa = topo - base || 1;
+    const pos = (v) => ((v - base) / faixa) * 100;          // % a partir de baixo
+    const zero = pos(0);
+
+    // ----- Colunas em pé (espaço largo). Escondidas do leitor de tela: a lista abaixo diz o mesmo em texto. -----
+    const colunasEl = el('div', 'graf-colunas'); colunasEl.setAttribute('aria-hidden', 'true');
+    const eixoEl = el('div', 'graf-eixo'), area = el('div', 'graf-area'), barras = el('div', 'graf-barras');
+    marcas.forEach((v) => {
+      const linha = el('div', 'graf-grade' + (v === 0 ? ' zero' : '')); linha.style.bottom = `${pos(v)}%`; area.append(linha);
+      const r = el('span', 'graf-eixo-valor', curto(v)); r.style.bottom = `${pos(v)}%`; eixoEl.append(r);
     });
-    // A linha do zero é medida a partir do TOPO das colunas (os rótulos embaixo podem ter 1 ou 2 linhas).
-    const linhaZero = el('div', 'colunas-zero'); linhaZero.style.top = `calc(${(100 - zero) / 100} * var(--alt-colunas))`;
-    area.append(linhaZero);
-    // Escala: o maior valor aparece escrito no topo, para dar noção de grandeza.
-    caixa.append(el('div', 'colunas-escala meta', `Maior valor: ${formatar(max)}`), area);
-    return caixa;
+    const rotulos = el('div', 'graf-rotulos');
+    serie.forEach((s, i) => {
+      const classes = (i === destaque ? ' destaque' : '') + (s.parcial ? ' parcial' : '');
+      const col = el('div', 'graf-col' + classes);
+      col.title = `${s.titulo || s.rotulo}: ${formatar(s.valor)}`;
+      if (typeof s.valor === 'number') {
+        const b = el('div', 'graf-barra' + (s.valor < 0 ? ' negativa' : ''));
+        const h = Math.abs(pos(s.valor) - zero);
+        b.style.height = `${Math.max(s.valor === 0 ? 0 : 0.8, h)}%`;
+        b.style.bottom = `${s.valor < 0 ? zero - h : zero}%`;
+        const valor = el('span', 'graf-valor', curto(s.valor));
+        valor.style.bottom = `calc(${s.valor < 0 ? zero : zero + h}% + 2px)`;
+        col.append(b, valor);
+      } else {
+        const sem = el('span', 'graf-valor sem-dado', 'sem dado'); sem.style.bottom = `calc(${zero}% + 2px)`; col.append(sem);
+      }
+      barras.append(col);
+      const r = el('span', 'graf-rotulo' + classes, s.rotulo);
+      if (i === destaque && o.marcaDestaque !== false) r.append(el('small', '', o.marcaDestaque || 'escolhido'));
+      rotulos.append(r);
+    });
+    area.append(barras);
+    colunasEl.append(eixoEl, area, el('span', 'graf-canto'), rotulos);
+
+    // ----- Barras deitadas (espaço estreito) e, sempre, o texto para leitores de tela. -----
+    const lista = el('ul', 'graf-lista');
+    lista.setAttribute('aria-label', o.titulo || o.descricao || 'Valores do gráfico');
+    const maxAbs = Math.max(0, ...serie.map((s) => (typeof s.valor === 'number' ? Math.abs(s.valor) : 0))) || 1;
+    serie.forEach((s, i) => {
+      const li = el('li', (i === destaque ? 'destaque' : '') + (s.parcial ? ' parcial' : ''));
+      const nome = el('span', 'graf-lista-nome', s.titulo || s.rotulo);
+      if (i === destaque && o.legendaDestaque) nome.append(el('small', '', ` (${o.marcaDestaque || 'escolhido'})`));
+      if (s.parcial) nome.append(el('small', '', ' (parcial)'));
+      const trilho = el('span', 'graf-lista-trilho'); trilho.setAttribute('aria-hidden', 'true');
+      const barra = el('i', typeof s.valor === 'number' && s.valor < 0 ? 'negativa' : '');
+      barra.style.width = typeof s.valor === 'number' ? `${Math.max(s.valor === 0 ? 0 : 1, (Math.abs(s.valor) / maxAbs) * 100)}%` : '0%';
+      trilho.append(barra);
+      li.append(nome, trilho, el('span', 'graf-lista-valor', typeof s.valor === 'number' ? formatar(s.valor) : 'sem dado'));
+      lista.append(li);
+    });
+    fig.append(colunasEl, lista);
+    if (o.descricao) fig.setAttribute('aria-label', o.descricao);
+    return fig;
   }
 
   /* HISTOGRAMA: conta quantos valores caem em cada faixa. Devolve [{de, ate, quantidade}].
@@ -125,5 +205,5 @@ OBS.graficos = (function () {
     return caixa;
   }
 
-  return { barras, colunas, faixas, medidor, vigencia, moedaCurta };
+  return { barras, colunas, faixas, medidor, vigencia, moedaCurta, eixo, extremos, passoRedondo };
 })();

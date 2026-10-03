@@ -18,9 +18,11 @@ OBS.inicioTela = (function () {
     const fechados = meses.filter((m) => !m.parcial && m.registros > 0);
     const ultimo = fechados[fechados.length - 1];
     if (!ultimo) return semDado(pergunta, '#gastos');
-    const doze = OBS.historico.doResumo(resumo, OBS.historico.meses(ultimo.anoMes, 12)) || [];
-    const grafico = doze.length === 12 ? OBS.graficos.colunas(doze.map((m) => ({ rotulo: OBS.mesCurto(Number(m.anoMes.slice(5))).charAt(0).toUpperCase(), valor: m.pago,   // inicial do mês: cabe no celular
-      titulo: OBS.periodoDoMes(m.anoMes).nome })), { destaque: 11, descricao: 'Valor pago pelo Município em cada um dos últimos 12 meses completos. Os números estão na aba Gastos.' }) : null;
+    const seis = OBS.historico.doResumo(resumo, OBS.historico.meses(ultimo.anoMes, 6)) || [];
+    const grafico = seis.length === 6 ? OBS.graficos.colunas(seis.map((m) => ({ rotulo: OBS.historico.rotulo(m.anoMes), valor: m.pago,
+      titulo: OBS.periodoDoMes(m.anoMes).nome })), { destaque: 5, titulo: 'Valor pago em cada um dos últimos 6 meses completos',
+      legendaDestaque: 'mês mais recente', legendaOutros: 'meses anteriores', marcaDestaque: 'mais recente',
+      descricao: 'Valor pago pelo Município em cada um dos últimos 6 meses completos.' }) : null;
     return OBS.cartaoPergunta({ pergunta, frase: F.gastoDoMes({ anoMes: ultimo.anoMes, pago: ultimo.total.pago }),
       exato: `Valor exato: ${moeda(ultimo.total.pago)}. Inclui Prefeitura, Câmara, autarquias, fundação e fundos.`,
       extra: grafico, periodo: OBS.periodoDoMes(ultimo.anoMes).nome,

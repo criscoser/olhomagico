@@ -103,9 +103,11 @@ OBS.fichas = (function () {
           painel.append(el('h3', '', `Salário-base de quem tem o cargo “${s.cargo}”`),
             el('p', '', `São ${qtd(comp.total)} registros com este cargo. ${qtd(comp.maiores)} têm salário-base maior que este, ` +
               `${qtd(comp.menores)} menor e ${qtd(comp.iguais - 1)} igual.`),
-            OBS.graficos.colunas(serie, { destaque: minha, formatar: (n) => `${qtd(n)} registros`,
+            OBS.graficos.colunas(serie, { destaque: minha, formatar: (n) => `${qtd(n)} ${n === 1 ? 'registro' : 'registros'}`, formatarCurto: (n) => qtd(n),
+              titulo: `Quantos registros do cargo há em cada faixa de salário-base`, legendaDestaque: 'faixa deste registro',
+              legendaOutros: 'outras faixas', marcaDestaque: 'este registro',
               descricao: `Distribuição do salário-base entre os ${comp.total} registros com o cargo ${s.cargo}.` }),
-            el('p', 'meta', 'Unidade: quantidade de registros por faixa de salário-base (em reais). Legenda: a coluna dourada é a faixa deste registro. ' +
+            el('p', 'meta', 'Cada coluna é uma faixa de salário-base (o número embaixo é onde a faixa começa, em reais). ' +
               'Diferenças podem vir de tempo de serviço, nível na carreira ou carga horária; não indicam irregularidade.'));
         }
         // O QUE ESTA FICHA NÃO TEM (antes eram duas abas que só diziam "não temos"): uma lista curta e direta.
@@ -233,7 +235,7 @@ OBS.fichas = (function () {
       porMes.forEach((m) => m.orgaos.forEach(([o, v]) => orgaos.set(o, (orgaos.get(o) || 0) + v)));
       area.replaceChildren(...[frase,
         OBS.graficos.colunas(porMes.map((m) => ({ rotulo: OBS.historico.rotulo(m.anoMes), valor: m.pago, titulo: OBS.periodoDoMes(m.anoMes).nome })),
-          { descricao: 'Valor pago a este CNPJ em cada mês. Os números estão na tabela abaixo.' }),
+          { resumo: true, titulo: 'Valor pago a este CNPJ em cada mês', descricao: 'Valor pago a este CNPJ em cada mês. Os números estão na tabela abaixo.' }),
         el('p', 'meta', 'As colunas mostram o valor PAGO. Na tabela, as três etapas aparecem separadas: não some as colunas.'),
         t.elemento,
         orgaos.size ? el('h4', '', 'Quem pagou (órgãos do município), somando os 12 meses') : null,

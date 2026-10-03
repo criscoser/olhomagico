@@ -41,7 +41,10 @@ OBS.contasTela = (function () {
       const ordem = poder.periodos.slice().sort((a, b) => (a.ano - b.ano) || (a.periodo - b.periodo));
       const det = el('details'); det.append(el('summary', '', 'Ver os períodos anteriores (números exatos)'));
       det.append(OBS.graficos.colunas(ordem.map((p) => ({ rotulo: `${p.periodo}${p.periodicidade}/${String(p.ano).slice(2)}`, valor: p.dtpPct, titulo: p.rotulo })),
-        { destaque: ordem.length - 1, formatar: pct, descricao: 'Gasto com pessoal em cada período. Os números estão na tabela abaixo.' }));
+        { destaque: ordem.length - 1, formatar: pct, formatarCurto: pct, resumo: true,
+          titulo: 'Gasto com pessoal declarado em cada período (% da receita corrente líquida)',
+          legendaDestaque: 'período mais recente', legendaOutros: 'períodos anteriores', marcaDestaque: 'mais recente',
+          descricao: 'Gasto com pessoal em cada período. Os números estão na tabela abaixo.' }));
       const t = OBS.tabela({ colunas: [{ chave: 'rotulo', titulo: 'Período', ordenavel: false }, { chave: 'dtpPct', titulo: 'Gasto com pessoal', tipo: 'pct', ordenavel: false }], porPagina: 20 });
       det.append(el('p', 'meta', 'Q = quadrimestre, S = semestre.'), t.elemento); t.mostrar(ordem.slice().reverse());
       caixa.append(det);
@@ -91,10 +94,12 @@ OBS.contasTela = (function () {
         frase.append(` No mesmo período de ${ano - 1}, foram ${OBS.frases.reais(anterior)} (${variacao >= 0 ? 'alta' : 'queda'} de ${pct(Math.abs(Math.round(variacao * 10) / 10))}).`);
       }
       $('transfExato').textContent = `Valor exato: ${moeda(total)}` + (anterior !== null ? `; em ${ano - 1}, no mesmo período: ${moeda(anterior)}.` : '.');
-      const serie = meses.map((v, i) => ({ rotulo: OBS.mesCurto(i + 1), valor: v, titulo: `${OBS.MESES[i]} de ${ano}${v === null ? ' (sem dado)' : ''}` }));
-      $('transfGrafico').replaceChildren(OBS.graficos.colunas(serie, { destaque: ultimo - 1,
+      const serie = meses.map((v, i) => ({ rotulo: OBS.mesCurto(i + 1), valor: v, titulo: `${OBS.MESES[i].toLowerCase()} de ${ano}` }));
+      $('transfGrafico').replaceChildren(OBS.graficos.colunas(serie, { destaque: ultimo - 1, resumo: true,
+        titulo: `Valor recebido ${tipo ? `de “${tipo}” ` : 'em transferências constitucionais '}em cada mês de ${ano}`,
+        legendaDestaque: 'mês mais recente com dado', legendaOutros: 'outros meses', marcaDestaque: 'mais recente',
         descricao: `Valor recebido em cada mês de ${ano}. Os valores por tipo estão na tabela abaixo.` }),
-        el('p', 'meta', 'Meses sem coluna ainda não têm dado na fonte. O mês mais recente pode estar incompleto: a fonte acrescenta ' +
+        el('p', 'meta', '"Sem dado" = a fonte ainda não publicou o mês. O mês mais recente pode estar incompleto: a fonte acrescenta ' +
           'os repasses ao longo do mês. Valores negativos são ajustes e devoluções, como a fonte publica.'));
       tabela.mostrar(T.porTipo(regs, ano).filter((x) => !tipo || x.tipo === tipo));
     }
@@ -315,8 +320,10 @@ OBS.contasTela = (function () {
       }
       $('beneficioGrafico').replaceChildren(
         OBS.graficos.colunas(linhas.map((b) => ({ rotulo: OBS.historico.rotulo(`${b.mes.slice(0, 4)}-${b.mes.slice(4, 6)}`), valor: b.valor, titulo: mesNome(b.mes) })),
-          { destaque: linhas.length - 1, descricao: `Valor pago pelo ${prog} em Videira em cada mês. Os números estão na tabela abaixo.` }),
-        el('p', 'meta', 'Unidade: reais pagos no mês. Meses sem coluna ainda não foram publicados pela CGU.'));
+          { destaque: linhas.length - 1, resumo: true, titulo: `Valor pago pelo ${prog} às famílias de Videira em cada mês`,
+            legendaDestaque: 'mês mais recente', legendaOutros: 'meses anteriores', marcaDestaque: 'mais recente',
+            descricao: `Valor pago pelo ${prog} em Videira em cada mês. Os números estão na tabela abaixo.` }),
+        el('p', 'meta', 'Unidade: reais pagos no mês. A CGU publica os meses com algum atraso.'));
       t.mostrar(linhas.slice().reverse());
     };
     $('programaBeneficio').addEventListener('change', atualizar);

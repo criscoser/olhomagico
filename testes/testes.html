@@ -204,6 +204,12 @@
   teste('histograma: nenhum valor se perde', fx.reduce((t, f) => t + f.quantidade, 0), 5);
   teste('histograma: o maior valor cai na última faixa', fx[fx.length - 1].quantidade >= 1 && fx[fx.length - 1].ate > 9999.99, true);
   teste('histograma: lista vazia', OBS.graficos.faixas([null, undefined]), []);
+  teste('gráfico: eixo com passo redondo', OBS.graficos.eixo([46165401.23, 30000000, 12000000]), { base: 0, topo: 60000000, marcas: [0, 20000000, 40000000, 60000000] });
+  teste('gráfico: eixo com negativo', OBS.graficos.eixo([-5, 10, null]), { base: -5, topo: 10, marcas: [-5, 0, 5, 10] });
+  teste('gráfico: eixo sem valores', OBS.graficos.eixo([null]), { base: 0, topo: 1, marcas: [0, 1] });
+  teste('gráfico: frase do maior e do menor', OBS.graficos.extremos([{ titulo: 'agosto', valor: 10 }, { titulo: 'setembro', valor: 30 }, { titulo: 'outubro', valor: null }], (n) => `R$ ${n}`),
+    'Maior valor: setembro, R$ 30. Menor valor: agosto, R$ 10.');
+  teste('gráfico: sem frase se todos iguais', OBS.graficos.extremos([{ rotulo: 'a', valor: 5 }, { rotulo: 'b', valor: 5 }], String), '');
   teste('valor curto', [OBS.graficos.moedaCurta(3622769.83), OBS.graficos.moedaCurta(980000), OBS.graficos.moedaCurta(-2500000)], ['R$ 3,6 mi', 'R$ 980 mil', '-R$ 2,5 mi']);
   // ----- Vários meses (evolução e pagamentos de um fornecedor) -----
   teste('12 meses atravessam o ano', OBS.historico.meses('2026-02', 3), ['2025-12', '2026-01', '2026-02']);

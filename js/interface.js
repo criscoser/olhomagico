@@ -226,7 +226,7 @@ OBS.ui = (function () {
     const nomes = { pago: 'pago', liquidado: 'liquidado', empenhado: 'empenhado' };
     const totais = evolucao;
     const serie = totais.map((m) => ({ rotulo: OBS.historico.rotulo(m.anoMes), valor: m[etapa],
-      titulo: OBS.periodoDoMes(m.anoMes).nome + (m.erro ? ' (não respondeu)' : '') + (m.parcial ? ' (parcial)' : '') }));
+      titulo: OBS.periodoDoMes(m.anoMes).nome + (m.erro ? ' (não respondeu)' : '') }));
     const t = OBS.tabela({ colunas: [
       { chave: 'anoMes', titulo: 'Mês', formatar: (v, l) => OBS.periodoDoMes(v).nome + (l.parcial ? ' (parcial)' : ''), ordenavel: false },
       { chave: 'empenhado', titulo: 'Empenhado', tipo: 'moeda', ordenavel: false },
@@ -236,8 +236,11 @@ OBS.ui = (function () {
     const det = el('details'); det.append(el('summary', '', 'Ver os números exatos'), t.elemento);
     const erros = totais.filter((m) => m.erro).length;
     $('evolucaoConteudo').replaceChildren(
-      OBS.graficos.colunas(serie, { destaque: serie.length - 1, descricao: `Valor ${nomes[etapa]} em cada mês. Os números estão na tabela abaixo.` }),
-      el('p', 'meta', `Colunas: valor ${nomes[etapa]} em cada mês; a última é o mês escolhido.` +
+      OBS.graficos.colunas(serie.map((s, i) => Object.assign(s, { parcial: totais[i].parcial })), { destaque: serie.length - 1, resumo: true,
+        titulo: `Valor ${nomes[etapa]} pelo Município em cada mês: ${OBS.periodoDoMes(totais[0].anoMes).nome} a ${OBS.periodoDoMes(totais[totais.length - 1].anoMes).nome}`,
+        legendaDestaque: `mês escolhido (${OBS.periodoDoMes(totais[totais.length - 1].anoMes).nome})`, legendaOutros: 'meses anteriores',
+        descricao: `Valor ${nomes[etapa]} em cada mês. Os números exatos estão na tabela abaixo.` }),
+      el('p', 'meta', '' +
         (erros ? ` ${erros} mês(es) não responderam e ficaram em branco.` : '') +
         (totais.some((m) => m.parcial) ? ' O último mês ainda está em andamento (valor parcial).' : '') +
         ' Pagamentos se concentram em alguns meses (13º salário, etapas de obras): compare com cuidado. ' + evolucaoFonte),

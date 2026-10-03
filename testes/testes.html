@@ -15,6 +15,7 @@
 <script src="../js/transferencias-regras.js"></script>
 <script src="../js/busca-regras.js"></script>
 <script src="../js/historico.js"></script>
+<script src="../js/frases.js"></script>
 <script src="../js/componentes/graficos.js"></script>
 <script src="../js/rotas.js"></script>
 <script src="../js/pix-regras.js"></script>
@@ -252,6 +253,32 @@
       .map(OBS.rotas.redirecionar),
     ['#pessoal', '#pessoal/lista', '#limites', '#entradas/transferencias', '#entradas/beneficios', '#gastos/areas', '#limites/educacao', '#glossario/sigla-fpm']);
   teste('rotas: endereços novos ficam como estão', ['#gastos/2026-09', '#pessoal', '#contratos', '#contasx', ''].map(OBS.rotas.redirecionar), [null, null, null, null, null]);
+  // ----- Gerador de frases (linguagem simples, sem opinião, sujeito certo) -----
+  const F0 = OBS.frases;
+  // Nos testes, o espaço que não quebra linha (usado depois de "R$") é comparado como espaço comum.
+  const semNbsp = (x) => (typeof x === 'string' ? x.replace(/ /g, ' ') : x);
+  const F = Object.fromEntries(Object.entries(F0).map(([k, f]) => [k, typeof f === 'function' ? (...a) => semNbsp(f(...a)) : f]));
+  teste('frases: reais por extenso', [46165401.23, 1500000, 1999999, 2000000, 980000.4, 233594.31, 1004.99, 999.5, -70670.44, 2.5e9, 1e9]
+    .map(F.reais), ['R$ 46,2 milhões', 'R$ 1,5 milhão', 'R$ 2 milhões', 'R$ 2 milhões', 'R$ 980 mil', 'R$ 234 mil', 'R$ 1 mil',
+    'R$ 999,50', '−R$ 71 mil', 'R$ 2,5 bilhões', 'R$ 1 bilhão']);
+  teste('frases: percentual junto a limite mantém as casas da fonte (53,98% não vira 54%)', [F.pct(53.98), F.pct(24.96), F.pct(54)], ['53,98%', '24,96%', '54%']);
+  teste('frases: gasto do mês fala do MUNICÍPIO e põe o período primeiro', F.gastoDoMes({ anoMes: '2026-09', pago: 46165401.23 }),
+    'Em setembro de 2026, o Município de Videira pagou R$ 46,2 milhões.');
+  teste('frases: mês em andamento diz que é parcial na própria frase', F.gastoDoMes({ anoMes: '2026-10', pago: 233594.31, parcial: true }),
+    'Até agora em outubro de 2026 (o mês ainda não terminou), o Município de Videira pagou R$ 234 mil.');
+  teste('frases: sem dado não vira "R$ 0"', F.gastoDoMes({ anoMes: '2026-11', pago: 0, vazio: true }), 'A fonte ainda não publicou os gastos de novembro de 2026.');
+  teste('frases: gasto com pessoal é da PREFEITURA e é DECLARADO', F.limitePessoal({ rotulo: '2º quadrimestre de 2026', dtpPct: 43.77, limiteMaximoPct: 54 }),
+    'No 2º quadrimestre de 2026, a Prefeitura declarou ao Tesouro um gasto com pessoal de 43,77% da receita corrente líquida. O limite máximo da lei é 54%.');
+  teste('frases: pessoal do Município, com aposentados e pensionistas', F.pessoal({ registros: 3049, comissionados: 110, inativos: 663 }),
+    'A lista de pessoal do Município tem 3.049 registros, incluindo 663 de aposentados e pensionistas. 110 são cargos de indicação (comissionados).');
+  teste('frases: detector de opinião', [F.opiniao('o gasto foi muito alto'), F.opiniao('Só R$ 2 mil'), F.opiniao('alta de 12,4%'), F.opiniao('pagou R$ 2 mil')],
+    ['muito', 'só', null, null]);
+  teste('frases: NENHUMA frase gerada tem palavra de opinião', [
+    F.gastoDoMes({ anoMes: '2026-09', pago: 1 }), F.gastoDoMes({ anoMes: '2026-10', pago: 1, parcial: true }), F.gastoDoMes({ anoMes: '2026-10', vazio: true }),
+    F.transferencias(2026, 9, 96038059.66), F.pessoal({ registros: 1, comissionados: 1, inativos: 1 }), F.contratos({ contratos: 1, valorGlobal: 1 }),
+    F.limitePessoal({ rotulo: 'x', dtpPct: 1, limiteMaximoPct: 54 }), F.pautaCamara({ titulo: 'Pauta', data: '2026-10-06 20:30:00' })
+  ].map(F.opiniao).filter(Boolean), []);
+  teste('frases: nenhuma frase do Município chama os gastos de "Prefeitura"', /Prefeitura/.test(F.gastoDoMes({ anoMes: '2026-09', pago: 1 }) + F.contratos({ contratos: 1, valorGlobal: 1 }) + F.pessoal({ registros: 1 })), false);
   // ----- Resumo diário das despesas (dados/despesas-resumo.js) -----
   const RESUMO = { meses: [
     { anoMes: '2026-08', registros: 10, parcial: false, credoresQueReceberam: 7, total: { empenhado: 3, liquidado: 2, pago: 1 } },

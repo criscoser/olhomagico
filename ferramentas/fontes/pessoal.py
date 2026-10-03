@@ -71,9 +71,12 @@ def remover_repetidos(registros):
 
 
 def resumo(conteudo):
-    """Números curtos para o painel inicial: total de registros e quantos são cargos comissionados."""
+    """Números curtos para o painel inicial: total de registros, cargos comissionados e aposentados/pensionistas
+    (a lista é do Município inteiro e inclui inativos do instituto de previdência)."""
     lista = conteudo["servidores"]
-    return {"registros": len(lista), "comissionados": sum(1 for s in lista if "comission" in (s.get("vinculo") or "").lower())}
+    vinculo = lambda s: (s.get("vinculo") or "").lower()
+    return {"registros": len(lista), "comissionados": sum(1 for s in lista if "comission" in vinculo(s)),
+            "inativos": sum(1 for s in lista if "aposentad" in vinculo(s) or "pensionist" in vinculo(s))}
 
 
 def coletar(municipio, pausa=1.5, avisar=print):

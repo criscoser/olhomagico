@@ -470,7 +470,7 @@ class TestCoordenador(unittest.TestCase):
             si = ler_js(dados / "siope.js", "OBS_DADOS_SIOPE")
             self.assertEqual(si["periodos"][0]["indicadores"][0]["valor"], 28.08)
             sit0 = ler_js(dados / "situacao.js", "OBS_SITUACAO")
-            self.assertEqual(sit0["pessoal"]["resumo"], {"registros": 150, "comissionados": 0})
+            self.assertEqual(sit0["pessoal"]["resumo"], {"registros": 150, "comissionados": 0, "inativos": 0})
             self.assertEqual(sit0["pncp"]["resumo"]["contratos"], 2)
             antes = (dados / "pncp.js").read_text()
 

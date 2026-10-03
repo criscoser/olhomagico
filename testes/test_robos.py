@@ -276,6 +276,34 @@ class TestRecuperacao(unittest.TestCase):
         self.assertEqual(len(recuperar.ARQUIVOS), 10)
 
 
+class TestConferenciaPix(unittest.TestCase):
+    """O código Pix que vai para o ar precisa bater com a impressão digital guardada fora do repositório."""
+
+    def montar(self, pasta, config):
+        (Path(pasta) / "js").mkdir(parents=True, exist_ok=True)
+        (Path(pasta) / "js" / "config.js").write_text(config, encoding="utf-8")
+
+    def test_conferencia(self):
+        import hashlib
+        import conferir_pix
+        real = (RAIZ / "js" / "config.js").read_text(encoding="utf-8")
+        codigo = conferir_pix.extrair_codigo(real)
+        self.assertTrue(codigo and codigo.endswith("6304F8D7"))
+        certo = hashlib.sha256(codigo.encode()).hexdigest()
+        with tempfile.TemporaryDirectory() as pasta:
+            self.montar(pasta, real)
+            self.assertEqual(conferir_pix.conferir(pasta, certo)[0], 0)                   # igual: publica
+            self.assertEqual(conferir_pix.conferir(pasta, certo.upper())[0], 0)           # maiúsculas no Secret: tudo bem
+            saida, msg = conferir_pix.conferir(pasta, "")                                  # sem Secret: aviso, publica
+            self.assertEqual(saida, 0); self.assertIn("::warning::", msg)
+            self.assertEqual(conferir_pix.conferir(pasta, "0" * 64)[0], 1)                 # diferente: bloqueia
+            self.montar(pasta, real.replace("ec8e0fc1", "ffffffff"))                       # código trocado no arquivo
+            saida, msg = conferir_pix.conferir(pasta, certo)
+            self.assertEqual(saida, 1); self.assertNotIn(certo, msg)                       # a impressão nunca aparece
+            self.montar(pasta, real + "\nOBS.config.PIX_COPIA_E_COLA: 'outro'")           # código duplicado: bloqueia
+            self.assertEqual(conferir_pix.conferir(pasta, certo)[0], 1)
+
+
 class TestCoordenador(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

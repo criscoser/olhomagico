@@ -70,6 +70,13 @@ jobs:
           mkdir _site
           cp -r index.html css js dados _site/
 
+      - name: Conferir o Pix que vai para o ar
+        # ÚLTIMO passo antes de enviar: compara o código Pix de _site com a impressão digital guardada FORA do
+        # repositório (Secret PIX_SHA256). Se for diferente, o site NÃO é publicado (fica a versão anterior no ar).
+        env:
+          PIX_SHA256: ${{ secrets.PIX_SHA256 }}
+        run: python3 ferramentas/conferir_pix.py _site
+
       - name: Enviar a pasta para o GitHub Pages
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

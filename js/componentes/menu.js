@@ -1,11 +1,10 @@
-/* MENU (Sidebar / MobileMenu)
-   - No computador (acima de 1024 px): o menu fica RECOLHIDO, só com os ícones. Ele abre quando o mouse passa
-     por cima ou quando recebe o foco do teclado (isso é feito só com CSS). O botão "Manter o menu aberto" fixa.
-   - Até 1024 px: barra no topo com o botão "Menu".
-   Regras de acessibilidade do guia:
-     - o botão informa se o menu está aberto (aria-expanded);
-     - a tecla Esc fecha o menu e devolve o foco ao botão;
-     - escolher uma seção fecha o menu.
+/* MENU
+   - No computador (acima de 1024 px): menu lateral SEMPRE aberto, com o nome de cada seção (só CSS).
+   - Até 1024 px: barra inferior com 5 atalhos; o botão "Mais" abre o corpo do menu como uma folha que sobe de baixo.
+   Regras de acessibilidade:
+     - o botão "Mais" informa se a folha está aberta (aria-expanded);
+     - a tecla Esc fecha a folha e devolve o foco ao botão; tocar fora dela também fecha;
+     - escolher uma seção (ou trocar de tela) fecha a folha.
    Também cuida do botão de tema (claro/escuro). As escolhas ficam guardadas só neste navegador. */
 OBS.menu = (function () {
   const { $ } = OBS;
@@ -17,8 +16,9 @@ OBS.menu = (function () {
 
   function abrir(sim) {
     $('lateral').classList.toggle('aberto', sim);
+    document.body.classList.toggle('mais-aberto', sim);   // escurece o fundo atrás da folha
     $('btnMenu').setAttribute('aria-expanded', String(sim));
-    $('btnMenu').textContent = sim ? 'Fechar' : 'Menu';
+    $('btnMenuTexto').textContent = sim ? 'Fechar' : 'Mais';
   }
 
   /* Tema: "claro" (padrão), "escuro", ou null = segue o modo do celular/computador (prefers-color-scheme).
@@ -35,25 +35,14 @@ OBS.menu = (function () {
     document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = claro ? '#FAF8F5' : '#16111D'; });
   }
 
-  /* Menu fixo aberto (só no computador). */
-  function fixar(sim) {
-    document.body.classList.toggle('menu-fixo', sim);
-    $('btnFixar').setAttribute('aria-pressed', String(sim));
-  }
-
   function iniciar() {
     aplicarTema(lembrado('tema'));
-    fixar(lembrado('menu-fixo') === 'sim');
     $('btnTema').addEventListener('click', () => {
       const novo = temaEfetivo() === 'claro' ? 'escuro' : 'claro';
       aplicarTema(novo); lembrar('tema', novo);
     });
     // Sem escolha guardada, acompanha a troca de modo do sistema (ex.: celular que escurece à noite).
     sistemaEscuro.addEventListener('change', () => { if (!escolhido) aplicarTema(null); });
-    $('btnFixar').addEventListener('click', () => {
-      const sim = !document.body.classList.contains('menu-fixo');
-      fixar(sim); lembrar('menu-fixo', sim ? 'sim' : 'nao');
-    });
     $('btnMenu').addEventListener('click', () => {
       const vaiAbrir = $('btnMenu').getAttribute('aria-expanded') !== 'true';
       abrir(vaiAbrir);
@@ -62,9 +51,13 @@ OBS.menu = (function () {
     $('menuPrincipal').addEventListener('click', (ev) => {
       const link = ev.target.closest('a');
       if (!link) return;
-      if (!larga.matches) abrir(false);              // celular: escolheu uma seção, o menu fecha
-      else if (ev.detail > 0) link.blur();           // computador, clique do mouse: tira o foco para o menu recolher
+      if (!larga.matches) abrir(false);              // celular: escolheu uma seção, a folha fecha
     });
+    // Tocar fora da folha (no fundo escurecido) fecha; trocar de tela também.
+    document.addEventListener('click', (ev) => {
+      if (document.body.classList.contains('mais-aberto') && !ev.target.closest('#lateralCorpo, #btnMenu')) abrir(false);
+    });
+    window.addEventListener('hashchange', () => abrir(false));
     // Esc fecha e devolve o foco ao botão que abriu.
     document.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape' && $('btnMenu').getAttribute('aria-expanded') === 'true') { abrir(false); $('btnMenu').focus(); }

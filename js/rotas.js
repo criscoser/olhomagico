@@ -28,10 +28,10 @@ OBS.rotas = (function () {
   /* Mostra só uma vista e marca no menu a aba correspondente. */
   function exibir(idVista, abaDoMenu) {
     VISTAS.forEach((v) => OBS.$(v).classList.toggle('oculto', v !== idVista));
-    document.querySelectorAll('a.aba').forEach((link) => {
+    document.body.dataset.rota = abaDoMenu || '';   // usado pelo CSS (ex.: a pesquisa aparece no topo na tela de busca)
+    document.querySelectorAll('a.aba, a.aba-inferior').forEach((link) => {
       if (link.getAttribute('href') === `#${abaDoMenu}`) {
         link.setAttribute('aria-current', 'page');
-        link.parentElement.scrollLeft = Math.max(0, link.offsetLeft - 16);   // no celular o menu rola para o lado
       } else {
         link.removeAttribute('aria-current');
       }
@@ -56,8 +56,10 @@ OBS.rotas = (function () {
       return;
     }
     if (nome === 'busca') {
-      exibir('vista-busca', '');
+      exibir('vista-busca', 'busca');
       await OBS.buscaTela.abrir(resto);
+      // Sem nada digitado (ex.: tocou em "Buscar" na barra inferior): o cursor já vai para a caixa de pesquisa.
+      if (!resto) { primeira = false; window.scrollTo(0, 0); OBS.$('campoBusca').focus(); return; }
       focarTitulo('vista-busca');
       return;
     }

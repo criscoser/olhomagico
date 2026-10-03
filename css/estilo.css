@@ -63,7 +63,6 @@
   --sombra-2: 0 -2px 10px rgba(31, 26, 36, .12);             /* barra inferior e folha "Mais" */
   --sombra-3: 0 12px 32px rgba(31, 26, 36, .22);             /* diálogo */
   --largura-lateral: 15rem;   /* menu aberto */
-  --trilho: 4.25rem;          /* menu recolhido (só ícones) */
   color-scheme: light;
 }
 /* TEMA ESCURO: pela preferência do sistema (se a pessoa não escolheu o claro) ou pela escolha no botão.
@@ -115,10 +114,10 @@ a:hover { text-decoration-thickness:2px; }
 a.pular { position:absolute; left:-999px; top:0; z-index:50; padding:.6rem 1rem; background:var(--cartao); color:var(--marca); font-weight:700; }
 a.pular:focus { left:.5rem; top:.5rem; }
 
-/* ================= AppShell: menu lateral recolhível + conteúdo =================
-   Acima de 1024 px: o menu fica RECOLHIDO à esquerda (só os ícones) e abre por cima do conteúdo quando o mouse
-   passa sobre ele ou quando ele recebe o foco do teclado. O botão "Manter o menu aberto" deixa aberto de vez.
-   Até 1024 px: barra no topo com o botão "Menu", que abre a lista. */
+/* ================= AppShell: menu lateral + conteúdo + barra inferior =================
+   Acima de 1024 px: menu lateral SEMPRE aberto, com o nome de cada seção (nada aparece só ao passar o mouse).
+   Até 1024 px: topo só com a marca; barra INFERIOR fixa com 5 atalhos (perto do polegar); "Mais" abre o corpo
+   do menu como uma folha que sobe de baixo, por cima de um fundo escurecido. */
 .app { min-height:100vh; }
 .lateral { background:var(--menu-fundo); color:var(--menu-texto); }
 .lateral-topo { display:flex; align-items:center; justify-content:space-between; gap:var(--esp-3); padding:var(--esp-3) var(--esp-4); }
@@ -129,7 +128,6 @@ h1.marca a { display:inline-flex; align-items:center; gap:.7rem; color:var(--men
 /* Logo V3: uvas lilás (o menu é escuro nos dois temas), aro dourado e lente uva. */
 .logo { width:2rem; height:2rem; flex:none; }
 .logo-uva { fill:#CDB6F0; } .logo-aro { fill:var(--menu-marcador); } .logo-lente { fill:#3B1F5C; }
-.btn-menu { background:transparent; color:var(--menu-texto); border:1px solid var(--menu-texto-2); min-height:var(--alvo); }
 .lateral-corpo { display:flex; flex-direction:column; }
 nav.menu { display:flex; flex-direction:column; gap:2px; padding:var(--esp-2) var(--esp-3); }
 /* Itens do menu: ícone + nome. */
@@ -146,33 +144,43 @@ nav.menu a.aba[aria-current="page"] .icone { color:var(--menu-marcador); }
 button.item-lateral { color:var(--menu-texto-2); font-size:var(--letra-legenda); }
 button.item-lateral[aria-pressed="true"] { color:var(--menu-marcador); }
 
-@media (min-width: 64.0625rem) {   /* acima de 1024 px: menu recolhível */
-  .app { padding-left:var(--trilho); }
-  .lateral { position:fixed; top:0; bottom:0; left:0; z-index:30; width:var(--trilho); overflow:hidden;
+/* Barra inferior: escondida no computador. */
+.barra-inferior { display:none; }
+
+@media (min-width: 64.0625rem) {   /* acima de 1024 px: menu lateral fixo e aberto */
+  .app { padding-left:var(--largura-lateral); }
+  .lateral { position:fixed; top:0; bottom:0; left:0; z-index:30; width:var(--largura-lateral);
     display:flex; flex-direction:column; border-right:1px solid var(--menu-linha); }
   .lateral-corpo { flex:1; justify-content:space-between; overflow-y:auto; overflow-x:hidden; }
-  .lateral-topo { padding:var(--esp-4) .9rem; }
-  nav.menu, .lateral-rodape { padding-left:.55rem; padding-right:.55rem; }
-  .btn-menu { display:none; }
-  /* Recolhido: os nomes ficam transparentes (continuam no código, então o leitor de tela lê normalmente). */
-  .lateral .rotulo { opacity:0; transition:opacity .15s; }
-  /* Aberto: ao passar o mouse, ao receber o foco do teclado, ou fixado pelo botão. */
-  .lateral:hover, .lateral:focus-within, .menu-fixo .lateral { width:var(--largura-lateral); }
-  .lateral:hover .rotulo, .lateral:focus-within .rotulo, .menu-fixo .lateral .rotulo { opacity:1; }
-  .lateral:hover, .lateral:focus-within { box-shadow:8px 0 30px rgba(0, 0, 0, .35); }
-  .menu-fixo .lateral { box-shadow:none; }
-  .menu-fixo .app { padding-left:var(--largura-lateral); }
+  .lateral-topo { padding:var(--esp-4); }
+  nav.menu a.aba, button.item-lateral { white-space:normal; }
 }
-@media (min-width: 64.0625rem) and (prefers-reduced-motion: no-preference) {
-  .lateral { transition:width .18s ease, box-shadow .18s ease; }
-}
-@media (max-width: 64rem) {        /* até 1024 px: barra no topo e menu que abre e fecha */
+@media (max-width: 64rem) {        /* até 1024 px: topo com a marca, barra inferior e folha "Mais" */
   .lateral { position:sticky; top:0; z-index:20; }
-  .lateral-topo { padding:var(--esp-2) var(--esp-4); }
+  .lateral-topo { padding:var(--esp-2) var(--esp-4); min-height:3.5rem; }
   .logo { width:1.75rem; height:1.75rem; }
-  .so-computador { display:none !important; }
   .lateral-corpo { display:none; }
-  .lateral.aberto .lateral-corpo { display:flex; border-top:1px solid var(--menu-linha); max-height:calc(100vh - 3.5rem); overflow-y:auto; }
+  /* Folha "Mais": sobe de baixo, acima da barra inferior, com no máximo 75% da altura da tela. */
+  .lateral.aberto .lateral-corpo { display:flex; position:fixed; left:0; right:0; bottom:calc(3.75rem + env(safe-area-inset-bottom));
+    z-index:45; max-height:75vh; overflow-y:auto; background:var(--menu-fundo); border-radius:var(--raio-grande) var(--raio-grande) 0 0;
+    box-shadow:var(--sombra-2); border-top:1px solid var(--menu-linha); }
+  body.mais-aberto::before { content:""; position:fixed; inset:0; z-index:35; background:rgba(0, 0, 0, .45); }
+  /* Barra inferior fixa, com o nome escrito em cada atalho. Respeita a barra de gestos do celular (safe-area). */
+  .barra-inferior { display:grid; grid-template-columns:repeat(5, 1fr); position:fixed; left:0; right:0; bottom:0; z-index:40;
+    background:var(--cartao); border-top:1px solid var(--borda-forte); box-shadow:var(--sombra-2); padding-bottom:env(safe-area-inset-bottom); }
+  .aba-inferior { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:3.75rem;
+    padding:var(--esp-1); border:0; border-radius:0; background:none; color:var(--texto-2); font:inherit; font-size:var(--letra-legenda);
+    font-weight:400; text-decoration:none; cursor:pointer; position:relative; }
+  .aba-inferior .icone { width:1.5rem; height:1.5rem; }
+  .aba-inferior[aria-current="page"], .aba-inferior[aria-expanded="true"] { color:var(--marca); font-weight:700; }
+  .aba-inferior[aria-current="page"]::before { content:""; position:absolute; top:0; left:25%; right:25%; height:3px;
+    border-radius:0 0 3px 3px; background:var(--destaque-borda); }
+  button.aba-inferior:hover:not(:disabled) { filter:none; background:var(--marca-suave); }
+  /* Espaço para a barra não cobrir o fim da página nem o que está com foco (WCAG 2.4.11). */
+  body { padding-bottom:calc(3.75rem + env(safe-area-inset-bottom)); }
+  html { scroll-padding-top:4.5rem; scroll-padding-bottom:5rem; }
+  /* No celular a pesquisa sai do topo (fica no atalho "Buscar"); na tela de busca ela volta. */
+  body:not([data-rota="busca"]) .busca-topo { display:none; }
 }
 
 /* ---------- Cabeçalho da página: contexto + pesquisa + atualização ---------- */

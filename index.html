@@ -675,18 +675,38 @@
   </div><!-- fim .principal -->
 </div><!-- fim .app -->
 
-<!-- CAIXA DE APOIO (Pix): elemento <dialog> nativo, já acessível (teclado, Esc fecha, foco preso). -->
-<dialog id="dlgApoio" aria-labelledby="tApoio">
+<!-- CAIXA DE APOIO (Pix): elemento <dialog> nativo, já acessível (teclado, Esc fecha, foco preso).
+     Os valores (chave, código, nomes, endereço oficial) vêm de js/config.js e são CONFERIDOS por js/pix-regras.js:
+     se não combinarem, nada de Pix aparece ("falha fechada"). Textos aprovados no plano do projeto. -->
+<dialog id="dlgApoio" class="apoio" aria-labelledby="tApoio">
   <h2 id="tApoio">Apoie o projeto</h2>
-  <p>Este site é gratuito e independente. Se ele te ajudou, contribua com qualquer valor por Pix. O dinheiro ajuda a pagar domínio e hospedagem.</p>
-  <p class="meta">A contribuição é voluntária e não dá acesso a nada nem influencia o conteúdo do site.</p>
-  <div id="pixDados">
-    <p class="meta">Chave Pix:</p>
-    <code id="pixChave"></code>
-    <p><button type="button" id="copiarPix">Copiar chave</button></p>
+  <p>O Olho Mágico é gratuito e independente. Se ele foi útil para você, pode contribuir com qualquer valor por Pix. O apoio ajuda a manter e melhorar o projeto.</p>
+  <p class="meta">O apoio é voluntário: não dá acesso a nada e não muda o que o site mostra. O site não registra quem contribuiu: não há cadastro, lista de apoiadores nem formulário.</p>
+  <div id="pixDados" class="apoio-pix">
+    <!-- QR Code: desenhado no navegador a partir do código Copia e Cola (js/apoio.js). -->
+    <figure class="apoio-qr oculto" id="apoioQr"></figure>
+    <div class="apoio-acoes">
+      <button type="button" class="apoio-principal" id="copiarCodigo">Copiar código Pix</button>
+      <ol class="passos" id="pixPassos">
+        <li>Toque em “Copiar código Pix”.</li>
+        <li>No app do seu banco, abra <strong>Pix</strong> e escolha <strong>Pix Copia e Cola</strong>. Cole o código.</li>
+        <li>Escolha o valor e confira o nome do recebedor.</li>
+      </ol>
+      <p class="aviso-recebedor"><strong>Confira o nome do recebedor no app do seu banco: <span id="pixNome"></span></strong>
+        (alguns bancos mostram abreviado: <span id="pixNomeCurto"></span>). Se aparecer outro nome, não pague: a página pode ser falsa.
+        O endereço oficial deste site é <strong id="pixSite"></strong>.</p>
+      <details class="apoio-chave" id="pixDetalhes">
+        <summary>Prefere usar a chave Pix?</summary>
+        <p class="meta">Chave aleatória:</p>
+        <code id="pixChave"></code>
+        <p><button type="button" class="sec" id="copiarPix">Copiar chave</button></p>
+        <p class="meta">Código Pix completo (se o botão não funcionar, toque e segure para copiar):</p>
+        <code id="pixCodigo"></code>
+      </details>
+    </div>
   </div>
+  <p class="meta" id="pixMsg" role="status" aria-live="polite"></p>
   <p><button type="button" class="sec" id="fecharApoio">Fechar</button></p>
-  <p class="meta" id="pixMsg" role="status"></p>
 </dialog>
 
 

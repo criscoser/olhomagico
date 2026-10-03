@@ -51,7 +51,7 @@ OBS.buscaTela = (function () {
       caixa.append(grupo('Servidores', r.servidores, [
         { chave: 'nome', titulo: 'Nome', link: (s) => OBS.rotas.link.servidor(s) },
         { chave: 'cargo', titulo: 'Cargo' }, { chave: 'lotacao', titulo: 'Setor' },
-        { chave: 'salario', titulo: 'Salário-base', tipo: 'moeda' }], atalho('Ver todos na lista de servidores', 'servidores', 'buscaServidor', termo)));
+        { chave: 'salario', titulo: 'Salário-base', tipo: 'moeda' }], atalho('Ver todos na lista de pessoal', 'pessoal', 'buscaServidor', termo)));
     }
     if (r.fornecedores.length) {
       caixa.append(grupo('Fornecedores com contrato', r.fornecedores, [
@@ -73,7 +73,7 @@ OBS.buscaTela = (function () {
     }
     const faltando = [!pes && 'servidores', !pn && 'contratos e licitações'].filter(Boolean);
     if (faltando.length) caixa.append(el('p', 'meta', `Ainda sem cópia neste site: ${faltando.join(' e ')}. A pesquisa não incluiu esses dados.`));
-    caixa.append(el('p', 'meta', 'A pesquisa não inclui os gastos do mês (consultados ao vivo): para eles, use a aba Gastos do mês.'));
+    caixa.append(el('p', 'meta', 'A pesquisa não inclui os gastos do mês (consultados ao vivo): para eles, use a aba Gastos.'));
   }
 
   /* Liga a caixa de pesquisa do topo: enviar leva para #busca/termo. */

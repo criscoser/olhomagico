@@ -32,7 +32,7 @@ OBS.pessoalTela = (function () {
     $('pessoalFrase').replaceChildren(el('span', 'valor', registros(lista.length)), ' na lista de pessoal do Município de Videira.');
     const entidades = [...new Set(lista.map((s) => s.entidade).filter(Boolean))];
     const inativos = lista.filter(OBS.pessoal.ehInativo).length;
-    $('pessoalNota').textContent = 'Esta lista mostra a situação no dia da cópia: ela NÃO muda com o mês escolhido em “Gastos do mês”, ' +
+    $('pessoalNota').textContent = 'Esta lista mostra a situação no dia da cópia: ela NÃO muda com o mês escolhido em “Gastos”, ' +
       'porque a fonte oficial não tem histórico por mês. Inclui quem está trabalhando ou afastado' +
       (inativos ? ` e também ${registros(inativos)} de aposentados e pensionistas` : '') + '. Cada registro é um vínculo (matrícula): ' +
       'quem tem dois cargos aparece duas vezes. ' + (entidades.length ? `Entidades: ${entidades.join('; ')}.` : '');
@@ -171,8 +171,25 @@ OBS.pessoalTela = (function () {
     $('filtroSetor').value = setor; atualizar();
   }
 
+  /* Cartão "gasto com pessoal x limite da lei": o número que a PREFEITURA (Poder Executivo) declarou no Relatório de
+     Gestão Fiscal. A lista abaixo é do Município inteiro, por isso o cartão diz de quem é o número. Leva à tela Limites. */
+  async function desenharLimite() {
+    const caixa = $('pessoalLimite');
+    const d = await OBS.dados.siconfi();
+    const p = d && d.poderes && d.poderes.E && OBS.contas.maisRecente(d.poderes.E.periodos);
+    if (!p) { caixa.replaceChildren(); return; }
+    const f = OBS.contas.faixa(p);
+    const frase = el('p', 'frase-media');
+    frase.append(`No ${p.rotulo}, a Prefeitura declarou um gasto com pessoal de `, el('span', 'valor', OBS.contas.pct(p.dtpPct)),
+      ` da receita corrente líquida. O limite máximo da lei é ${OBS.contas.pct(p.limiteMaximoPct)}.` + (f ? ` Isso está ${f.texto}.` : ''));
+    const link = el('a', '', 'Ver os limites da lei (Prefeitura e Câmara)'); link.href = '#limites/pessoal';
+    const p2 = el('p', 'meta'); p2.append('Fonte: Relatório de Gestão Fiscal (SICONFI, Tesouro Nacional). ', link);
+    caixa.replaceChildren(frase, p2);
+  }
+
   async function carregar() {
     estado('Carregando a lista de servidores…');
+    desenharLimite().catch((e) => console.error('Cartão de limite:', e));
     try {
       const d = await OBS.dados.pessoal();
       if (!d) {
@@ -194,7 +211,7 @@ OBS.pessoalTela = (function () {
       $('pessoalConteudo').classList.remove('oculto');
     } catch (erro) {
       estado('Não foi possível mostrar a lista de servidores. Tente recarregar a página.', true);
-      console.error('Erro na aba Servidores:', erro);
+      console.error('Erro na aba Pessoal:', erro);
     }
   }
 

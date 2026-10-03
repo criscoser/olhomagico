@@ -247,6 +247,11 @@
   teste('siglas: busca sem acento', OBS.siglas.filtrar(OBS.siglas.TERMOS, 'inexigibilidade lei').map((t) => t.termo), ['Inexigibilidade']);
   teste('siglas: endereço da sigla', OBS.siglas.slug('ADO 25'), 'ado-25');
   teste('rota da aba de siglas', OBS.rotas.ler('#siglas/sigla-fpm'), { nome: 'siglas', resto: 'sigla-fpm' });
+  teste('rotas: endereços antigos (links compartilhados) levam às telas novas',
+    ['#servidores', '#servidores/lista', '#contas', '#contas/transferencias', '#contas/beneficios', '#contas/areas', '#contas/educacao', '#siglas/sigla-fpm']
+      .map(OBS.rotas.redirecionar),
+    ['#pessoal', '#pessoal/lista', '#limites', '#entradas/transferencias', '#entradas/beneficios', '#gastos/areas', '#limites/educacao', '#glossario/sigla-fpm']);
+  teste('rotas: endereços novos ficam como estão', ['#gastos/2026-09', '#pessoal', '#contratos', '#contasx', ''].map(OBS.rotas.redirecionar), [null, null, null, null, null]);
   // ----- Resumo diário das despesas (dados/despesas-resumo.js) -----
   const RESUMO = { meses: [
     { anoMes: '2026-08', registros: 10, parcial: false, credoresQueReceberam: 7, total: { empenhado: 3, liquidado: 2, pago: 1 } },

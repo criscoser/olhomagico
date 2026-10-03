@@ -54,24 +54,25 @@
       <!-- MARCA: logo V3 (cacho de uvas em pontos, com um olho mágico dourado no lugar de uma uva).
            Versão simplificada (própria para 16/32 px). No menu, que é escuro nos dois temas, as uvas são lilás.
            Desenho feito no próprio HTML, sem imagem extra. -->
-      <h1 class="marca"><a href="#inicio">
+      <p class="marca"><a href="#inicio">
         <svg class="logo" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
           <g class="logo-uva"><circle cx="8" cy="4.6" r="2.2"/><circle cx="12.2" cy="4.6" r="2.2"/><circle cx="5.9" cy="8.4" r="2.2"/><circle cx="10.1" cy="8.4" r="2.2"/><circle cx="8" cy="12.2" r="2.2"/></g>
           <circle class="logo-aro" cx="3.8" cy="4.6" r="2.6"/><circle class="logo-lente" cx="3.8" cy="4.6" r="1.2"/>
-        </svg><span class="marca-texto rotulo"><span id="nomeSite">Olho Mágico</span><small>Transparência pública</small></span></a></h1>
+        </svg><span class="marca-texto rotulo"><span id="nomeSite">Olho Mágico</span><small>Transparência pública</small></span></a></p>
     </div>
     <div class="lateral-corpo" id="lateralCorpo">
       <!-- MENU: cada link muda o fim do endereço (#inicio, #gastos...); o arquivo js/rotas.js mostra a tela certa.
            Os ícones são só enfeite (aria-hidden); o nome de cada seção está sempre no texto do link. -->
       <nav class="menu" id="menuPrincipal" aria-label="Seções do site">
-        <a class="aba" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="rotulo">Visão geral</span></a>
-        <a class="aba" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span class="rotulo">Despesas públicas</span></a>
-        <a class="aba" href="#servidores"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span class="rotulo">Servidores</span></a>
-        <a class="aba" href="#contratos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 13h8M9 17h6"/></svg><span class="rotulo">Licitações e contratos</span></a>
-        <a class="aba" href="#contas"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg><span class="rotulo">Contas e transferências</span></a>
-        <a class="aba" href="#camara"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M2 21h20"/><path d="M9 21v-6h6v6"/><path d="M12 2v2"/></svg><span class="rotulo">Câmara de Vereadores</span></a>
-        <a class="aba" href="#siglas"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7h6M9 10.5h4"/></svg><span class="rotulo">Siglas e termos</span></a>
-        <a class="aba" href="#sobre"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="rotulo">Fontes e metodologia</span></a>
+        <a class="aba" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="rotulo">Início</span></a>
+        <a class="aba" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span class="rotulo">Gastos</span></a>
+        <a class="aba" href="#pessoal"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span class="rotulo">Pessoal</span></a>
+        <a class="aba" href="#contratos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 13h8M9 17h6"/></svg><span class="rotulo">Contratos</span></a>
+        <a class="aba" href="#entradas"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg><span class="rotulo">Entradas</span></a>
+        <a class="aba" href="#limites"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg><span class="rotulo">Limites da lei</span></a>
+        <a class="aba" href="#camara"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M2 21h20"/><path d="M9 21v-6h6v6"/><path d="M12 2v2"/></svg><span class="rotulo">Câmara</span></a>
+        <a class="aba" href="#glossario"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7h6M9 10.5h4"/></svg><span class="rotulo">Palavras e siglas</span></a>
+        <a class="aba" href="#sobre"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="rotulo">Sobre e fontes</span></a>
       </nav>
       <!-- RODAPÉ DO MENU: apoio (só aparece com chave Pix em js/config.js) e tema claro/escuro. -->
       <div class="lateral-rodape">
@@ -102,7 +103,7 @@
   <p class="aviso-independente" role="note"><strong>Portal independente.</strong> Os dados são organizados a partir de fontes públicas oficiais. Consulte sempre os documentos originais.</p>
   <!-- ================= INÍCIO: painel com os principais números (cada quadro só aparece se houver dado) ================= -->
   <div id="aba-inicio">
-    <h2 class="titulo-pagina">Visão geral</h2>
+    <h1 class="titulo-pagina">Visão geral</h1>
     <p class="sub">Acompanhe os dados disponíveis e consulte as fontes oficiais. Cada número mostra o período e a origem.</p>
 
     <!-- COMPETÊNCIA: o mês dos indicadores de despesa logo abaixo (consulta ao vivo no portal da Prefeitura). -->
@@ -128,7 +129,7 @@
         <h2 id="t-acesso">Acesso rápido</h2>
         <ul>
           <li><a href="#gastos"><strong>Consultar despesas</strong><span>Por mês, secretaria, unidade, origem e credor</span></a></li>
-          <li><a href="#servidores/lista"><strong>Pesquisar servidor</strong><span>Ficha com cargo, vínculo e salário-base</span></a></li>
+          <li><a href="#pessoal/lista"><strong>Pesquisar servidor</strong><span>Ficha com cargo, vínculo e salário-base</span></a></li>
           <li><a href="#contratos"><strong>Licitações e contratos</strong><span>Fornecedores e registros oficiais do PNCP</span></a></li>
           <li><a href="#sobre"><strong>Ver fontes oficiais</strong><span>Origem, metodologia e atualização</span></a></li>
         </ul>
@@ -142,7 +143,7 @@
 
   <!-- ================= PESQUISA GERAL (resultado) ================= -->
   <div id="vista-busca" class="oculto">
-    <h2 id="buscaTitulo" class="titulo-pagina">Pesquisa</h2>
+    <h1 id="buscaTitulo" class="titulo-pagina">Pesquisa</h1>
     <div class="sub" id="buscaResumoGeral" aria-live="polite"></div>
     <div id="buscaResultados"></div>
   </div>
@@ -152,7 +153,8 @@
 
   <!-- ================= GASTOS DA PREFEITURA (busca ao vivo na API de despesas) ================= -->
   <div id="aba-gastos" class="oculto">
-  <h2 class="titulo-pagina">Gastos do mês</h2>
+  <h1 class="titulo-pagina">Para onde vai o dinheiro?</h1>
+  <p class="sub">Quanto o Município de Videira pagou em cada mês, a quem e por qual órgão.</p>
   <!-- FORMULÁRIO: o cidadão escolhe o mês. O JavaScript (main.js) escuta o envio. -->
   <!-- Duas listas (mês e ano) em vez do campo de calendário: o campo "month" não funciona no Firefox nem no Safari. -->
   <form class="controles" id="form">
@@ -265,7 +267,7 @@
       </ol>
 
       <h3>Quanto ganha cada servidor</h3>
-      <p>A aba <a href="#servidores">Servidores</a> mostra nome, cargo, setor e salário-base do pessoal do município (inclusive aposentados e pensionistas do instituto de previdência). O valor completo de cada mês (com gratificações e descontos) está no portal oficial:</p>
+      <p>A aba <a href="#pessoal">Pessoal</a> mostra nome, cargo, setor e salário-base do pessoal do município (inclusive aposentados e pensionistas do instituto de previdência). O valor completo de cada mês (com gratificações e descontos) está no portal oficial:</p>
       <ol class="passos">
         <li>Abra a <a id="lnkSalarios" target="_blank" rel="noopener">Relação Funcionário x Salário no portal oficial</a>.</li>
         <li>Escolha o mês (competência) e, se quiser, filtre pelo nome ou pelo cargo.</li>
@@ -278,7 +280,7 @@
       <h2 id="t-fonte">De onde vêm esses dados?</h2>
       <p id="fonte"></p>
       <h3>O que esta página ainda não mostra</h3>
-      <p>Só as despesas do mês escolhido. Ainda não aparecem: o que a Prefeitura arrecada (receitas), o orçamento previsto, os “restos a pagar” e as diárias de viagem. Parte disso pode ser consultada no portal oficial (veja “Quer ver mais detalhes?”). Salários-base, contratos e licitações estão nas abas <a href="#servidores">Servidores</a> e <a href="#contratos">Contratos</a>.</p>
+      <p>Só as despesas do mês escolhido. Ainda não aparecem: o que a Prefeitura arrecada (receitas), o orçamento previsto, os “restos a pagar” e as diárias de viagem. Parte disso pode ser consultada no portal oficial (veja “Quer ver mais detalhes?”). Salários-base, contratos e licitações estão nas abas <a href="#pessoal">Pessoal</a> e <a href="#contratos">Contratos</a>.</p>
       <h3>O que significam essas palavras?</h3>
       <details><summary>Credor</summary>
         <p>É quem tem a receber: uma empresa, uma entidade ou uma pessoa que prestou serviço ou vendeu algo à Prefeitura.</p></details>
@@ -302,12 +304,27 @@
         <p>Para proteger dados pessoais, mostramos só parte do número de pessoas físicas. O dado completo está no portal oficial.</p></details>
     </section>
   </div>
+
+    <section aria-labelledby="t-areas" id="sec-areas" class="oculto">
+      <h2 id="t-areas">No ano fechado: em que áreas o dinheiro foi gasto</h2>
+      <p class="sub">Despesa por “função” (a grande área: saúde, educação, urbanismo...), das contas anuais enviadas ao Tesouro. Toque em uma área para ver como ela se divide.</p>
+      <div class="filtros">
+        <div><label for="anoDca">Ano</label><select id="anoDca"></select></div>
+        <div><label for="etapaDca">Etapa</label><select id="etapaDca"><option value="empenhado">Empenhado</option><option value="liquidado">Liquidado</option><option value="pago">Pago</option></select></div>
+      </div>
+      <p class="frase-media" id="dcaFrase"></p>
+      <ul class="lista" id="dcaLista"></ul>
+      <p><button type="button" class="sec" id="csvDca">Baixar este ano (planilha CSV)</button></p>
+      <div id="dcaOrigem"></div>
+      <div id="areasDesatualizado"></div>
+    </section>
   </div><!-- fim da aba de gastos -->
 
   <!-- ================= SERVIDORES (cópia diária da lista oficial, feita pelo robô) =================
        Os dados vêm de dados/pessoal.js, gerado uma vez por dia por ferramentas/fontes/pessoal.py. -->
-  <div id="aba-servidores" class="oculto">
-    <h2 class="titulo-pagina">Servidores e remunerações</h2>
+  <div id="aba-pessoal" class="oculto">
+    <h1 class="titulo-pagina">Quem trabalha para o município?</h1>
+    <div id="pessoalLimite"></div>
     <div id="pessoalEstado" role="status" aria-live="polite"></div>
     <div id="pessoalDesatualizado"></div>
     <div id="pessoalConteudo" class="oculto">
@@ -327,7 +344,7 @@
           <div class="filtro-botao"><button type="button" class="sec" id="limparFiltros">Limpar filtros</button></div>
         </div>
         <div class="chips" id="chipsServidores"></div>
-        <!-- O id NÃO pode ser "servidores": o link #servidores pularia direto para esta lista. -->
+        <!-- O id NÃO pode ser "pessoal": o link #pessoal pularia direto para esta lista. -->
         <div id="listaServidores"></div>
       </section>
 
@@ -376,11 +393,11 @@
         <p id="pessoalAusentes"></p>
       </section>
     </div>
-  </div><!-- fim da aba de servidores -->
+  </div><!-- fim da aba de pessoal -->
 
   <!-- ================= CONTRATOS E LICITAÇÕES (PNCP, cópia diária) ================= -->
   <div id="aba-contratos" class="oculto">
-    <h2 class="titulo-pagina">Contratos e licitações</h2>
+    <h1 class="titulo-pagina">O que foi comprado e contratado?</h1>
     <div id="contratosEstado" role="status" aria-live="polite"></div>
     <div id="contratosDesatualizado"></div>
     <div id="contratosConteudo" class="oculto">
@@ -429,29 +446,15 @@
     </div>
   </div><!-- fim da aba de contratos -->
 
-  <!-- ================= CONTAS PÚBLICAS (Tesouro Nacional e FNDE, cópias diárias) =================
-       Cada seção só aparece se a fonte dela tiver dados. Nenhuma depende do mês escolhido em "Gastos do mês". -->
-  <div id="aba-contas" class="oculto">
-    <h2 class="titulo-pagina">Contas públicas</h2>
-    <p class="nota">Relatórios que o próprio município envia ao Governo Federal. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos do mês”.</p>
-    <nav class="sumario oculto" id="contasSumario" aria-label="Seções desta página"></nav>
-    <div id="contasEstado" role="status" aria-live="polite"></div>
-    <div id="contasDesatualizado"></div>
-
-    <section aria-labelledby="t-lrf" id="sec-pessoal" class="oculto">
-      <h2 id="t-lrf">Gasto com pessoal e os limites da LRF</h2>
-      <p class="sub">A Lei de Responsabilidade Fiscal limita quanto da receita a Prefeitura e a Câmara podem gastar com pessoal (salários, encargos, aposentadorias).</p>
-      <div id="contasConteudo" class="duas-colunas"></div>
-      <details><summary>O que significam os limites?</summary>
-        <p>A conta é feita sobre a “receita corrente líquida”, que é o dinheiro que entra de forma regular (impostos e repasses), descontadas algumas transferências.</p>
-        <ul>
-          <li><strong>Limite de alerta:</strong> o Tribunal de Contas avisa o município.</li>
-          <li><strong>Limite prudencial:</strong> o município passa a ter restrições, como não poder criar cargos ou dar aumentos.</li>
-          <li><strong>Limite máximo:</strong> o município precisa reduzir o gasto e pode sofrer sanções.</li>
-        </ul>
-        <p class="meta">Os percentuais e limites são os que o próprio município declarou ao Tesouro Nacional no Relatório de Gestão Fiscal. O site não recalcula.</p>
-      </details>
-    </section>
+  <!-- ================= ENTRADAS: "De onde vem o dinheiro?" (Tesouro Nacional e CGU, cópias diárias) =================
+       Cada seção só aparece se a fonte dela tiver dados (as seções são desenhadas por js/contas-tela.js). -->
+  <div id="aba-entradas" class="oculto">
+    <h1 class="titulo-pagina">De onde vem o dinheiro?</h1>
+    <p class="nota">Dinheiro do Governo Federal que chega a Videira. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos”.</p>
+    <p class="aviso-faltando">Ainda não aparecem aqui os impostos da cidade (como IPTU e ISS) e as outras receitas próprias do Município: não há uma fonte aberta delas integrada a este site.</p>
+    <nav class="sumario oculto" id="sumarioEntradas" aria-label="Seções desta página"></nav>
+    <div id="entradasEstado" role="status" aria-live="polite"></div>
+    <div id="entradasDesatualizado"></div>
 
     <section aria-labelledby="t-transf" id="sec-transferencias" class="oculto">
       <h2 id="t-transf">Dinheiro que a União repassa ao município</h2>
@@ -484,25 +487,37 @@
 
     <section aria-labelledby="t-beneficios" id="sec-beneficios" class="oculto">
       <h2 id="t-beneficios">Benefícios federais pagos em Videira</h2>
-      <p class="sub">Total pago por mês às famílias de Videira pelo Bolsa Família e pelo Benefício de Prestação Continuada (BPC). São totais do município: nenhuma pessoa é identificada.</p>
+      <p class="sub">Total pago por mês às famílias de Videira pelo Bolsa Família e pelo Benefício de Prestação Continuada (BPC). São totais do município: nenhuma pessoa é identificada. <strong>Esse dinheiro é pago direto às famílias pelo Governo Federal: não passa pelo caixa da Prefeitura.</strong></p>
       <div class="filtros"><div><label for="programaBeneficio">Programa</label><select id="programaBeneficio"></select></div></div>
       <p class="frase-media" id="beneficioFrase"></p>
       <div id="beneficioGrafico"></div>
       <details><summary>Ver os números de cada mês</summary><div id="beneficioTabela"></div></details>
       <div id="beneficiosOrigem"></div>
     </section>
+  </div><!-- fim da aba de entradas -->
 
-    <section aria-labelledby="t-areas" id="sec-areas" class="oculto">
-      <h2 id="t-areas">Em que áreas o dinheiro foi gasto no ano</h2>
-      <p class="sub">Despesa por “função” (a grande área: saúde, educação, urbanismo...), das contas anuais enviadas ao Tesouro. Toque em uma área para ver como ela se divide.</p>
-      <div class="filtros">
-        <div><label for="anoDca">Ano</label><select id="anoDca"></select></div>
-        <div><label for="etapaDca">Etapa</label><select id="etapaDca"><option value="empenhado">Empenhado</option><option value="liquidado">Liquidado</option><option value="pago">Pago</option></select></div>
-      </div>
-      <p class="frase-media" id="dcaFrase"></p>
-      <ul class="lista" id="dcaLista"></ul>
-      <p><button type="button" class="sec" id="csvDca">Baixar este ano (planilha CSV)</button></p>
-      <div id="dcaOrigem"></div>
+  <!-- ================= LIMITES: "O que a lei exige, e onde o município está?" (SICONFI e SIOPE, cópias diárias) =================
+       Os números são os DECLARADOS pelo município; o site só os compara com os limites e mínimos da lei. -->
+  <div id="aba-limites" class="oculto">
+    <h1 class="titulo-pagina">O que a lei exige, e onde o município está?</h1>
+    <p class="nota">Relatórios que o próprio município declara ao Governo Federal, comparados com os limites e mínimos da lei. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos”.</p>
+    <nav class="sumario oculto" id="sumarioLimites" aria-label="Seções desta página"></nav>
+    <div id="limitesEstado" role="status" aria-live="polite"></div>
+    <div id="limitesDesatualizado"></div>
+
+    <section aria-labelledby="t-lrf" id="sec-pessoal" class="oculto">
+      <h2 id="t-lrf">Gasto com pessoal e os limites da LRF</h2>
+      <p class="sub">A Lei de Responsabilidade Fiscal limita quanto da receita a Prefeitura e a Câmara podem gastar com pessoal (salários, encargos, aposentadorias).</p>
+      <div id="contasConteudo" class="duas-colunas"></div>
+      <details><summary>O que significam os limites?</summary>
+        <p>A conta é feita sobre a “receita corrente líquida”, que é o dinheiro que entra de forma regular (impostos e repasses), descontadas algumas transferências.</p>
+        <ul>
+          <li><strong>Limite de alerta:</strong> o Tribunal de Contas avisa o município.</li>
+          <li><strong>Limite prudencial:</strong> o município passa a ter restrições, como não poder criar cargos ou dar aumentos.</li>
+          <li><strong>Limite máximo:</strong> o município precisa reduzir o gasto e pode sofrer sanções.</li>
+        </ul>
+        <p class="meta">Os percentuais e limites são os que o próprio município declarou ao Tesouro Nacional no Relatório de Gestão Fiscal. O site não recalcula.</p>
+      </details>
     </section>
 
     <section aria-labelledby="t-educacao" id="sec-educacao" class="oculto">
@@ -519,11 +534,11 @@
       <div id="entregasTabela"></div>
       <div id="entregasOrigem"></div>
     </section>
-  </div><!-- fim da aba de contas -->
+  </div><!-- fim da aba de limites -->
 
   <!-- ================= CÂMARA DE VEREADORES (API de dados abertos da Câmara, cópia diária) ================= -->
   <div id="aba-camara" class="oculto">
-    <h2 class="titulo-pagina">Câmara de Vereadores</h2>
+    <h1 class="titulo-pagina">O que faz a Câmara de Vereadores?</h1>
     <p class="sub">Quem são os vereadores de Videira e o que a Câmara colocou em pauta. Dados publicados pela própria Câmara.</p>
     <div id="camaraEstado" role="status" aria-live="polite"></div>
     <div id="camaraDesatualizado"></div>
@@ -548,8 +563,8 @@
 
   <!-- ================= SIGLAS E TERMOS =================
        Lista em js/siglas.js. data-sem-siglas: aqui as siglas não viram "tocáveis" (a explicação já está ao lado). -->
-  <div id="aba-siglas" class="oculto" data-sem-siglas>
-    <h2 class="titulo-pagina">Siglas e termos</h2>
+  <div id="aba-glossario" class="oculto" data-sem-siglas>
+    <h1 class="titulo-pagina">Palavras e siglas</h1>
     <p class="sub">O que significam as siglas e as palavras técnicas que aparecem no site. Em qualquer tela, as siglas com sublinhado pontilhado podem ser tocadas para ver o significado.</p>
     <div class="filtros">
       <div><label for="buscaSigla">Procurar sigla ou termo</label><input type="search" id="buscaSigla" autocomplete="off"></div>
@@ -564,12 +579,12 @@
       <h2 id="t-lista-termos">Termos</h2>
       <div class="glossario" id="listaTermos"></div>
     </section>
-  </div><!-- fim da aba de siglas -->
+  </div><!-- fim da aba de palavras e siglas -->
 
   <!-- ================= SOBRE E METODOLOGIA =================
        Texto fixo: explica o projeto, como ler os números, como cada um é calculado e de onde vem. -->
   <div id="aba-sobre" class="oculto">
-    <h2 class="titulo-pagina">Sobre e metodologia</h2>
+    <h1 class="titulo-pagina">Sobre e fontes</h1>
     <section aria-labelledby="t-sobre">
       <h2 id="t-sobre">Sobre o Olho Mágico</h2>
       <p>O Olho Mágico é um portal <strong>independente</strong> e gratuito que organiza informações públicas da Prefeitura de Videira (SC) para que qualquer pessoa consiga entendê-las e conferi-las.</p>
@@ -617,7 +632,7 @@
         <li>Itens repetidos são removidos pelo número de controle do PNCP. Cada item tem link para o registro oficial.</li>
         <li>“Maiores fornecedores” soma o <strong>valor global</strong> (previsto) dos contratos, juntando pelo CNPJ. Não é o valor pago.</li>
       </ul>
-      <h3>Contas públicas</h3>
+      <h3>Entradas e limites da lei</h3>
       <ul>
         <li><strong>Gasto com pessoal:</strong> cópia diária do Relatório de Gestão Fiscal (RGF) enviado pelo município ao SICONFI (Tesouro Nacional), para a Prefeitura e para a Câmara.</li>
         <li><strong>Repasses da União:</strong> cópia diária das transferências constitucionais (FPM, FUNDEB, ITR e outras) publicadas pelo Tesouro Nacional, por mês e por tipo. A comparação com o ano anterior usa sempre os mesmos meses. Valores negativos (ajustes) entram como a fonte publica.</li>
@@ -689,7 +704,7 @@
   <nav class="barra-inferior" aria-label="Atalhos">
     <a class="aba-inferior" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Início</span></a>
     <a class="aba-inferior" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span>Gastos</span></a>
-    <a class="aba-inferior" href="#servidores"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span>Pessoal</span></a>
+    <a class="aba-inferior" href="#pessoal"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span>Pessoal</span></a>
     <a class="aba-inferior" href="#busca"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Buscar</span></a>
     <button type="button" class="aba-inferior" id="btnMenu" aria-expanded="false" aria-controls="lateralCorpo"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span id="btnMenuTexto">Mais</span></button>
   </nav>

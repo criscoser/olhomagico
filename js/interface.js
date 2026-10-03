@@ -153,8 +153,8 @@ OBS.ui = (function () {
     if (exp) {
       const p = el('p', 'explica', exp.texto + ' ');
       if (exp.link === 'salarios') {
-        // Leva para a aba Servidores deste site (lista com cargo e salário-base) e para o portal (valor completo).
-        const interno = el('a', '', 'Servidores'); interno.href = '#servidores';
+        // Leva para a aba Pessoal deste site (lista com cargo e salário-base) e para o portal (valor completo).
+        const interno = el('a', '', 'Pessoal'); interno.href = '#pessoal';
         p.append('Veja quem são, com cargo e salário-base, na aba ', interno,
           '. O valor completo de cada pessoa (com gratificações e descontos) está na ',
           link('Relação Funcionário x Salário do portal oficial', OBS.config.PORTAL_SALARIOS), '.');
@@ -394,7 +394,7 @@ OBS.ui = (function () {
     });
   }
 
-  // Os ajudantes linhaClicavel, barra e link também são usados pela aba Servidores (pessoal-tela.js).
+  // Os ajudantes linhaClicavel, barra e link também são usados pela aba Pessoal (pessoal-tela.js).
   /* Mês que está na tela agora ("AAAA-MM"), ou null. */
   const mesNaTela = () => (ultima ? ultima.anoMes : null);
 

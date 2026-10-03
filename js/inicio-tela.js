@@ -70,7 +70,7 @@ OBS.inicioTela = (function () {
     if (!f || !f.resumo || !f.resumo.registros) return null;
     return OBS.kpi({ rotulo: 'Servidores (registros)', valor: qtd(f.resumo.registros),
       detalhe: `${qtd(f.resumo.comissionados)} em cargos de indicação`,
-      periodo: `situação em ${new Date(f.ultimoSucesso).toLocaleDateString('pt-BR')}`, fonte: 'API de Pessoal da Prefeitura', href: '#servidores' });
+      periodo: `situação em ${new Date(f.ultimoSucesso).toLocaleDateString('pt-BR')}`, fonte: 'API de Pessoal da Prefeitura', href: '#pessoal' });
   }
 
   /* Evolução: 12 meses até o mês escolhido. Do resumo diário (instantâneo); se faltar mês, consulta ao vivo, um por vez. */
@@ -118,7 +118,7 @@ OBS.inicioTela = (function () {
     return quadro({ titulo: 'Gasto com pessoal da Prefeitura', numero: pct(p.dtpPct),
       frase: `da receita corrente líquida, no ${p.rotulo}. ${f ? `Está ${f.texto}.` : ''}`,
       extra: OBS.graficos.medidor(p, pct), fonte: 'Relatório de Gestão Fiscal (SICONFI, Tesouro Nacional).',
-      link: '#contas/pessoal', linkTexto: 'Ver Prefeitura e Câmara' });
+      link: '#limites/pessoal', linkTexto: 'Ver Prefeitura e Câmara' });
   }
 
   /* ---------- Repasses da União no ano ---------- */
@@ -134,7 +134,7 @@ OBS.inicioTela = (function () {
       frase: `recebidos de janeiro a ${OBS.MESES[ultimo - 1].toLowerCase()} (FPM, FUNDEB e outros; o último mês pode estar incompleto).` +
         (variacao !== null ? ` No mesmo período de ${ano - 1}: ${curta(anterior)} (${variacao >= 0 ? 'alta' : 'queda'} de ${pct(Math.abs(Math.round(variacao * 10) / 10))}).` : ''),
       extra: OBS.graficos.colunas(serie, { destaque: ultimo - 1, descricao: `Repasses por mês em ${ano}.` }),
-      fonte: 'Transferências constitucionais (Tesouro Nacional).', link: '#contas/transferencias', linkTexto: 'Ver mês a mês e por tipo' });
+      fonte: 'Transferências constitucionais (Tesouro Nacional).', link: '#entradas/transferencias', linkTexto: 'Ver mês a mês e por tipo' });
   }
 
   /* ---------- Áreas com mais despesa (contas anuais) ---------- */
@@ -145,7 +145,7 @@ OBS.inicioTela = (function () {
     if (!funcoes.length) return null;
     return quadro({ titulo: `Onde o dinheiro foi gasto em ${a.ano}`, frase: 'Despesa empenhada (reservada) por área, as cinco maiores:',
       extra: OBS.graficos.barras(funcoes.slice(0, 5).map((f) => ({ rotulo: f.nome, valor: f.valor, detalhe: `${pct(Math.round(f.fatia * 10) / 10)} do total` })), { formatar: curta }),
-      fonte: 'Contas anuais (DCA, SICONFI, Tesouro Nacional).', link: '#contas/areas', linkTexto: 'Ver todas as áreas' });
+      fonte: 'Contas anuais (DCA, SICONFI, Tesouro Nacional).', link: '#gastos/areas', linkTexto: 'Ver todas as áreas' });
   }
 
   /* ---------- Educação (mínimo constitucional) ---------- */
@@ -159,7 +159,7 @@ OBS.inicioTela = (function () {
     return quadro({ titulo: parcial ? `Educação em ${p.ano} (até o ${p.bimestre}º bimestre)` : `Educação em ${p.ano}`, numero: pct(achado.ind.valor),
       frase: `das receitas de impostos foram aplicadas no ensino (mínimo da Constituição: ${pct(25)} no ano). ` +
         (parcial ? OBS.contas.AVISO_PARCIAL : achado.min.cumpre ? 'Está acima do mínimo.' : 'Está abaixo do mínimo.'),
-      fonte: 'SIOPE (FNDE, Ministério da Educação).', link: '#contas/educacao', linkTexto: 'Ver os indicadores' });
+      fonte: 'SIOPE (FNDE, Ministério da Educação).', link: '#limites/educacao', linkTexto: 'Ver os indicadores' });
   }
 
   /* ---------- Contratos: totais do resumo do robô (o arquivo grande não é carregado aqui) ---------- */
@@ -179,7 +179,7 @@ OBS.inicioTela = (function () {
     if (!r) return null;
     return quadro({ titulo: 'Prestação de contas ao Tesouro', numero: OBS.dataBR(r.data),
       frase: `foi o último envio da Prefeitura: ${r.entregavel} (${OBS.contas.rotuloPeriodo(r)} de ${r.exercicio}).`,
-      fonte: 'Extrato de entregas (SICONFI, Tesouro Nacional).', link: '#contas/entregas', linkTexto: 'Ver todos os relatórios' });
+      fonte: 'Extrato de entregas (SICONFI, Tesouro Nacional).', link: '#limites/entregas', linkTexto: 'Ver todos os relatórios' });
   }
 
   async function carregar() {

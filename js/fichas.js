@@ -12,7 +12,7 @@ OBS.fichas = (function () {
     const v = el('a', 'voltar', voltar.texto); v.href = voltar.href;
     // Se a pessoa veio de outra tela do site, "Voltar" volta para ela (com os filtros como estavam).
     v.addEventListener('click', (ev) => { if (OBS.rotas.podeVoltar()) { ev.preventDefault(); history.back(); } });
-    topo.append(v, el('p', 'ficha-tipo', tipo), el('h2', 'titulo-pagina', titulo));
+    topo.append(v, el('p', 'ficha-tipo', tipo), el('h1', 'titulo-pagina', titulo));
     if (subtitulo) topo.append(el('p', 'sub', subtitulo));
     return topo;
   }
@@ -54,7 +54,7 @@ OBS.fichas = (function () {
 
   /* ================= SERVIDOR (um registro da lista oficial) ================= */
   async function servidor(id) {
-    const voltar = { texto: 'Voltar para Servidores', href: '#servidores' };
+    const voltar = { texto: 'Voltar para Pessoal', href: '#pessoal' };
     const d = await OBS.dados.pessoal();
     if (!d) return naoEncontrado('A lista de servidores ainda não está disponível neste site.', voltar);
     const s = d.lista.find((x) => x.id === id);
@@ -78,7 +78,7 @@ OBS.fichas = (function () {
     if (setorLink) {
       setorLink.type = 'button';
       setorLink.addEventListener('click', async () => {
-        await OBS.rotas.irPara('#servidores');
+        await OBS.rotas.irPara('#pessoal');
         await OBS.pessoalTela.filtrarSetor(s.lotacao);
         $('sec-lista').scrollIntoView({ block: 'start' });
       });

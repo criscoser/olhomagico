@@ -109,7 +109,7 @@ OBS.siglas = (function () {
     { termo: 'Salário-base', texto: 'Valor fixo do cargo, antes de gratificações, adicionais e descontos. Não é o que a pessoa recebe no mês.' }
   ];
 
-  /* "Inexigibilidade" -> "inexigibilidade"; "ADO 25" -> "ado-25": vira parte do endereço (#siglas/sigla-ado-25). */
+  /* "Inexigibilidade" -> "inexigibilidade"; "ADO 25" -> "ado-25": vira parte do endereço (#glossario/sigla-ado-25). */
   const slug = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const normalizar = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
@@ -208,7 +208,7 @@ OBS.siglas = (function () {
     fechar.setAttribute('aria-label', 'Fechar explicação');
     fechar.addEventListener('click', () => fecharBalao(true));
     const ver = OBS.el('a', '', 'Ver todas as siglas e termos');
-    ver.href = `#siglas/sigla-${slug(item.sigla)}`;
+    ver.href = `#glossario/sigla-${slug(item.sigla)}`;
     ver.addEventListener('click', () => fecharBalao(false));
     balao.replaceChildren(fechar, titulo, OBS.el('p', '', item.texto), ver);
     balao.setAttribute('aria-label', `Significado de ${item.sigla}`);
@@ -266,7 +266,7 @@ OBS.siglas = (function () {
     areas.forEach((a) => observador.observe(a, { childList: true, subtree: true }));
   }
 
-  /* ---------------- Aba "Siglas e termos" (#siglas) ---------------- */
+  /* ---------------- Aba "Palavras e siglas" (#glossario) ---------------- */
   const tela = (function () {
     let pronto = false;
 
@@ -298,7 +298,7 @@ OBS.siglas = (function () {
         OBS.$('buscaSigla').addEventListener('input', desenhar);
         OBS.$('limparSigla').addEventListener('click', () => { OBS.$('buscaSigla').value = ''; desenhar(); });
       }
-      // Chegou por um link de uma sigla (#siglas/sigla-fpm): limpa a busca para a sigla com certeza aparecer.
+      // Chegou por um link de uma sigla (#glossario/sigla-fpm): limpa a busca para a sigla com certeza aparecer.
       if (location.hash.includes('/')) OBS.$('buscaSigla').value = '';
       desenhar();
     }

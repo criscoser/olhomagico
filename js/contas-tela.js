@@ -1,4 +1,4 @@
-/* TELA DA ABA "CONTAS PÚBLICAS": relatórios que o município envia ao Governo Federal.
+/* SEÇÕES DAS ABAS "ENTRADAS", "LIMITES" e da despesa por área em "GASTOS": relatórios e repasses do Governo Federal.
    Cada seção tem a sua fonte e o seu arquivo de cópia diária, e só aparece se houver dado:
      - Gasto com pessoal x limites da LRF ......... dados/siconfi.js        (SICONFI, RGF)
      - Transferências constitucionais da União .... dados/transferencias.js (Tesouro Nacional)
@@ -325,15 +325,26 @@ OBS.contasTela = (function () {
     return true;
   }
 
+  /* As seções desta tela ficam em TRÊS abas (organização por perguntas):
+       Entradas (#entradas): repasses, convênios e benefícios;   Limites (#limites): pessoal x LRF, educação e relatórios;
+       Gastos (#gastos): despesa do ano fechado por área.
+     Tudo é desenhado de uma vez, na primeira vez que qualquer uma dessas abas é aberta. */
+  const ABAS = [
+    { aba: 'entradas', estado: 'entradasEstado', sumario: 'sumarioEntradas', avisos: 'entradasDesatualizado', fontes: ['transferencias', 'cgu'],
+      vazio: 'Os dados do Tesouro e da CGU ainda não estão disponíveis. Eles são atualizados uma vez por dia.' },
+    { aba: 'limites', estado: 'limitesEstado', sumario: 'sumarioLimites', avisos: 'limitesDesatualizado', fontes: ['siconfi', 'siope', 'entregas'],
+      vazio: 'Os dados do Tesouro e do FNDE ainda não estão disponíveis. Eles são atualizados uma vez por dia.' },
+    { aba: 'gastos', avisos: 'areasDesatualizado', fontes: ['dca'] }
+  ];
+
   async function carregar() {
-    const estado = $('contasEstado');
-    estado.textContent = 'Carregando…';
+    ABAS.forEach((a) => { if (a.estado) $(a.estado).textContent = 'Carregando…'; });
     const [sic, tr, dc, si, en, cg] = await Promise.all([OBS.dados.siconfi(), OBS.dados.transferencias(), OBS.dados.dca(), OBS.dados.siope(), OBS.dados.entregas(), OBS.dados.cgu()]);
     const secoes = [
       ['sec-pessoal', 'Gasto com pessoal', () => desenharLrf(sic)],
       ['sec-transferencias', 'Repasses da União', () => desenharTransferencias(tr)],
       ['sec-convenios', 'Convênios federais', () => desenharConvenios(cg)],
-      ['sec-beneficios', 'Benefícios federais', () => desenharBeneficios(cg)],
+      ['sec-beneficios', 'Benefícios às famílias', () => desenharBeneficios(cg)],
       ['sec-areas', 'Despesa por área', () => desenharDca(dc)],
       ['sec-educacao', 'Educação', () => desenharSiope(si)],
       ['sec-entregas', 'Relatórios enviados', () => desenharEntregas(en)]
@@ -345,18 +356,22 @@ OBS.contasTela = (function () {
       $(id).classList.toggle('oculto', !ok);    // seção sem dado não aparece (nada de seção vazia)
       if (ok) visiveis.push([id, rotulo]);
     });
-    // Aviso de cópia desatualizada, uma linha por fonte com problema.
-    const avisos = $('contasDesatualizado'); avisos.replaceChildren();
-    ['siconfi', 'transferencias', 'dca', 'siope', 'entregas', 'cgu'].forEach((f) => { const c = el('div'); avisos.append(c); OBS.avisoDesatualizado(c, f); });
-    // Sumário com atalhos para cada seção que apareceu.
-    const sumario = $('contasSumario');
-    sumario.replaceChildren(...visiveis.map(([id, rotulo]) => { const a = el('a', '', rotulo); a.href = `#contas/${id.slice(4)}`; return a; }));
-    sumario.classList.toggle('oculto', visiveis.length < 2);
-    if (visiveis.length) { estado.textContent = ''; estado.className = ''; } else {
-      estado.textContent = 'Os dados do Tesouro e do FNDE ainda não estão disponíveis. Eles são atualizados uma vez por dia. ' +
-        '(Para quem cuida do site: rode ferramentas/atualizar.py.)';
-      estado.className = 'erro';
-    }
+    ABAS.forEach((a) => {
+      // Aviso de cópia desatualizada, uma linha por fonte com problema.
+      const avisos = $(a.avisos); avisos.replaceChildren();
+      a.fontes.forEach((f) => { const c = el('div'); avisos.append(c); OBS.avisoDesatualizado(c, f); });
+      if (!a.estado) return;
+      // Sumário com atalhos para as seções desta aba que apareceram.
+      const daAba = visiveis.filter(([id]) => $(id).closest(`#aba-${a.aba}`));
+      const sumario = $(a.sumario);
+      sumario.replaceChildren(...daAba.map(([id, rotulo]) => { const l = el('a', '', rotulo); l.href = `#${a.aba}/${id.slice(4)}`; return l; }));
+      sumario.classList.toggle('oculto', daAba.length < 2);
+      const estado = $(a.estado);
+      if (daAba.length) { estado.textContent = ''; estado.className = ''; } else {
+        estado.textContent = a.vazio + ' (Para quem cuida do site: rode ferramentas/atualizar.py.)';
+        estado.className = 'erro';
+      }
+    });
   }
 
   function abrir() { iniciado = iniciado || carregar(); return iniciado; }

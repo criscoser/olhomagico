@@ -3,14 +3,32 @@
 
      #inicio                  painel com os principais números
      #gastos/2026-09          despesas de um mês (o período fica no endereço)
-     #gastos, #servidores, #contratos, #contas, #camara, #siglas, #sobre      abas
-     #siglas/sigla-fpm        aba de siglas, já na explicação de uma sigla
-     #contas/transferencias   aba + seção (rola até a seção "sec-transferencias")
+     #gastos, #entradas, #pessoal, #contratos, #limites, #camara, #glossario, #sobre   abas (uma pergunta por tela)
+     #glossario/sigla-fpm     palavras e siglas, já na explicação de uma sigla
+     #entradas/transferencias aba + seção (rola até a seção "sec-transferencias")
+   Endereços ANTIGOS (#servidores, #contas/..., #siglas/...) são trocados pelos novos (links compartilhados continuam valendo).
      #busca/termo             resultado da pesquisa geral
      #servidor/ID, #fornecedor/CHAVE, #contrato/ID           fichas de detalhe */
 OBS.rotas = (function () {
-  const ABAS = ['inicio', 'gastos', 'servidores', 'contratos', 'contas', 'camara', 'siglas', 'sobre'];
-  const FICHAS = { servidor: 'servidores', fornecedor: 'contratos', contrato: 'contratos' };  // ficha -> aba "mãe" no menu
+  const ABAS = ['inicio', 'gastos', 'entradas', 'pessoal', 'contratos', 'limites', 'camara', 'glossario', 'sobre'];
+  const FICHAS = { servidor: 'pessoal', fornecedor: 'contratos', contrato: 'contratos' };  // ficha -> aba "mãe" no menu
+
+  /* Endereços antigos -> novos (a organização por perguntas mudou os nomes). Só o começo do endereço é trocado. */
+  const ANTIGOS = [
+    ['#servidores', '#pessoal'], ['#siglas', '#glossario'],
+    ['#contas/transferencias', '#entradas/transferencias'], ['#contas/convenios', '#entradas/convenios'],
+    ['#contas/beneficios', '#entradas/beneficios'], ['#contas/areas', '#gastos/areas'],
+    ['#contas/pessoal', '#limites/pessoal'], ['#contas/educacao', '#limites/educacao'], ['#contas/entregas', '#limites/entregas'],
+    ['#contas', '#limites']
+  ];
+  /* Devolve o endereço novo de um endereço antigo, ou null se não for antigo. */
+  function redirecionar(hash) {
+    const h = String(hash || '');
+    for (const [velho, novo] of ANTIGOS) {
+      if (h === velho || h.startsWith(velho + '/')) return novo + h.slice(velho.length);
+    }
+    return null;
+  }
   const VISTAS = [...ABAS.map((a) => `aba-${a}`), 'vista-busca', 'vista-ficha'];
   let primeira = true;
   let trocas = 0;   // quantas vezes a pessoa navegou DENTRO do site (para o botão Voltar das fichas)
@@ -41,12 +59,14 @@ OBS.rotas = (function () {
   /* Leva a pessoa ao topo da nova tela e põe o foco no título (quem usa leitor de tela ouve onde está). */
   function focarTitulo(idVista) {
     if (primeira) { primeira = false; if (!location.hash) return; }
-    const titulo = OBS.$(idVista).querySelector('h2');
+    const titulo = OBS.$(idVista).querySelector('h1');
     window.scrollTo(0, 0);
     if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
   }
 
   async function mostrar() {
+    const novo = redirecionar(location.hash);
+    if (novo) history.replaceState(null, '', novo);   // troca o endereço sem criar um passo extra no "Voltar"
     const { nome, resto } = ler(location.hash);
     if (FICHAS[nome] && resto) {
       exibir('vista-ficha', FICHAS[nome]);
@@ -68,10 +88,13 @@ OBS.rotas = (function () {
     // Despesas de um mês: "#gastos/2026-09" escolhe o mês e consulta (o período fica no endereço e pode ser compartilhado).
     if (aba === 'gastos' && /^\d{4}-\d{2}$/.test(resto)) {
       focarTitulo('aba-gastos');
+      OBS.contasTela.abrir();   // a despesa do ano fechado (por área) fica no fim desta aba
       await OBS.abrirMes(resto);
       return;
     }
-    const abrir = { inicio: OBS.inicioTela, servidores: OBS.pessoalTela, contratos: OBS.contratosTela, contas: OBS.contasTela, camara: OBS.camaraTela, siglas: OBS.siglasTela, sobre: OBS.situacaoTela }[aba];
+    // Entradas, Limites e a despesa por área (em Gastos) são desenhadas pela mesma tela (js/contas-tela.js).
+    const abrir = { inicio: OBS.inicioTela, gastos: OBS.contasTela, entradas: OBS.contasTela, pessoal: OBS.pessoalTela, contratos: OBS.contratosTela,
+      limites: OBS.contasTela, camara: OBS.camaraTela, glossario: OBS.siglasTela, sobre: OBS.situacaoTela }[aba];
     if (resto) {
       if (abrir) await abrir.abrir();
       const secao = OBS.$(`sec-${resto}`);
@@ -105,5 +128,5 @@ OBS.rotas = (function () {
   /* true se a pessoa chegou na tela atual vindo de outra tela do site (então "Voltar" pode usar o histórico). */
   const podeVoltar = () => trocas > 0;
 
-  return { iniciar, mostrar, ler, link, irPara, podeVoltar };
+  return { iniciar, mostrar, ler, link, irPara, podeVoltar, redirecionar };
 })();

@@ -107,6 +107,8 @@ a:hover { text-decoration-thickness:2px; }
 [tabindex="-1"]:focus { outline:none; }
 .wrap { max-width:72rem; margin:0 auto; padding:0 var(--esp-4); }
 /* Texto corrido fica estreito (no máximo ~75 letras por linha), mesmo com a página larga: é mais fácil de ler. */
+.aviso-faltando { margin:var(--esp-3) 0; padding:var(--esp-3) var(--esp-4); border-left:4px solid var(--borda-forte);
+  border-radius:0 var(--raio-campo) var(--raio-campo) 0; background:var(--cartao-2); max-width:65ch; }
 .sub, .nota, section > p, .ficha-secao p, details p { max-width:65ch; }
 .oculto { display:none !important; }
 
@@ -121,8 +123,8 @@ a.pular:focus { left:.5rem; top:.5rem; }
 .app { min-height:100vh; }
 .lateral { background:var(--menu-fundo); color:var(--menu-texto); }
 .lateral-topo { display:flex; align-items:center; justify-content:space-between; gap:var(--esp-3); padding:var(--esp-3) var(--esp-4); }
-h1.marca { margin:0; font-size:1.05rem; line-height:1.1; }
-h1.marca a { display:inline-flex; align-items:center; gap:.7rem; color:var(--menu-texto); text-decoration:none; }
+.marca { margin:0; font-size:1.05rem; line-height:1.1; font-weight:700; }
+.marca a { display:inline-flex; align-items:center; gap:.7rem; color:var(--menu-texto); text-decoration:none; }
 .marca-texto { display:flex; flex-direction:column; white-space:nowrap; }
 .marca-texto small { font-family:var(--font); font-size:var(--letra-legenda); font-weight:400; letter-spacing:.02em; opacity:.8; }
 /* Logo V3: uvas lilás (o menu é escuro nos dois temas), aro dourado e lente uva. */
@@ -347,9 +349,9 @@ p, li, dd, td, th, figcaption { overflow-wrap:break-word; }
 
 
 /* ---------- Mensagens de carregamento das abas ---------- */
-#contratosEstado, #contasEstado { margin:1.5rem 0; }
-#contratosEstado:empty, #contasEstado:empty { display:none; }
-#contratosEstado.erro, #contasEstado.erro { padding:1rem; border-radius:var(--raio); background:var(--cartao); border:1px solid var(--erro); }
+#contratosEstado, #entradasEstado, #limitesEstado { margin:1.5rem 0; }
+#contratosEstado:empty, #entradasEstado:empty, #limitesEstado:empty { display:none; }
+#contratosEstado.erro, #entradasEstado.erro, #limitesEstado.erro { padding:1rem; border-radius:var(--raio); background:var(--cartao); border:1px solid var(--erro); }
 
 /* ---------- Medidor da LRF (aba Contas e limites) ---------- */
 .conta-poder .frase { margin-top:.25rem; }
@@ -377,7 +379,7 @@ p, li, dd, td, th, figcaption { overflow-wrap:break-word; }
 .titulo-pagina { font-size:var(--letra-h1); font-weight:700; line-height:1.15; letter-spacing:-.01em; margin:1.5rem 0 .35rem; }
 .frase-media { font-size:var(--letra-destaque); font-weight:700; line-height:1.35; margin:.5rem 0 1rem; max-width:46rem; }
 .frase-media .valor { color:var(--destaque-texto); white-space:nowrap; }
-#inicioEstado:empty, #contasEstado:empty { display:none; }
+#inicioEstado:empty, #entradasEstado:empty, #limitesEstado:empty { display:none; }
 
 /* ---------- Painel inicial: quadros ----------
    O quadro dos gastos do mês ocupa duas colunas em telas largas: é o único número consultado ao vivo. */

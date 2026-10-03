@@ -109,7 +109,7 @@ OBS.contratosTela = (function () {
     const soma = (lista) => lista.reduce((t, c) => t + (c.valorGlobal || 0), 0);
     $('contratosFrase').replaceChildren(`De ${ini} a ${fim}, os órgãos do Município de Videira publicaram no PNCP `,
       el('span', 'valor', `${qtd(comprasProprias.length)} licitações e compras`), ' e ', el('span', 'valor', `${qtd(proprios.length)} contratos`), '.');
-    $('contratosNota').textContent = 'Este período é fixo (últimos 12 meses) e não muda com o mês escolhido em “Gastos do mês”.' +
+    $('contratosNota').textContent = 'Este período é fixo (últimos 12 meses) e não muda com o mês escolhido em “Gastos”.' +
       (deConsorcio ? ` As listas abaixo também mostram ${qtd(deConsorcio)} contratos (${OBS.graficos.moedaCurta(soma(d.contratos) - soma(proprios))}) ` +
         'de consórcio intermunicipal com sede em Videira. O consórcio é outra entidade e atende vários municípios, por isso ' +
         'esses contratos não entram nos totais nem no ranking de fornecedores.' : '');

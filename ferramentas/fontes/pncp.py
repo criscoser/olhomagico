@@ -4,9 +4,10 @@ Confirmado para Videira em 02/10/2026:
   - Licitações/compras: {pncp}/api/consulta/v1/contratacoes/publicacao?dataInicial=AAAAMMDD&dataFinal=AAAAMMDD
       &codigoModalidadeContratacao=N&codigoMunicipioIbge=IBGE&pagina=P&tamanhoPagina=50
   - Contratos: {pncp}/api/consulta/v1/contratos?dataInicial=...&dataFinal=...&cnpjOrgao=CNPJ&pagina=P
-  - Registro individual (link de cada item):
-      compra:   {pncp}/api/consulta/v1/orgaos/{cnpj}/compras/{ano}/{sequencial}
-      contrato: {pncp}/api/pncp/v1/orgaos/{cnpj}/contratos/{ano}/{sequencial}
+  - Página oficial de cada item (link para pessoas; confirmada no navegador em 03/10/2026):
+      compra:   {pncp}/app/editais/{cnpj}/{ano}/{sequencial}
+      contrato: {pncp}/app/contratos/{cnpj}/{ano}/{sequencial}
+    (os endereços /api/... devolvem JSON, bom para programas e ruim para quem visita o site)
 """
 import re
 import time
@@ -67,7 +68,7 @@ def resumir_compra(c, base):
         "situacao": limpar(c.get("situacaoCompraNome")),
         "dataPublicacao": (limpar(c.get("dataPublicacaoPncp")) or "")[:10] or None,
         "srp": bool(c.get("srp")),
-        "url": f"{base}/api/consulta/v1/orgaos/{cnpj}/compras/{ano}/{seq}" if cnpj and ano and seq else None,
+        "url": f"{base}/app/editais/{cnpj}/{ano}/{seq}" if cnpj and ano and seq else None,
     }
 
 
@@ -93,7 +94,7 @@ def resumir_contrato(c, base):
         "tipo": limpar((c.get("tipoContrato") or {}).get("nome")),
         "categoria": limpar((c.get("categoriaProcesso") or {}).get("nome")),
         "compraId": limpar(c.get("numeroControlePncpCompra")),
-        "url": f"{base}/api/pncp/v1/orgaos/{cnpj}/contratos/{ano}/{seq}" if cnpj and ano and seq else None,
+        "url": f"{base}/app/contratos/{cnpj}/{ano}/{seq}" if cnpj and ano and seq else None,
     }
 
 

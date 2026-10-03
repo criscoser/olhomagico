@@ -202,10 +202,10 @@ class TestExtracao(unittest.TestCase):
 
     def test_pncp_link_individual_e_cpf_mascarado(self):
         c = pncp.resumir_contrato(contrato(7, ni="12345678901", tipo="PF"), "https://pncp.gov.br")
-        self.assertEqual(c["url"], "https://pncp.gov.br/api/pncp/v1/orgaos/83039842000184/contratos/2025/7")
+        self.assertEqual(c["url"], "https://pncp.gov.br/app/contratos/83039842000184/2025/7")
         self.assertEqual(c["fornecedorDoc"], "***.456.789-**")
         k = pncp.resumir_compra(compra(3), "https://pncp.gov.br")
-        self.assertEqual(k["url"], "https://pncp.gov.br/api/consulta/v1/orgaos/83039842000184/compras/2026/3")
+        self.assertEqual(k["url"], "https://pncp.gov.br/app/editais/83039842000184/2026/3")
 
     def test_pessoal_nao_guarda_dados_sensiveis(self):
         r = pessoal.resumir(SERVIDORES[0])

@@ -75,6 +75,10 @@ dados/
   - compra: `https://pncp.gov.br/api/consulta/v1/orgaos/{cnpj}/compras/{ano}/{sequencial}`
   - contrato: `https://pncp.gov.br/api/pncp/v1/orgaos/{cnpj}/contratos/{ano}/{sequencial}`
   - O endereço antigo da compra (`/api/pncp/v1/...compras`) foi movido; o novo foi confirmado.
+  - **Atualizado em 03/10/2026:** os endereços acima devolvem JSON (servem para programas). O site agora
+    leva para as páginas do PNCP feitas para pessoas, confirmadas no navegador:
+    compra `https://pncp.gov.br/app/editais/{cnpj}/{ano}/{sequencial}` e
+    contrato `https://pncp.gov.br/app/contratos/{cnpj}/{ano}/{sequencial}`.
 - **Robôs testados só com servidor simulado.** A primeira execução real deve acontecer no seu computador ou no GitHub.
 - **Ainda não confirmado:** se a API de contratos do PNCP aceita mais de uma página (o robô percorre as páginas até vir vazia) e se o intervalo de 12 meses é aceito em todas as modalidades.
 

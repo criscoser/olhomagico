@@ -1,4 +1,4 @@
-Esta pasta recebe os arquivos gerados pelos robôs (ferramentas/atualizar.py):
+# Esta pasta recebe os arquivos gerados pelos robôs (ferramentas/atualizar.py):
   pessoal.js         lista de servidores (API de Pessoal da Prefeitura)
   siconfi.js         gasto com pessoal e limites da LRF (Tesouro Nacional)
   pncp.js            licitações e contratos (PNCP)

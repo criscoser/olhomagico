@@ -35,8 +35,22 @@ OBS.menu = (function () {
     document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = claro ? '#FAF8F5' : '#16111D'; });
   }
 
+  /* Tamanho da letra: 4 passos. O CSS faz o resto (todos os tamanhos do site estão em "rem"). */
+  const TAMANHOS = [100, 115, 130, 150];
+  function aplicarLetra(passo) {
+    const p = Math.min(TAMANHOS.length, Math.max(1, Number(passo) || 1));
+    if (p === 1) delete document.documentElement.dataset.letra; else document.documentElement.dataset.letra = String(p);
+    $('letraValor').textContent = `${TAMANHOS[p - 1]}%`;
+    $('letraMenor').disabled = p === 1;
+    $('letraMaior').disabled = p === TAMANHOS.length;
+    return p;
+  }
+
   function iniciar() {
     aplicarTema(lembrado('tema'));
+    let letra = aplicarLetra(lembrado('letra'));
+    $('letraMenor').addEventListener('click', () => { letra = aplicarLetra(letra - 1); lembrar('letra', String(letra)); });
+    $('letraMaior').addEventListener('click', () => { letra = aplicarLetra(letra + 1); lembrar('letra', String(letra)); });
     $('btnTema').addEventListener('click', () => {
       const novo = temaEfetivo() === 'claro' ? 'escuro' : 'claro';
       aplicarTema(novo); lembrar('tema', novo);

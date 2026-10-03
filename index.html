@@ -77,6 +77,13 @@
       <!-- RODAPÉ DO MENU: apoio (só aparece com chave Pix em js/config.js) e tema claro/escuro. -->
       <div class="lateral-rodape">
         <button type="button" class="item-lateral oculto" id="btnApoio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="rotulo">Apoie o projeto</span></button>
+        <!-- TAMANHO DA LETRA: 4 passos (100%, 115%, 130%, 150%), por cima do tamanho que a pessoa já usa no aparelho. -->
+        <div class="controle-letra" role="group" aria-labelledby="rotuloLetra">
+          <span id="rotuloLetra" class="rotulo-letra">Tamanho da letra</span>
+          <button type="button" class="item-letra" id="letraMenor" aria-label="Diminuir a letra">A−</button>
+          <span id="letraValor" class="valor-letra" aria-live="polite">100%</span>
+          <button type="button" class="item-letra" id="letraMaior" aria-label="Aumentar a letra">A+</button>
+        </div>
         <button type="button" class="item-lateral" id="btnTema"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><span class="rotulo" id="btnTemaTexto">Usar tema escuro</span></button>
       </div>
     </div>

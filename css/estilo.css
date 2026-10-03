@@ -163,23 +163,24 @@ button.item-lateral[aria-pressed="true"] { color:var(--menu-marcador); }
   .logo { width:1.75rem; height:1.75rem; }
   .lateral-corpo { display:none; }
   /* Folha "Mais": sobe de baixo, acima da barra inferior, com no máximo 75% da altura da tela. */
-  .lateral.aberto .lateral-corpo { display:flex; position:fixed; left:0; right:0; bottom:calc(3.75rem + env(safe-area-inset-bottom));
+  .lateral.aberto .lateral-corpo { display:flex; position:fixed; left:0; right:0; bottom:calc(60px + env(safe-area-inset-bottom));
     z-index:45; max-height:75vh; overflow-y:auto; background:var(--menu-fundo); border-radius:var(--raio-grande) var(--raio-grande) 0 0;
     box-shadow:var(--sombra-2); border-top:1px solid var(--menu-linha); }
   body.mais-aberto::before { content:""; position:fixed; inset:0; z-index:35; background:rgba(0, 0, 0, .45); }
   /* Barra inferior fixa, com o nome escrito em cada atalho. Respeita a barra de gestos do celular (safe-area). */
-  .barra-inferior { display:grid; grid-template-columns:repeat(5, 1fr); position:fixed; left:0; right:0; bottom:0; z-index:40;
+  /* A barra é a moldura da navegação: tamanho FIXO (14 px), mesmo com a letra aumentada (o conteúdo é que cresce). */
+  .barra-inferior { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); position:fixed; left:0; right:0; bottom:0; z-index:40;
     background:var(--cartao); border-top:1px solid var(--borda-forte); box-shadow:var(--sombra-2); padding-bottom:env(safe-area-inset-bottom); }
-  .aba-inferior { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:3.75rem;
-    padding:var(--esp-1); border:0; border-radius:0; background:none; color:var(--texto-2); font:inherit; font-size:var(--letra-legenda);
+  .aba-inferior { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:60px;
+    padding:4px; border:0; border-radius:0; background:none; color:var(--texto-2); font:inherit; font-size:14px; line-height:1.2;
     font-weight:400; text-decoration:none; cursor:pointer; position:relative; }
-  .aba-inferior .icone { width:1.5rem; height:1.5rem; }
+  .aba-inferior .icone { width:24px; height:24px; }
   .aba-inferior[aria-current="page"], .aba-inferior[aria-expanded="true"] { color:var(--marca); font-weight:700; }
   .aba-inferior[aria-current="page"]::before { content:""; position:absolute; top:0; left:25%; right:25%; height:3px;
     border-radius:0 0 3px 3px; background:var(--destaque-borda); }
   button.aba-inferior:hover:not(:disabled) { filter:none; background:var(--marca-suave); }
   /* Espaço para a barra não cobrir o fim da página nem o que está com foco (WCAG 2.4.11). */
-  body { padding-bottom:calc(3.75rem + env(safe-area-inset-bottom)); }
+  body { padding-bottom:calc(60px + env(safe-area-inset-bottom)); }
   html { scroll-padding-top:4.5rem; scroll-padding-bottom:5rem; }
   /* No celular a pesquisa sai do topo (fica no atalho "Buscar"); na tela de busca ela volta. */
   body:not([data-rota="busca"]) .busca-topo { display:none; }
@@ -223,9 +224,9 @@ h3 { font-size:var(--letra-h3); line-height:1.3; margin:1rem 0 .25rem; }
 .sub { color:var(--texto-2); font-size:var(--letra-corpo); margin:0 0 1rem; }
 
 /* ---------- Os três passos (empenhado / liquidado / pago) e ajustes ---------- */
-.etapas { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit, minmax(14rem, 1fr)); }
+.etapas { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
 .etapa { border-left:4px solid var(--marca); padding-left:.8rem; }
-.etapa .num { font-size:1.375rem; font-weight:700; font-family:var(--font-titulo); }
+.etapa .num { font-size:clamp(1.125rem, .25rem + 4.5vw, 1.375rem);   /* cabe em 320 px sem ficar < 18 px */ font-weight:700; font-family:var(--font-titulo); }
 .etapa .nome { font-weight:700; }
 .etapa p { margin:.2rem 0 0; color:var(--texto-2); font-size:var(--letra-corpo); }
 
@@ -304,10 +305,10 @@ button.mini { min-height:var(--alvo); padding:.3rem .7rem; font-size:var(--letra
 
 /* ---------- Telas estreitas (celular): o valor desce para baixo do nome em vez de espremer o texto ---------- */
 .linha { flex-wrap:wrap; }
-.linha .nome { flex:1 1 14rem; overflow-wrap:break-word; }
+.linha .nome { flex:1 1 min(100%, 14rem); min-width:0; overflow-wrap:anywhere; }   /* palavra longa quebra só se não couber */
 .linha .v { margin-left:auto; }
 .painel .mini li { flex-wrap:wrap; }
-.painel .mini .nome { flex:1 1 12rem; overflow-wrap:break-word; }
+.painel .mini .nome { flex:1 1 min(100%, 12rem); min-width:0; overflow-wrap:anywhere; }
 .painel .mini .v { margin-left:auto; }
 
 /* ---------- Abas (Gastos / Servidores) ---------- */
@@ -339,7 +340,8 @@ details.origem dd { margin:0; overflow-wrap:anywhere; }
 /* ---------- Diversos ---------- */
 .sem-js { padding:1rem; }                       /* aviso para quem está sem JavaScript (antes era estilo embutido) */
 p.acoes { margin:0 0 1rem; }
-.filtro-botao { flex:0 0 auto !important; }
+.filtro-botao { flex:0 1 auto !important; max-width:100%; }
+.filtro-botao button { max-width:100%; }
 #aba-sobre ul { padding-left:1.2rem; }
 #aba-sobre li { margin:.35rem 0; }
 code { font-size:.9em; padding:0 .25rem; border-radius:var(--raio-campo); background:var(--marca-suave); overflow-wrap:anywhere; }
@@ -398,7 +400,7 @@ p, li, dd, td, th, figcaption { overflow-wrap:break-word; }
 .quadro .medidor { margin:.25rem 0; }
 
 /* ---------- Números-resumo (cartões de indicador) ---------- */
-.numeros { display:grid; gap:.75rem; grid-template-columns:repeat(auto-fit, minmax(13rem, 1fr)); margin:1rem 0; }
+.numeros { display:grid; gap:.75rem; grid-template-columns:repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); margin:1rem 0; }
 .numeros:empty { display:none; }
 .numero { display:flex; flex-direction:column; gap:.15rem; padding:.8rem 1rem; border-radius:var(--raio); background:var(--marca-suave); }
 .numero-rotulo { color:var(--texto-2); font-size:var(--letra-corpo); }
@@ -624,3 +626,18 @@ details.explica-diferenca li { margin:.35rem 0; }
 button.botao-ouvir { display:inline-flex; align-items:center; gap:var(--esp-2); margin:0 0 var(--esp-3); }
 button.botao-ouvir[aria-pressed="true"] { background:var(--marca-suave); }
 .lendo { background:var(--aviso-fundo); outline:2px solid var(--destaque-borda); outline-offset:2px; border-radius:var(--raio-campo); }
+/* ---------- Tamanho da letra (menu): o passo escolhido multiplica o tamanho que a pessoa já usa no aparelho ---------- */
+html { font-size:100%; }
+html[data-letra="2"] { font-size:115%; }
+html[data-letra="3"] { font-size:130%; }
+html[data-letra="4"] { font-size:150%; }
+/* Com letra grande, valores longos podem quebrar a linha em vez de passar da largura da tela. */
+html[data-letra="3"] :is(.linha .v, .frase .valor, .frase-media .valor, .painel .mini .v, .tabela .num, .etapa .num, .quadro-numero),
+html[data-letra="4"] :is(.linha .v, .frase .valor, .frase-media .valor, .painel .mini .v, .tabela .num, .etapa .num, .quadro-numero) { white-space:normal; overflow-wrap:anywhere; }
+.controle-letra { display:flex; flex-wrap:wrap; align-items:center; gap:var(--esp-2); padding:.25rem .8rem; color:var(--menu-texto-2); }
+.rotulo-letra { flex:1 1 100%; font-size:var(--letra-legenda); }   /* rótulo numa linha, botões na outra: cabe com letra grande */
+.valor-letra { min-width:3.2rem; text-align:center; font-size:var(--letra-legenda); color:var(--menu-texto); }
+button.item-letra { min-width:var(--alvo); min-height:var(--alvo); padding:0 .5rem; background:transparent; color:var(--menu-texto);
+  border:1px solid var(--menu-texto-2); border-radius:var(--raio-campo); font-weight:700; }
+button.item-letra:hover:not(:disabled) { background:var(--menu-hover); filter:none; }
+button.item-letra:disabled { opacity:.45; cursor:not-allowed; }

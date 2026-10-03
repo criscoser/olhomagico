@@ -17,6 +17,7 @@
 <script src="../js/historico.js"></script>
 <script src="../js/frases.js"></script>
 <script src="../js/ouvir.js"></script>
+<script src="../js/compartilhar.js"></script>
 <script src="../js/componentes/graficos.js"></script>
 <script src="../js/rotas.js"></script>
 <script src="../js/pix-regras.js"></script>
@@ -308,6 +309,23 @@
   teste('ouvir: sigla vira o nome completo', fala('recebeu do FPM'), 'recebeu do Fundo de Participação dos Municípios');
   teste('ouvir: fala dividida por frases e em pedaços de até 200 letras',
     [OBS.ouvir.pedacos('Primeira frase. Segunda frase!').length, OBS.ouvir.pedacos('a'.repeat(150) + ', ' + 'b'.repeat(150)).every((p) => p.length <= 200)], [2, true]);
+  // ----- Compartilhar (WhatsApp): a mensagem se sustenta sozinha, longe do site -----
+  const CP = OBS.compartilhar;
+  teste('compartilhar: endereço oficial completo com o "#" da tela', CP.enderecoDaTela('#gastos/2026-09'), 'https://criscoser.github.io/olhomagico/#gastos/2026-09');
+  const msgGasto = CP.montarTexto({ titulo: 'Para onde vai o dinheiro?', frase: 'Em setembro de 2026, o Município de Videira pagou R$ 46,2 milhões.',
+    exato: 'Valor exato: R$ 46.165.401,23.', data: '03/10/2026', url: 'https://criscoser.github.io/olhomagico/#gastos/2026-09' });
+  teste('compartilhar: mensagem com frase, valor exato, data, link e aviso de que não é oficial', msgGasto,
+    '*Para onde vai o dinheiro?*\nEm setembro de 2026, o Município de Videira pagou R$ 46,2 milhões.\nValor exato: R$ 46.165.401,23.\n\n' +
+    'Fonte: dados públicos oficiais (a origem de cada número está no link). Consultado em 03/10/2026.\n' +
+    'Veja os detalhes: https://criscoser.github.io/olhomagico/#gastos/2026-09\n\nOlho Mágico, portal independente (não é site oficial da Prefeitura).');
+  const msgServidor = CP.textoFichaServidor('PROFESSOR', '03/10/2026', 'https://x/#servidor/fulano--professor');
+  teste('compartilhar: ficha de servidor sem nome e sem salário (só o cargo)', [msgServidor.includes('Cargo: PROFESSOR.'), /R\$/.test(msgServidor), /sal[aá]rio/i.test(msgServidor), msgServidor.includes('não é site oficial')],
+    [true, false, false, true]);
+  teste('compartilhar: valor exato inteiro (os pontos de milhar fazem parte do número)', [
+    CP.valorExato('Valor exato: R$ 46.165.401,23. 22 órgãos pagaram 717 credores.'), CP.valorExato('Valor exato: R$ 999,50.'),
+    CP.valorExato('Valor exato: −R$ 70.670,44.'), CP.valorExato('sem valor aqui')],
+    ['Valor exato: R$ 46.165.401,23.', 'Valor exato: R$ 999,50.', 'Valor exato: −R$ 70.670,44.', '']);
+  teste('compartilhar: mensagem sem palavra de opinião', [OBS.frases.opiniao(msgGasto), OBS.frases.opiniao(msgServidor)], [null, null]);
   // ----- Resumo diário das despesas (dados/despesas-resumo.js) -----
   const RESUMO = { meses: [
     { anoMes: '2026-08', registros: 10, parcial: false, credoresQueReceberam: 7, total: { empenhado: 3, liquidado: 2, pago: 1 } },

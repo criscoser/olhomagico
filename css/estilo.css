@@ -641,3 +641,10 @@ button.item-letra { min-width:var(--alvo); min-height:var(--alvo); padding:0 .5r
   border:1px solid var(--menu-texto-2); border-radius:var(--raio-campo); font-weight:700; }
 button.item-letra:hover:not(:disabled) { background:var(--menu-hover); filter:none; }
 button.item-letra:disabled { opacity:.45; cursor:not-allowed; }
+/* Barra "Compartilhar" (WhatsApp, Copiar link, Outros apps), abaixo do título de cada tela. */
+.barra-compartilhar { display:flex; flex-wrap:wrap; align-items:center; gap:var(--esp-2); margin:0 0 var(--esp-4); }
+.botao-compartilhar { display:inline-flex; align-items:center; gap:var(--esp-2); min-height:var(--alvo); padding:.4rem .9rem; border:1px solid var(--borda-forte);
+  border-radius:var(--raio-pilula); background:var(--cartao); color:var(--marca); font:inherit; font-weight:700; text-decoration:none; cursor:pointer; }
+.botao-compartilhar:hover:not(:disabled) { background:var(--marca-suave); filter:none; }
+.compartilhar-msg { flex-basis:100%; }
+.compartilhar-msg:empty { display:none; }

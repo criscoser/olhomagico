@@ -29,7 +29,11 @@ OBS.historico = {
      Um mês que falhar não derruba os outros: ele volta com "erro". */
   async varios(listaMeses, aoAvancar = () => {}) {
     const resultado = [];
+    let consultouAntes = false;
     for (let i = 0; i < listaMeses.length; i++) {
+      // Pausa entre consultas ao portal (limite de 10 por minuto). Mês que já está na memória não consulta nem espera.
+      if (consultouAntes && !OBS.cache.has(listaMeses[i])) await new Promise((r) => setTimeout(r, OBS.fontes.despesas.PAUSA_ENTRE_CONSULTAS_MS));
+      consultouAntes = !OBS.cache.has(listaMeses[i]) || consultouAntes;
       try {
         resultado.push(Object.assign({ anoMes: listaMeses[i] }, await this.mes(listaMeses[i])));
       } catch (erro) {

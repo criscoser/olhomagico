@@ -6,6 +6,11 @@
 OBS.fontes = OBS.fontes || {};
 
 OBS.fontes.despesas = {
+  /* O portal da Prefeitura aceita no máximo 10 consultas por minuto (conferido em 03/10/2026). */
+  LIMITE_POR_MINUTO: 10,
+  PAUSA_ENTRE_CONSULTAS_MS: 6500,   // ~9 por minuto: abaixo do limite
+  MENSAGEM_LIMITE: 'O portal da Prefeitura aceita no máximo 10 consultas por minuto. Aguarde um minuto e tente de novo.',
+
   /* Monta o endereço da consulta. As datas vão com "/" puro (01/09/2026): codificar a barra (%2F)
      faz a API responder erro 400. */
   montarUrl(ini, fim) {
@@ -18,9 +23,13 @@ OBS.fontes.despesas = {
     const relogio = setTimeout(() => controle.abort(), OBS.config.TIMEOUT_MS);
     try {
       const resposta = await fetch(this.montarUrl(ini, fim), { signal: controle.signal });
+      const json = await resposta.json().catch(() => null);
+      // O portal aceita no máximo 10 consultas por minuto; passou disso, responde 429 e uma mensagem de "limite".
+      if (resposta.status === 429 || (json && /limite de requisi/i.test(String(json.msg || '')))) {
+        const e = new Error(OBS.fontes.despesas.MENSAGEM_LIMITE); e.limite = true; throw e;
+      }
       if (!resposta.ok) throw new Error(`A fonte respondeu com erro ${resposta.status}.`);
-      const json = await resposta.json();
-      if (json.status !== 'ok' || !Array.isArray(json.retorno)) throw new Error('A fonte respondeu em um formato inesperado.');
+      if (!json || json.status !== 'ok' || !Array.isArray(json.retorno)) throw new Error('A fonte respondeu em um formato inesperado.');
       return json.retorno;
     } finally {
       clearTimeout(relogio); // sempre desliga o relógio, deu certo ou não

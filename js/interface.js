@@ -254,7 +254,7 @@ OBS.ui = (function () {
     if (evolucao) {
       evolucaoFonte = `Fonte: API de despesas da Prefeitura, cópia diária de ${new Date(resumo.meta.geradoEm).toLocaleDateString('pt-BR')}.`;
     } else {
-      const resultado = await OBS.historico.varios(meses, (feitos, total) => { $('evolucaoEstado').textContent = `Consultando o portal: ${feitos} de ${total} meses (cerca de 800 KB cada)…`; });
+      const resultado = await OBS.historico.varios(meses, (feitos, total) => { $('evolucaoEstado').textContent = `Consultando o portal: ${feitos} de ${total} meses (cerca de 800 KB cada; o portal aceita 10 consultas por minuto, por isso demora)…`; });
       evolucao = OBS.historico.totaisPorMes(resultado);
       evolucaoFonte = 'Fonte: API de despesas da Prefeitura, consulta ao vivo.';
     }

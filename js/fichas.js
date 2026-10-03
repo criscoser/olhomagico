@@ -215,7 +215,7 @@ OBS.fichas = (function () {
     const area = el('div');
     botao.addEventListener('click', async () => {
       botao.disabled = true;
-      const resultado = await OBS.historico.varios(meses, (feitos, total) => { estado.textContent = `Consultando: ${feitos} de ${total} meses…`; });
+      const resultado = await OBS.historico.varios(meses, (feitos, total) => { estado.textContent = `Consultando: ${feitos} de ${total} meses (o portal aceita 10 consultas por minuto: leva cerca de 1 minuto e meio)…`; });
       const porMes = OBS.historico.doCredor(resultado, cnpj);
       const erros = porMes.filter((m) => m.erro).length;
       const pago = porMes.reduce((t, m) => t + (m.pago || 0), 0);

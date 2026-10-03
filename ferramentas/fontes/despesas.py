@@ -81,7 +81,7 @@ def resumo(conteudo):
     return {"meses": len(conteudo["meses"])}
 
 
-def coletar(municipio, pausa=3.0, avisar=print, hoje=None):   # o portal pede calma (HTTP 429) se formos rápido
+def coletar(municipio, pausa=7.0, avisar=print, hoje=None):   # o portal aceita 10 consultas por minuto (HTTP 429 acima disso)
     hoje = hoje or date.today()
     meses = []
     for i, (ano, mes) in enumerate(lista_meses(hoje)):

@@ -1,5 +1,15 @@
 /* ESTILO DA PÁGINA. Mudou uma cor? Altere só os "tokens" no :root, o resto acompanha. */
 
+/* ---------- Letra: Atkinson Hyperlegible, hospedada NO PRÓPRIO SITE ----------
+   Criada pelo Braille Institute para pessoas com baixa visão (distingue bem 0/O, 1/l/I, 5/S: importante em valores).
+   Só o conjunto "latin" (tem todos os acentos do português): 2 arquivos de ~17 KB. Licença SIL OFL 1.1 em
+   css/tipografia/OFL.txt. Hospedar aqui evita mandar o endereço de quem visita ao Google e acelera o 3G.
+   font-display: swap = o texto aparece logo com a letra do sistema e troca quando esta chegar. */
+@font-face { font-family:"Atkinson Hyperlegible"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("tipografia/atkinson-hyperlegible-400.woff2") format("woff2"); unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family:"Atkinson Hyperlegible"; font-style:normal; font-weight:700; font-display:swap;
+  src:url("tipografia/atkinson-hyperlegible-700.woff2") format("woff2"); unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
 /* ---------- Tokens (design system) ----------
    Paleta "Uva e Ouro": roxo-uva para marca, links e botões; âmbar (ouro) só como preenchimento e detalhe.
    Tema CLARO é o padrão. O ESCURO entra quando o celular/computador está no modo escuro, ou quando a pessoa
@@ -33,7 +43,7 @@
   --menu-fundo: #241338; --menu-texto: #F3EFF7; --menu-texto-2: #CFC3DD; --menu-marcador: #F4B940;
   --menu-hover: rgba(255, 255, 255, .08); --menu-ativo: rgba(244, 185, 64, .16); --menu-linha: rgba(243, 239, 247, .16);
   --font: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-titulo: "Sora", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-titulo: var(--font);   /* uma família só: títulos em negrito da mesma letra */
   /* Espaçamentos, raios e sombra */
   --esp-1: .25rem; --esp-2: .5rem; --esp-3: .75rem; --esp-4: 1rem; --esp-5: 1.5rem; --esp-6: 2rem;
   --raio: 10px; --raio-grande: 14px;
@@ -74,7 +84,7 @@
 /* ---------- Base ---------- */
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust:100%; }
-/* Letra um pouco menor que antes (15 px), como pedido; títulos e números com a fonte Sora. */
+/* Títulos e números usam a mesma letra (Atkinson Hyperlegible), em negrito. */
 body { margin:0; background:var(--fundo); color:var(--texto); font:.9375rem/1.55 var(--font); overflow-x:hidden; }
 h1, h2, h3, .titulo-pagina, .frase, .frase-media, .kpi-valor, .quadro-numero, .numero-valor { font-family:var(--font-titulo); letter-spacing:-.01em; }
 a { color:var(--marca); }

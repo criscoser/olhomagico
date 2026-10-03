@@ -5,11 +5,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- POLÍTICA DE SEGURANÇA (CSP): o navegador só aceita scripts e estilos deste próprio site (mais a fonte do Google)
+<!-- POLÍTICA DE SEGURANÇA (CSP): o navegador só aceita scripts, estilos e letras deste próprio site
      e só conversa com a API oficial de Videira. Se alguém conseguir injetar código, ele não roda.
      Trusted Types: scripts só podem ser carregados pela política "olhomagico" (js/fontes/arquivos.js), que aceita
      apenas os arquivos de dados do próprio site. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://videira.atende.net; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types olhomagico">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src https://videira.atende.net; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types olhomagico">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Olho Mágico — Para onde vai o dinheiro público de Videira?</title>
 <!-- DESCRIÇÃO e PRÉVIA DE COMPARTILHAMENTO: é o texto que aparece no Google e quando o link
@@ -23,10 +23,9 @@
 <meta name="theme-color" content="#16111D" media="(prefers-color-scheme: dark)">
 <!-- ÍCONE DA ABA: a lente do "olho mágico" (âmbar e ciano), desenhada no próprio arquivo (sem imagem extra). -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23f4c55a'/%3E%3Ccircle cx='20' cy='20' r='11' fill='%230b1a30'/%3E%3Ccircle cx='20' cy='20' r='4.5' fill='%233fd0e0'/%3E%3C/svg%3E">
-<!-- FONTES: "Atkinson Hyperlegible" no texto (criada para ser fácil de ler) e "Sora" nos títulos e números.
-     Se não carregarem, o navegador usa outras parecidas. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- LETRA: "Atkinson Hyperlegible" (criada para ser fácil de ler), hospedada no próprio site (css/tipografia/).
+     O "preload" pede a letra normal logo no começo, junto com o CSS. -->
+<link rel="preload" href="css/tipografia/atkinson-hyperlegible-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
@@ -661,7 +660,7 @@
       <ul>
         <li>CPF de pessoa física aparece mascarado. Matrícula, horário, local de trabalho e afastamentos não são mostrados nem guardados.</li>
         <li>O site não tem cadastro, não usa cookies de rastreamento e não guarda o que você pesquisa.</li>
-        <li>A fonte de letra vem do Google Fonts; por isso, o Google recebe o endereço de internet de quem abre o site.</li>
+        <li>As letras do site ficam no próprio site: abrir o Olho Mágico não envia o seu endereço de internet ao Google nem a outras empresas.</li>
       </ul>
     </section>
 

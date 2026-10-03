@@ -5,7 +5,8 @@ Confirmado para Videira pelo usuário em 02/10/2026 (a resposta traz CO_IBGE 421
 
 Endereço: {tesouro_transferencias}/por_estado_municipio?p_estado=UF&p_municipio=COD&p_ano=ANO
   UF e COD são códigos PRÓPRIOS desse sistema (SC = 24, Videira = 8379), não os do IBGE.
-  A resposta vem em páginas (10 itens por página) e cada página aponta para a próxima ("next").
+  A resposta vem em páginas (10 itens por página, lista no campo "registros") e cada página aponta para a
+  próxima ("next"). Atenção: o "next" vem até depois do fim; a leitura para na primeira página vazia.
 
 Campos usados: ANO, MES, TRANSFERENCIA (tipo), VALOR, CO_IBGE. O VALOR pode ser negativo (ajustes e devoluções).
 """
@@ -79,9 +80,14 @@ def baixar_ano(municipio, ano, pausa):
         vistos.add(url)
         time.sleep(pausa)
         resposta = baixar_json(url) or {}
-        if not isinstance(resposta, dict) or not isinstance(resposta.get("items", []), list):
-            raise ValueError("formato inesperado: falta a lista 'items'")
-        itens.extend(resposta.get("items") or [])
+        # O Tesouro manda a lista no campo "registros"; aceitamos "items" também, caso o formato mude.
+        pagina = resposta.get("registros", resposta.get("items", [])) if isinstance(resposta, dict) else None
+        if not isinstance(pagina, list):
+            raise ValueError("formato inesperado: falta a lista 'registros'")
+        # O Tesouro SEMPRE manda o link "next", mesmo depois do fim. Por isso uma página vazia encerra a leitura.
+        if not pagina:
+            return itens
+        itens.extend(pagina)
         url = proxima_pagina(resposta, url)
         if not url:
             return itens

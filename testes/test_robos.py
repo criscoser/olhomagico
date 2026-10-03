@@ -166,13 +166,11 @@ class ServidorFalso(BaseHTTPRequestHandler):
                 p = int(q["pagina"]); return self._json(PAUTAS[(p - 1) * 50:p * 50])
             return self._json([])
         if u.path.endswith("/por_estado_municipio"):
-            if q.get("p_ano") != ANO_ANT:
-                return self._json({"items": [], "hasMore": False})
-            p = int(q.get("page", 0)); fatia = TRANSF_2025[p * 10:(p + 1) * 10]
-            corpo = {"items": fatia, "hasMore": (p + 1) * 10 < len(TRANSF_2025)}
-            if corpo["hasMore"]:
-                corpo["next"] = {"$ref": f"https://endereco-interno.exemplo/ords/x?p_ano=2025&page={p + 1}"}
-            return self._json(corpo)
+            # Imita o Tesouro de verdade: lista em "registros" e link "next" SEMPRE presente (até nas páginas vazias).
+            p = int(q.get("page", 0))
+            fatia = TRANSF_2025[p * 10:(p + 1) * 10] if q.get("p_ano") == ANO_ANT else []
+            return self._json({"registros": fatia, "page": p, "pageSize": 10, "status": "ok",
+                               "next": f"https://endereco-interno.exemplo/aria//v1/x?p_ano={q.get('p_ano')}&page={p + 1}&pageSize=10"})
         if u.path.endswith("/dca"):
             return self._json({"items": DCA_2024 if q["an_exercicio"] == ANO_ANT2 else [], "hasMore": False})
         if u.path.endswith("/extrato_entregas"):

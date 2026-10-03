@@ -93,9 +93,12 @@ def baixar_json(url, timeout=60, cabecalhos=None):
                 print(f"    fonte pediu calma (HTTP 429): esperando {espera} s antes de tentar de novo")
                 time.sleep(min(espera, 300))
                 continue
-        except (urllib.error.URLError, TimeoutError) as erro:
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as erro:
+            # ConnectionError inclui "conexão cancelada pelo host remoto" (WinError 10054):
+            # a internet caiu ou o servidor fechou a conexão no meio. Vale tentar de novo.
             if tentativa == TENTATIVAS:
                 raise RuntimeError(f"falha de conexão em {url} ({erro})")
+            print(f"    conexão falhou (tentativa {tentativa} de {TENTATIVAS}): tentando de novo em {5 * tentativa} s")
         else:
             if parece_bloqueio(texto):
                 raise Bloqueado(f"verificação anti-robô em {url}")

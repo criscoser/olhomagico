@@ -29,10 +29,12 @@ OBS.pessoalTela = (function () {
   /* ---------- Resumo do topo ---------- */
   function desenharResumo(meta) {
     const data = new Date(meta.geradoEm);
-    $('pessoalFrase').replaceChildren(el('span', 'valor', registros(lista.length)), ' na lista de servidores da Prefeitura de Videira.');
+    $('pessoalFrase').replaceChildren(el('span', 'valor', registros(lista.length)), ' na lista de pessoal do Município de Videira.');
     const entidades = [...new Set(lista.map((s) => s.entidade).filter(Boolean))];
+    const inativos = lista.filter(OBS.pessoal.ehInativo).length;
     $('pessoalNota').textContent = 'Esta lista mostra a situação no dia da cópia: ela NÃO muda com o mês escolhido em “Gastos do mês”, ' +
-      'porque a fonte oficial não tem histórico por mês. Inclui quem está trabalhando ou afastado. Cada registro é um vínculo (matrícula): ' +
+      'porque a fonte oficial não tem histórico por mês. Inclui quem está trabalhando ou afastado' +
+      (inativos ? ` e também ${registros(inativos)} de aposentados e pensionistas` : '') + '. Cada registro é um vínculo (matrícula): ' +
       'quem tem dois cargos aparece duas vezes. ' + (entidades.length ? `Entidades: ${entidades.join('; ')}.` : '');
     const comissionados = lista.filter(OBS.pessoal.ehComissionado).length;
     OBS.numeros($('pessoalNumeros'), [

@@ -46,6 +46,16 @@
   teste('secretaria sabe a quem pagou', r.orgaos[0].porCredor.get('12345678000190'), 50);
   teste('origem não informada', r.fontes, [['(origem não informada)', 60]]);
   const r2 = OBS.agregar([{ nomeCredor: 'B', cpfCnpjCredor: '', orgaoDescricao: 'X', valorEmpenhado: '100', valorAnulado: '20', valorLiquidado: '80', valorRetido: '5', valorPago: '75' }]);
+  // Mesmo CNPJ com nomes diferentes (caso real: instituto de previdência e a folha dos aposentados): nenhum nome some.
+  const r3 = OBS.agregar([
+    { nomeCredor: 'INSTITUTO', cpfCnpjCredor: '05002371000126', orgaoDescricao: 'X', valorEmpenhado: '10', valorLiquidado: '10', valorPago: '10' },
+    { nomeCredor: 'FOLHA APOSENTADOS', cpfCnpjCredor: '05.002.371/0001-26', orgaoDescricao: 'Y', valorEmpenhado: '30', valorLiquidado: '30', valorPago: '30' },
+    { nomeCredor: 'SÓ EMPENHO', cpfCnpjCredor: '11222333000144', orgaoDescricao: 'X', valorEmpenhado: '99', valorLiquidado: '0', valorPago: '0' },
+    { nomeCredor: 'ESTORNO', cpfCnpjCredor: '99888777000166', orgaoDescricao: 'X', valorEmpenhado: '-5', valorLiquidado: '-5', valorPago: '-5' }
+  ]);
+  teste('mesmo CNPJ: nome exibido é o de maior valor pago', r3.credores[0].nome, 'FOLHA APOSENTADOS');
+  teste('mesmo CNPJ: os outros nomes ficam guardados', r3.credores[0].outrosNomes, ['INSTITUTO']);
+  teste('"credores que receberam" não conta quem só teve empenho ou estorno', [r3.credores.length, r3.credoresQueReceberam], [3, 1]);
   teste('total anulado', r2.total.anulado, 20);
   teste('total retido', r2.total.retido, 5);
   const v = OBS.fontes.despesas.validar([{ valorEmpenhado: '1', valorLiquidado: '1', valorPago: '1' }, { valorEmpenhado: '1', valorLiquidado: '1', valorPago: 'x' }]);
@@ -116,6 +126,12 @@
   teste('contratos: busca sem acento', OBS.contratos.buscar(K, { termo: 'agua' }, 'valorGlobal', 'dataAssinatura').length, 2);
   teste('contratos: mais recentes primeiro', OBS.contratos.buscar(K, {}, 'valorGlobal', 'dataAssinatura').map((c) => c.objeto)[0], 'Limpeza 2');
   teste('contratos: maior valor primeiro, sem valor no fim', OBS.contratos.buscar(K, { ordem: 'valor' }, 'valorGlobal', 'dataAssinatura').map((c) => c.valorGlobal), [300, 250, 100, null]);
+  teste('contratos: consórcio intermunicipal não é órgão do município',
+    ['CONSORCIO PUBLICO INTERFEDERATIVO DE SAUDE - CISAMARP', 'Consórcio X', 'MUNICIPIO DE VIDEIRA', 'FUNDO MUNICIPAL DE SAUDE'].map((o) => OBS.contratos.ehConsorcio({ orgao: o })),
+    [true, true, false, false]);
+  teste('servidores: aposentados e pensionistas contam como inativos',
+    ['Aposentado', 'Pensionista do Tesouro', 'Aposentado (Complemento)', 'Estatutário', 'Cargo Comissionado'].map((v) => OBS.pessoal.ehInativo({ vinculo: v })),
+    [true, true, true, false, false]);
   teste('contratos: filtro por órgão', OBS.contratos.buscar(K, { orgao: 'FUNDO' }, 'valorGlobal', 'dataAssinatura').length, 1);
   teste('fornecedores: soma pelo CNPJ', OBS.contratos.fornecedores(K).slice(0, 2).map((f) => [f.nome, f.contratos, f.soma]), [['ÁGUA LIMPA LTDA', 2, 400], ['BETA SA', 1, 250]]);
   teste('contar por campo', OBS.contratos.contar(K, 'orgao'), [['MUNICIPIO', 3], ['FUNDO', 1]]);
@@ -155,6 +171,8 @@
   teste('DCA: etapa sem valor fica de fora (não vira zero)', OBS.contas.funcoes(DCA, 'pago').map((f) => [f.nome, f.valor, f.fatia]), [['Saúde', 90, 100]]);
   // ----- Educação (SIOPE) -----
   teste('SIOPE: mínimo de 25% em MDE', OBS.contas.minimoEducacao({ nome: 'Percentual de aplicação em MDE', valor: 28.08 }), { minimo: 25, base: 'Constituição Federal, art. 212', cumpre: true });
+  teste('SIOPE: só o 6º bimestre é ano fechado (antes disso não se compara com o mínimo)',
+    [4, 6].map((b) => OBS.contas.anoFechado({ ano: 2026, bimestre: b })), [false, true]);
   teste('SIOPE: valor em reais não ganha mínimo percentual', OBS.contas.minimoEducacao({ nome: 'Valor aplicado em MDE (R$)', valor: 10 }), null);
   teste('SIOPE: tipo do indicador pelo nome', ['Percentual X', 'Investimento por aluno', 'Número de matrículas'].map(OBS.contas.tipoIndicador), ['pct', 'moeda', 'numero']);
   // ----- Entregas -----

@@ -207,6 +207,16 @@ class TestExtracao(unittest.TestCase):
         k = pncp.resumir_compra(compra(3), "https://pncp.gov.br")
         self.assertEqual(k["url"], "https://pncp.gov.br/app/editais/83039842000184/2026/3")
 
+    def test_pncp_resumo_sem_consorcio(self):
+        # Consórcio intermunicipal com sede no município (ex.: CISAMARP) não entra nos totais do município.
+        conteudo = {"meta": {"periodo": {"inicio": "20251003", "fim": "20261002"}},
+                    "compras": [{"orgao": "MUNICIPIO DE VIDEIRA"}, {"orgao": "CONSORCIO PUBLICO INTERFEDERATIVO DE SAUDE - CISAMARP"}],
+                    "contratos": [{"orgao": "MUNICIPIO DE VIDEIRA", "valorGlobal": 100.0},
+                                  {"orgao": "CONSÓRCIO PÚBLICO X", "valorGlobal": 900.0},
+                                  {"orgao": "FUNDO MUNICIPAL DE SAUDE", "valorGlobal": None}]}
+        r = pncp.resumo(conteudo)
+        self.assertEqual((r["compras"], r["contratos"], r["valorGlobal"]), (1, 2, 100.0))
+
     def test_pessoal_nao_guarda_dados_sensiveis(self):
         r = pessoal.resumir(SERVIDORES[0])
         texto = json.dumps(r, ensure_ascii=False)

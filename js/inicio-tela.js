@@ -51,7 +51,7 @@ OBS.inicioTela = (function () {
         OBS.kpi({ rotulo: 'Total pago', valor: moeda(r.total.pago), periodo: periodo.nome, fonte, href }),
         OBS.kpi({ rotulo: 'Total empenhado (reservado)', valor: moeda(r.total.empenhado), periodo: periodo.nome, fonte, href }),
         OBS.kpi({ rotulo: 'Total liquidado (conferido)', valor: moeda(r.total.liquidado), periodo: periodo.nome, fonte, href }),
-        OBS.kpi({ rotulo: 'Credores que receberam', valor: qtd(r.credores.length), periodo: periodo.nome, fonte, href,
+        OBS.kpi({ rotulo: 'Credores que receberam', valor: qtd(r.credoresQueReceberam), periodo: periodo.nome, fonte, href,
           detalhe: `${qtd(d.recebidas)} registros recebidos da fonte` + (d.descartadas ? `, ${qtd(d.descartadas)} ignorados por valor inválido` : '') }),
         servidores
       ].filter(Boolean));
@@ -124,7 +124,7 @@ OBS.inicioTela = (function () {
     const variacao = anterior !== null ? T.variacao(total, anterior) : null;
     const serie = T.porMes(regs, ano).map((v, i) => ({ rotulo: OBS.mesCurto(i + 1).charAt(0).toUpperCase(), valor: v, titulo: OBS.MESES[i] }));
     return quadro({ titulo: `Repasses da União em ${ano}`, numero: moeda(total),
-      frase: `recebidos de janeiro a ${OBS.MESES[ultimo - 1].toLowerCase()} (FPM, FUNDEB e outros).` +
+      frase: `recebidos de janeiro a ${OBS.MESES[ultimo - 1].toLowerCase()} (FPM, FUNDEB e outros; o último mês pode estar incompleto).` +
         (variacao !== null ? ` No mesmo período de ${ano - 1}: ${curta(anterior)} (${variacao >= 0 ? 'alta' : 'queda'} de ${pct(Math.abs(Math.round(variacao * 10) / 10))}).` : ''),
       extra: OBS.graficos.colunas(serie, { destaque: ultimo - 1, descricao: `Repasses por mês em ${ano}.` }),
       fonte: 'Transferências constitucionais (Tesouro Nacional).', link: '#contas/transferencias', linkTexto: 'Ver mês a mês e por tipo' });
@@ -147,8 +147,11 @@ OBS.inicioTela = (function () {
     const p = d.periodos[0];
     const achado = p.indicadores.map((ind) => ({ ind, min: OBS.contas.minimoEducacao(ind) })).find((x) => x.min && x.min.minimo === 25);
     if (!achado) return null;
-    return quadro({ titulo: `Educação em ${p.ano}`, numero: pct(achado.ind.valor),
-      frase: `das receitas de impostos foram aplicadas no ensino (mínimo da Constituição: ${pct(25)}). ${achado.min.cumpre ? 'Está acima do mínimo.' : 'Está abaixo do mínimo.'}`,
+    // O mínimo de 25% vale para o ANO INTEIRO: com dado parcial, o site não diz se está acima ou abaixo.
+    const parcial = !OBS.contas.anoFechado(p);
+    return quadro({ titulo: parcial ? `Educação em ${p.ano} (até o ${p.bimestre}º bimestre)` : `Educação em ${p.ano}`, numero: pct(achado.ind.valor),
+      frase: `das receitas de impostos foram aplicadas no ensino (mínimo da Constituição: ${pct(25)} no ano). ` +
+        (parcial ? OBS.contas.AVISO_PARCIAL : achado.min.cumpre ? 'Está acima do mínimo.' : 'Está abaixo do mínimo.'),
       fonte: 'SIOPE (FNDE, Ministério da Educação).', link: '#contas/educacao', linkTexto: 'Ver os indicadores' });
   }
 

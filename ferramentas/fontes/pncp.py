@@ -98,10 +98,17 @@ def resumir_contrato(c, base):
     }
 
 
+def eh_consorcio(item):
+    """Consórcio intermunicipal (ex.: CISAMARP) tem sede no município e aparece na consulta pelo IBGE, mas é outra
+    entidade e atende vários municípios: fica fora dos totais do município (o site mostra os contratos dele à parte)."""
+    return bool(re.search(r"\bCONS[OÓ]RCIO\b", item.get("orgao") or "", re.I))
+
+
 def resumo(conteudo):
-    """Números curtos para o painel inicial."""
-    return {"compras": len(conteudo["compras"]), "contratos": len(conteudo["contratos"]),
-            "valorGlobal": round(sum(c["valorGlobal"] or 0 for c in conteudo["contratos"]), 2),
+    """Números curtos para o painel inicial (só órgãos do município; consórcios ficam fora)."""
+    contratos = [c for c in conteudo["contratos"] if not eh_consorcio(c)]
+    return {"compras": sum(1 for c in conteudo["compras"] if not eh_consorcio(c)), "contratos": len(contratos),
+            "valorGlobal": round(sum(c["valorGlobal"] or 0 for c in contratos), 2),
             "periodo": conteudo["meta"]["periodo"]}
 
 

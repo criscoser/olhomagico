@@ -49,5 +49,9 @@ OBS.contratos.contar = function (itens, campo) {
   return [...m.entries()].sort((a, b) => b[1] - a[1]);
 };
 
+/* CONSÓRCIO intermunicipal (ex.: CISAMARP) tem sede em Videira e por isso aparece na consulta pelo código IBGE,
+   mas é outra entidade e atende vários municípios: os contratos dele NÃO são do município e ficam fora dos totais. */
+OBS.contratos.ehConsorcio = (item) => /\bCONS[OÓ]RCIO\b/i.test(item.orgao || '');
+
 /* Data ISO (2025-12-10 ou 2025-12-10T...) para o formato brasileiro 10/12/2025. */
 OBS.contratos.data = (iso) => OBS.dataBR(iso);

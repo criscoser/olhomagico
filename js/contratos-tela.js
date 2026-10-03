@@ -88,8 +88,8 @@ OBS.contratosTela = (function () {
     $('buscaCompra').addEventListener('input', OBS.comEspera(atualizarCompras));
     ['filtroModalidade', 'filtroOrgaoCompra'].forEach((id) => $(id).addEventListener('change', atualizarCompras));
     $('limparCompras').addEventListener('click', () => { ['buscaCompra', 'filtroModalidade', 'filtroOrgaoCompra'].forEach((id) => { $(id).value = ''; }); atualizarCompras(); });
-    $('csvContratos').addEventListener('click', () => baixar(tContratos, COL_CONTRATOS, 'Contratos dos órgãos de Videira', 'olho-magico-contratos.csv'));
-    $('csvCompras').addEventListener('click', () => baixar(tCompras, COL_COMPRAS, 'Licitações e compras dos órgãos de Videira', 'olho-magico-licitacoes.csv'));
+    $('csvContratos').addEventListener('click', () => baixar(tContratos, COL_CONTRATOS, 'Contratos publicados no PNCP por órgãos com sede em Videira (a coluna Órgão identifica cada um)', 'olho-magico-contratos.csv'));
+    $('csvCompras').addEventListener('click', () => baixar(tCompras, COL_COMPRAS, 'Licitações e compras publicadas no PNCP por órgãos com sede em Videira (a coluna Órgão identifica cada um)', 'olho-magico-licitacoes.csv'));
   }
 
   async function carregar() {
@@ -104,23 +104,29 @@ OBS.contratosTela = (function () {
     }
     OBS.avisoDesatualizado($('contratosDesatualizado'), 'pncp');
     const ini = dataAAAAMMDD(d.meta.periodo.inicio), fim = dataAAAAMMDD(d.meta.periodo.fim);
-    $('contratosFrase').replaceChildren(`De ${ini} a ${fim}, órgãos de Videira publicaram no PNCP `,
-      el('span', 'valor', `${qtd(d.compras.length)} licitações e compras`), ' e ', el('span', 'valor', `${qtd(d.contratos.length)} contratos`), '.');
-    $('contratosNota').textContent = 'Este período é fixo (últimos 12 meses) e não muda com o mês escolhido em “Gastos do mês”.';
+    const proprios = d.contratos.filter((c) => !R.ehConsorcio(c)), comprasProprias = d.compras.filter((c) => !R.ehConsorcio(c));
+    const deConsorcio = d.contratos.length - proprios.length;
+    const soma = (lista) => lista.reduce((t, c) => t + (c.valorGlobal || 0), 0);
+    $('contratosFrase').replaceChildren(`De ${ini} a ${fim}, os órgãos do Município de Videira publicaram no PNCP `,
+      el('span', 'valor', `${qtd(comprasProprias.length)} licitações e compras`), ' e ', el('span', 'valor', `${qtd(proprios.length)} contratos`), '.');
+    $('contratosNota').textContent = 'Este período é fixo (últimos 12 meses) e não muda com o mês escolhido em “Gastos do mês”.' +
+      (deConsorcio ? ` As listas abaixo também mostram ${qtd(deConsorcio)} contratos (${OBS.graficos.moedaCurta(soma(d.contratos) - soma(proprios))}) ` +
+        'de consórcio intermunicipal com sede em Videira. O consórcio é outra entidade e atende vários municípios, por isso ' +
+        'esses contratos não entram nos totais nem no ranking de fornecedores.' : '');
     OBS.numeros($('contratosNumeros'), [
-      { rotulo: 'Contratos', valor: qtd(d.contratos.length) },
-      { rotulo: 'Valor global somado', valor: OBS.graficos.moedaCurta(d.contratos.reduce((t, c) => t + (c.valorGlobal || 0), 0)), detalhe: 'Valor previsto, não o pago.' },
+      { rotulo: 'Contratos', valor: qtd(proprios.length) },
+      { rotulo: 'Valor global somado', valor: OBS.graficos.moedaCurta(soma(proprios)), detalhe: 'Valor previsto, não o pago.' },
       { rotulo: 'Fornecedores diferentes', valor: qtd(d.fornecedores.length) },
-      { rotulo: 'Licitações e compras', valor: qtd(d.compras.length) }
+      { rotulo: 'Licitações e compras', valor: qtd(comprasProprias.length) }
     ]);
     $('origemContratos').replaceChildren(OBS.origem({
       fonte: 'PNCP: Portal Nacional de Contratações Públicas (Governo Federal)',
       url: `${d.meta.fonte}/api/consulta/v1/contratos?dataInicial=${d.meta.periodo.inicio}&dataFinal=${d.meta.periodo.fim}&cnpjOrgao=${d.meta.orgaosConsultados[0]}&pagina=1`,
       urlTexto: 'abrir a consulta oficial de contratos (primeira página, formato técnico)',
-      tipo: 'Licitações, compras diretas e contratos publicados pelos órgãos de Videira',
+      tipo: 'Licitações, compras diretas e contratos publicados pelos órgãos do município (e por consórcio com sede em Videira, mostrado à parte)',
       periodo: `${ini} a ${fim} (últimos 12 meses)`,
       metodo: `Cópia diária feita por robô, consultando o código IBGE do município e o CNPJ de cada órgão (${d.meta.orgaosConsultados.length} órgão(s)). Cada item tem link para o registro oficial.`,
-      limitacao: 'Só aparece o que os órgãos publicaram no PNCP. “Valor global” é o valor previsto no contrato, não o que já foi pago. Os links abrem os dados oficiais em formato técnico (JSON).'
+      limitacao: 'Só aparece o que os órgãos publicaram no PNCP. “Valor global” é o valor previsto no contrato, não o que já foi pago. Os links levam ao registro oficial de cada item no PNCP.'
     }));
     OBS.opcoes('filtroOrgaoContrato', R.contar(d.contratos, 'orgao').map(([o, n]) => [o, `${o} (${qtd(n)})`]));
     OBS.opcoes('filtroOrgaoCompra', R.contar(d.compras, 'orgao').map(([o, n]) => [o, `${o} (${qtd(n)})`]));

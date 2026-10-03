@@ -20,7 +20,7 @@ OBS.dados = (function () {
       .map((c) => Object.assign(c, { _chaveFornecedor: OBS.contratos.chaveFornecedor(c),
         _digitos: String(c.fornecedorDoc || '').replace(/\D/g, '') }));   // para achar pelo CNPJ digitado com pontos
     const compras = OBS.contratos.preparar(d.compras, ['objeto', 'modalidade', 'orgao', 'unidade']);
-    const fornecedores = OBS.contratos.fornecedores(contratos)
+    const fornecedores = OBS.contratos.fornecedores(contratos.filter((c) => !OBS.contratos.ehConsorcio(c)))
       .map((f) => Object.assign(f, { _busca: OBS.pessoal.normalizar(`${f.nome} ${f.doc || ''}`), _digitos: f.chave }));
     return { meta: d.meta, contratos, compras, fornecedores };
   });

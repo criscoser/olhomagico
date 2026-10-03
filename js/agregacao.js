@@ -40,10 +40,13 @@ OBS.agregar = function (linhas) {
     const chave = doc || l.nomeCredor || '(sem nome)';
     if (!credores.has(chave)) {
       credores.set(chave, { chave, nome: l.nomeCredor || '(sem nome)', doc: l.cpfCnpjCredor,
-        pago: 0, empenhado: 0, liquidado: 0, porOrgao: new Map(), porFonte: new Map() });
+        pago: 0, empenhado: 0, liquidado: 0, porOrgao: new Map(), porFonte: new Map(), porNome: new Map() });
     }
     const c = credores.get(chave);
     c.pago += pag; c.empenhado += emp; c.liquidado += liq;
+    // O mesmo CNPJ pode vir com nomes diferentes (ex.: "INSTITUTO DE PREVIDÊNCIA" e "FOLHA DE PAGAMENTO INPREVID - APOSENTADOS").
+    // Guardamos todos: o nome exibido é o de maior valor pago e os outros aparecem no detalhe (nenhum nome fica escondido).
+    OBS.somarEm(c.porNome, l.nomeCredor || '(sem nome)', pag);
     OBS.somarEm(c.porOrgao, orgao, pag);
     OBS.somarEm(c.porFonte, fonte, pag);
 
@@ -61,8 +64,16 @@ OBS.agregar = function (linhas) {
     OBS.somarEm(fontes, fonte, pag);
   }
 
+  for (const c of credores.values()) {
+    const nomes = OBS.ordenar(c.porNome);
+    c.nome = nomes[0][0];
+    c.outrosNomes = nomes.slice(1).map(([n]) => n);
+  }
+
   return {
     total,
+    // Só quem teve valor pago POSITIVO no período "recebeu". Os demais só tiveram empenho, liquidação ou estorno.
+    credoresQueReceberam: [...credores.values()].filter((c) => c.pago > 0).length,
     credores: [...credores.values()].sort((a, b) => b.pago - a.pago), // do maior para o menor valor pago
     credoresPorChave: credores,                                       // para achar o nome a partir da chave
     orgaos: [...orgaos.values()].sort((a, b) => b.pago - a.pago),

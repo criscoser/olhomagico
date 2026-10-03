@@ -46,6 +46,11 @@ OBS.contas.tipoIndicador = function (nome) {
   return 'numero';
 };
 
+/* Os mínimos da educação valem para o ANO FECHADO (6º bimestre). Antes disso o percentual é parcial
+   e muda até dezembro: comparar com o mínimo daria uma conclusão que a fonte não permite. */
+OBS.contas.anoFechado = (periodo) => Boolean(periodo) && periodo.bimestre === 6;
+OBS.contas.AVISO_PARCIAL = 'Dado parcial do ano: o mínimo vale para o ano inteiro, então ainda não dá para dizer se será cumprido.';
+
 /* Se o indicador tem um mínimo legal conhecido, compara. Devolve { minimo, base, cumpre } ou null. */
 OBS.contas.minimoEducacao = function (ind) {
   if (OBS.contas.tipoIndicador(ind.nome) !== 'pct') return null;

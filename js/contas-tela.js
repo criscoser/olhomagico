@@ -92,7 +92,8 @@ OBS.contasTela = (function () {
       const serie = meses.map((v, i) => ({ rotulo: OBS.mesCurto(i + 1), valor: v, titulo: `${OBS.MESES[i]} de ${ano}${v === null ? ' (sem dado)' : ''}` }));
       $('transfGrafico').replaceChildren(OBS.graficos.colunas(serie, { destaque: ultimo - 1,
         descricao: `Valor recebido em cada mês de ${ano}. Os valores por tipo estão na tabela abaixo.` }),
-        el('p', 'meta', 'Meses sem coluna ainda não têm dado na fonte. Valores negativos são ajustes e devoluções, como a fonte publica.'));
+        el('p', 'meta', 'Meses sem coluna ainda não têm dado na fonte. O mês mais recente pode estar incompleto: a fonte acrescenta ' +
+          'os repasses ao longo do mês. Valores negativos são ajustes e devoluções, como a fonte publica.'));
       tabela.mostrar(T.porTipo(regs, ano).filter((x) => !tipo || x.tipo === tipo));
     }
     $('anoTransf').addEventListener('change', atualizar);
@@ -116,7 +117,8 @@ OBS.contasTela = (function () {
       periodo: `Anos ${anos.slice().reverse().join(', ')}`,
       metodo: 'Cópia diária feita por robô. Os totais são somas simples dos valores publicados.' +
         (d.meta.descartados ? ` ${qtd(d.meta.descartados)} registro(s) incompletos foram ignorados.` : ''),
-      limitacao: 'Mostra só as transferências obrigatórias pela Constituição. Convênios, emendas e transferências voluntárias não estão aqui.'
+      limitacao: 'Mostra só as transferências obrigatórias pela Constituição. Convênios, emendas e transferências voluntárias não estão aqui. ' +
+        'O FUNDEB é formado principalmente por impostos do estado e dos municípios, mais uma complementação da União; ele aparece aqui porque é publicado nesta mesma fonte do Tesouro Nacional.'
     }));
     return true;
   }
@@ -182,16 +184,19 @@ OBS.contasTela = (function () {
     if (!d || !Array.isArray(d.periodos) || !d.periodos.length) return false;
     const p = d.periodos[0];   // o mais recente
     const destaques = p.indicadores.map((ind) => ({ ind, min: OBS.contas.minimoEducacao(ind) })).filter((x) => x.min);
+    const parcial = !OBS.contas.anoFechado(p);
     OBS.numeros($('siopeDestaques'), destaques.map(({ ind, min }) => ({
-      rotulo: ind.nome, valor: formatarIndicador(ind),
-      detalhe: `Mínimo exigido: ${pct(min.minimo)} (${min.base}). ${min.cumpre ? 'Está acima do mínimo.' : 'Está abaixo do mínimo.'}`
+      rotulo: ind.nome + (parcial ? ` (${p.ano}, até o ${p.bimestre}º bimestre)` : ` (${p.ano})`), valor: formatarIndicador(ind),
+      detalhe: `Mínimo exigido no ano: ${pct(min.minimo)} (${min.base}). ` +
+        (parcial ? OBS.contas.AVISO_PARCIAL : min.cumpre ? 'Está acima do mínimo.' : 'Está abaixo do mínimo.')
     })));
     $('siopeDestaques').classList.toggle('oculto', !destaques.length);
     const t = OBS.tabela({ colunas: [
       { chave: 'codigo', titulo: 'Código' }, { chave: 'nome', titulo: 'Indicador' }, { chave: 'grupo', titulo: 'Grupo' },
       { chave: 'valor', titulo: 'Valor', tipo: 'numero', formatar: (v, ind) => formatarIndicador(ind) }],
       porPagina: 50, legenda: 'Indicadores do SIOPE' });
-    $('siopeTabela').replaceChildren(t.elemento); t.mostrar(p.indicadores);
+    $('siopeTabela').replaceChildren(el('p', 'meta', 'Valores como o SIOPE publica. Um valor 0 pode significar que o indicador não foi ' +
+      'calculado ou informado nesse período, e não necessariamente que o gasto foi zero.'), t.elemento); t.mostrar(p.indicadores);
     $('siopeOrigem').replaceChildren(OBS.origem({
       fonte: 'SIOPE: Sistema de Informações sobre Orçamentos Públicos em Educação (FNDE)',
       url: p.url, urlTexto: 'abrir os dados oficiais (formato técnico)',

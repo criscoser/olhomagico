@@ -100,7 +100,8 @@ OBS.ui = (function () {
     const ul = $('orgaos'); ul.replaceChildren();
     const maximo = res.orgaos.length ? res.orgaos[0].pago : 0;
     res.orgaos.forEach((o) => {
-      const detalhe = `${pct(o.pago, res.total.pago)} · ${o.porCredor.size} ${o.porCredor.size === 1 ? 'credor' : 'credores'}`;
+      const receberam = [...o.porCredor.values()].filter((v) => v > 0).length;   // só quem recebeu valor positivo
+      const detalhe = `${pct(o.pago, res.total.pago)} · pagou ${receberam} ${receberam === 1 ? 'credor' : 'credores'}`;
       ul.append(linhaClicavel(o.nome, o.pago, maximo, detalhe, (painel) => {
         // Quem mais recebeu desta secretaria (trocamos a chave do credor pelo nome).
         const quem = OBS.ordenar(o.porCredor).map(([chave, v]) => [nomeExibido(res.credoresPorChave.get(chave)), v]);
@@ -159,6 +160,9 @@ OBS.ui = (function () {
           link('Relação Funcionário x Salário do portal oficial', OBS.config.PORTAL_SALARIOS), '.');
       }
       painel.append(p);
+    }
+    if (c.outrosNomes && c.outrosNomes.length) {
+      painel.append(el('p', 'meta', `Este documento aparece na fonte com mais de um nome. O valor acima soma todos: ${[c.nome, ...c.outrosNomes].join('; ')}.`));
     }
     // Empresa (CNPJ): atalho para a ficha, que junta contratos (PNCP) e pagamentos de 12 meses, SÓ pelo CNPJ.
     const digitos = String(c.doc || '').replace(/\D/g, '');
@@ -314,9 +318,13 @@ OBS.ui = (function () {
     const t = res.total;
 
     // Frase principal. (O "valor por morador" foi removido por decisão do projeto: não reintroduzir.)
-    $('frase').replaceChildren(`Em ${periodo.nome}, a Prefeitura pagou `, el('span', 'valor', moeda(t.pago)), '.');
+    // A API é a contabilidade do MUNICÍPIO inteiro: Prefeitura, Câmara, autarquias, fundação e fundos (conferido com a DCA de 2025).
+    $('frase').replaceChildren(`Em ${periodo.nome}, o Município de Videira pagou `, el('span', 'valor', moeda(t.pago)), '.');
 
-    let nota = `${res.orgaos.length} secretarias pagaram ${res.credores.length.toLocaleString('pt-BR')} credores. Consultado em ${meta.consultadoEm.toLocaleString('pt-BR')}.`;
+    let nota = `${res.orgaos.length} órgãos (Prefeitura e suas secretarias, Câmara, autarquias, fundação e fundos) pagaram ` +
+      `${res.credoresQueReceberam.toLocaleString('pt-BR')} credores. A soma inclui pagamentos entre os próprios órgãos do município ` +
+      '(por exemplo, contribuições das secretarias ao instituto de previdência dos servidores), que a fonte também registra como despesa. ' +
+      `Consultado em ${meta.consultadoEm.toLocaleString('pt-BR')}.`;
     if (meta.descartadas > 0) nota += ` Atenção: ${meta.descartadas} registro(s) com valores inválidos foram ignorados.`; // transparência sobre falhas
     $('notaFrase').textContent = nota;
 
@@ -333,7 +341,8 @@ OBS.ui = (function () {
       periodo: `${periodo.ini} a ${periodo.fim}`,
       consultadoEm: meta.consultadoEm,
       metodo: 'Consulta ao vivo, feita pelo seu navegador. Os totais são somas simples dos valores publicados.',
-      limitacao: 'A API não traz cada pagamento nem um link individual por registro. Para ver pagamento por pagamento, use a consulta de Pagamentos do portal oficial.'
+      limitacao: 'A API não traz cada pagamento nem um link individual por registro. Para ver pagamento por pagamento, use a consulta de Pagamentos do portal oficial. ' +
+        'O valor pago é o das despesas do orçamento do próprio ano: pagamentos de restos a pagar (despesas de anos anteriores) não entram nesta fonte.'
     }));
     $('fonte').replaceChildren(`Período: ${periodo.ini} a ${periodo.fim}. Origem: `,
       link('API de Dados Abertos (Contabilidade)', OBS.config.DOC_API_DESPESAS),
@@ -345,9 +354,9 @@ OBS.ui = (function () {
     prepararRegistros(ultima.linhas);
     desenharFontes();
     desenharCartoes('etapas', [
-      ['1. Empenhado (reservado)', t.empenhado, 'A Prefeitura reservou o dinheiro para um gasto.'],
+      ['1. Empenhado (reservado)', t.empenhado, 'O município reservou o dinheiro para um gasto (já descontadas as reservas canceladas no período).'],
       ['2. Liquidado (conferido)', t.liquidado, 'O serviço ou produto foi entregue e conferido.'],
-      ['3. Pago', t.pago, 'O dinheiro saiu da conta da Prefeitura.']]);
+      ['3. Pago', t.pago, 'O dinheiro saiu da conta do município.']]);
     desenharCartoes('ajustes', [
       ['Anulado', t.anulado, 'Reserva de dinheiro que foi cancelada.'],
       ['Retido', t.retido, 'Parte do valor liquidado que ficou retida (por exemplo, para recolher impostos).']]);

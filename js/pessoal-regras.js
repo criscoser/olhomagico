@@ -23,6 +23,9 @@ OBS.pessoal.explicarVinculo = function (vinculo) {
 /* É cargo comissionado (indicação)? */
 OBS.pessoal.ehComissionado = (s) => /comission/i.test(s.vinculo || '');
 
+/* É aposentado ou pensionista? (pelo texto do vínculo que a fonte manda, ex.: "Aposentado", "Pensionista do Tesouro") */
+OBS.pessoal.ehInativo = (s) => /aposentad|pensionist/i.test(s.vinculo || '');
+
 /* É prefeito, vice ou secretário municipal? (padrões em config.js) */
 OBS.pessoal.ehCargoPolitico = (s) => OBS.config.PESSOAL.CARGOS_POLITICOS.some((p) => p.test(s.cargo || ''));
 

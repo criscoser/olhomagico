@@ -28,12 +28,17 @@ OBS.comEspera = function (fn, ms = 150) {
   return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 };
 
-/* NÚMEROS-RESUMO (os "cartões" de indicador): [{ rotulo, valor, detalhe }] -> lista de destaque. */
+/* SELO "Dado parcial": vai junto do número de um período que ainda não terminou (o número ainda pode mudar). */
+OBS.seloParcial = (texto) => OBS.el('span', 'selo-parcial', texto || 'Dado parcial');
+
+/* NÚMEROS-RESUMO (os "cartões" de indicador): [{ rotulo, valor, detalhe, parcial }] -> lista de destaque.
+   parcial: true (ou um texto) acrescenta o selo "Dado parcial". */
 OBS.numeros = function (caixa, itens) {
   const { el } = OBS;
   caixa.replaceChildren(...itens.filter((i) => i.valor !== null && i.valor !== undefined).map((i) => {
     const d = el('div', 'numero');
     d.append(el('span', 'numero-rotulo', i.rotulo), el('strong', 'numero-valor', i.valor));
+    if (i.parcial) d.append(OBS.seloParcial(typeof i.parcial === 'string' ? i.parcial : ''));
     if (i.detalhe) d.append(el('span', 'numero-detalhe', i.detalhe));
     return d;
   }));

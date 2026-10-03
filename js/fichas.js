@@ -206,10 +206,10 @@ OBS.fichas = (function () {
 
   /* Seção de pagamentos: consulta os últimos 12 meses SÓ quando a pessoa pede (são 12 consultas ao portal). */
   function secaoPagamentos(cnpj) {
-    const s = secao('Pagamentos da Prefeitura a este CNPJ');
+    const s = secao('Pagamentos do Município a este CNPJ');
     const ultimo = OBS.mesAnterior(new Date());
     const meses = OBS.historico.meses(ultimo, 12);
-    const p = el('p', 'sub', `Totais por mês, de ${OBS.periodoDoMes(meses[0]).nome} a ${OBS.periodoDoMes(ultimo).nome}. São 12 consultas ao portal, feitas uma de cada vez.`);
+    const p = el('p', 'sub', `Totais por mês, de ${OBS.periodoDoMes(meses[0]).nome} a ${OBS.periodoDoMes(ultimo).nome}. São 12 consultas ao portal, feitas uma de cada vez (cerca de 10 MB de internet no total).`);
     const botao = el('button', '', 'Buscar os pagamentos'); botao.type = 'button';
     const estado = el('p', 'meta'); estado.setAttribute('role', 'status'); estado.setAttribute('aria-live', 'polite');
     const area = el('div');
@@ -236,7 +236,7 @@ OBS.fichas = (function () {
           { descricao: 'Valor pago a este CNPJ em cada mês. Os números estão na tabela abaixo.' }),
         el('p', 'meta', 'As colunas mostram o valor PAGO. Na tabela, as três etapas aparecem separadas: não some as colunas.'),
         t.elemento,
-        orgaos.size ? el('h4', '', 'Quem pagou (secretarias), somando os 12 meses') : null,
+        orgaos.size ? el('h4', '', 'Quem pagou (órgãos do município), somando os 12 meses') : null,
         orgaos.size ? OBS.graficos.barras([...orgaos.entries()].sort((a, b) => b[1] - a[1]).map(([o, v]) => ({ rotulo: o, valor: v }))) : null,
         OBS.origem({ fonte: 'API de Dados Abertos (Contabilidade), Portal da Transparência de Videira',
           url: OBS.fontes.despesas.montarUrl(OBS.periodoDoMes(ultimo).ini, OBS.periodoDoMes(ultimo).fim), urlTexto: 'abrir os dados brutos do mês mais recente',

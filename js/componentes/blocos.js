@@ -10,7 +10,7 @@
 OBS.status = function (tipo, titulo, texto, link) {
   const { el } = OBS;
   const rotulos = { carregando: 'Carregando', erro: 'Erro', indisponivel: 'Indisponível', vazio: 'Sem resultados',
-    desatualizado: 'Pode estar desatualizado', 'nao-integrado': 'Dados ainda não integrados' };
+    desatualizado: 'Pode estar desatualizado', 'nao-integrado': 'Dados ainda não integrados', parcial: 'Dado parcial' };
   const caixa = el('div', `status status-${tipo}`);
   caixa.setAttribute('role', tipo === 'erro' ? 'alert' : 'status');
   caixa.append(el('strong', 'status-tipo', rotulos[tipo] || tipo));

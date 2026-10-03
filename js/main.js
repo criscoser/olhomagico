@@ -3,7 +3,7 @@
 
 OBS.consultar = async function (anoMes) {
   const periodo = OBS.periodoDoMes(anoMes);
-  OBS.ui.mostrarEstado(`Buscando os dados de ${periodo.nome}… pode levar alguns segundos.`);
+  OBS.ui.mostrarEstado(`Buscando os gastos de ${periodo.nome} no portal da Prefeitura (cerca de 800 KB de internet)… pode levar alguns segundos.`);
   try {
     // OBS.historico.mes busca na API e guarda na memória da página (se repetir o mês, não consulta de novo).
     const dados = await OBS.historico.mes(anoMes);
@@ -21,7 +21,7 @@ OBS.consultar = async function (anoMes) {
     OBS.ui.mostrarEstado(
       demorou ? 'A fonte demorou demais para responder. Tente de novo em instantes.'
       : semAcesso ? 'Não consegui acessar a fonte. Pode ser internet ou instabilidade do portal. Tente novamente ou use o link do portal oficial.'
-      : erro.message, true);
+      : erro.message, true, { texto: 'Tentar de novo', fazer: () => OBS.consultar(anoMes) });
     console.error('Erro ao consultar despesas:', erro); // detalhe técnico, só para quem abre o console (F12)
   }
 };

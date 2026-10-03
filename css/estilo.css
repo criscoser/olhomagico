@@ -521,7 +521,10 @@ a.kpi:hover { border-color:var(--marca); }
 .status-carregando { border-left-color:var(--destaque-texto); }
 .status-erro { border-left-color:var(--erro); }
 .status-erro .status-tipo { color:var(--erro); }
-.status-desatualizado, .status-nao-integrado { border-left-color:var(--destaque-borda); background:var(--aviso-fundo); }
+.status-desatualizado, .status-nao-integrado, .status-parcial { border-left-color:var(--destaque-borda); background:var(--aviso-fundo); }
+/* Selo "Dado parcial" junto de um número (texto escuro sobre o fundo de aviso; borda em ouro escuro). */
+.selo-parcial { align-self:flex-start; display:inline-block; padding:.1rem .55rem; border:1px solid var(--destaque-borda); border-radius:var(--raio-pilula);
+  background:var(--aviso-fundo); color:var(--texto); font-size:var(--letra-legenda); font-weight:700; }
 .status-indisponivel, .status-vazio { border-left-color:var(--texto-2); }
 @media (prefers-reduced-motion: no-preference) {
   .status-carregando .status-tipo::after { content:"…"; animation:piscar 1.2s steps(3) infinite; }

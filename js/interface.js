@@ -31,9 +31,11 @@ OBS.ui = (function () {
   }
 
   /* Mostra uma mensagem de estado (carregando, erro, sem dados). erro=true deixa a borda vermelha. */
-  function mostrarEstado(texto, erro = false) {
+  function mostrarEstado(texto, erro = false, acao = null) {
     const e = $('estado');
     e.textContent = texto;
+    // Ação opcional (ex.: "Tentar de novo" depois de uma falha): { texto, fazer }.
+    if (acao) { const b = el('button', 'sec', acao.texto); b.type = 'button'; b.addEventListener('click', acao.fazer); e.append(' ', b); }
     e.className = erro ? 'erro' : '';
     $('resultado').classList.add('oculto');
   }

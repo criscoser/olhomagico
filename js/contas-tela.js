@@ -190,6 +190,7 @@ OBS.contasTela = (function () {
     const parcial = !OBS.contas.anoFechado(p);
     OBS.numeros($('siopeDestaques'), destaques.map(({ ind, min }) => ({
       rotulo: ind.nome + (parcial ? ` (${p.ano}, até o ${p.bimestre}º bimestre)` : ` (${p.ano})`), valor: formatarIndicador(ind),
+      parcial: parcial ? `Dado parcial: até o ${p.bimestre}º bimestre` : false,
       detalhe: `Mínimo exigido no ano: ${pct(min.minimo)} (${min.base}). ` +
         (parcial ? OBS.contas.AVISO_PARCIAL : min.cumpre ? 'Está acima do mínimo.' : 'Está abaixo do mínimo.')
     })));

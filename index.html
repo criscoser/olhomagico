@@ -6,8 +6,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- POLÍTICA DE SEGURANÇA (CSP): o navegador só aceita scripts e estilos deste próprio site (mais a fonte do Google)
-     e só conversa com a API oficial de Videira. Se alguém conseguir injetar código, ele não roda. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://videira.atende.net; object-src 'none'; base-uri 'none'; form-action 'none'">
+     e só conversa com a API oficial de Videira. Se alguém conseguir injetar código, ele não roda.
+     Trusted Types: scripts só podem ser carregados pela política "olhomagico" (js/fontes/arquivos.js), que aceita
+     apenas os arquivos de dados do próprio site. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://videira.atende.net; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types olhomagico">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Olho Mágico — Para onde vai o dinheiro público de Videira?</title>
 <!-- DESCRIÇÃO e PRÉVIA DE COMPARTILHAMENTO: é o texto que aparece no Google e quando o link

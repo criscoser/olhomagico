@@ -93,7 +93,7 @@ OBS.pessoalTela = (function () {
     const curta = OBS.graficos.moedaCurta;
     const serie = faixas.map((f) => ({ rotulo: curta(f.de).replace(/^R\$\s/, ''), valor: f.quantidade, titulo: `De ${moeda(f.de)} até ${moeda(f.ate)}` }));
     const grafico = OBS.graficos.colunas(serie, { formatar: (n) => `${qtd(n)} registros`, descricao: 'Quantidade de registros por faixa de salário-base. Os números estão na tabela abaixo.' });
-    const det = el('details'); det.append(el('summary', '', 'Ver os números'));
+    const det = el('details'); det.append(el('summary', '', 'Ver os números exatos'));
     const t = OBS.tabela({ colunas: [
       { chave: 'de', titulo: 'Faixa', formatar: (v, f) => `${moeda(f.de)} a ${moeda(f.ate)}`, ordenavel: false },
       { chave: 'quantidade', titulo: 'Registros', tipo: 'numero', ordenavel: false }], porPagina: 30 });

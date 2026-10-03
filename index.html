@@ -446,9 +446,9 @@
         <div><label for="tipoTransf">Tipo</label><select id="tipoTransf"><option value="">Todos os tipos</option></select></div>
       </div>
       <p class="frase-media" id="transfFrase"></p>
+      <p class="valor-exato" id="transfExato"></p>
       <div id="transfGrafico"></div>
-      <h3>Por tipo de transferência</h3>
-      <div id="transfTabela"></div>
+      <details><summary>Ver os números exatos (por tipo de transferência)</summary><div id="transfTabela"></div></details>
       <p><button type="button" class="sec" id="csvTransf">Baixar este ano (planilha CSV)</button></p>
       <div id="transfOrigem"></div>
     </section>
@@ -473,7 +473,7 @@
       <div class="filtros"><div><label for="programaBeneficio">Programa</label><select id="programaBeneficio"></select></div></div>
       <p class="frase-media" id="beneficioFrase"></p>
       <div id="beneficioGrafico"></div>
-      <details><summary>Ver os números de cada mês</summary><div id="beneficioTabela"></div></details>
+      <details><summary>Ver os números exatos (cada mês)</summary><div id="beneficioTabela"></div></details>
       <div id="beneficiosOrigem"></div>
     </section>
   </div><!-- fim da aba de entradas -->
@@ -506,7 +506,7 @@
       <h2 id="t-educacao">Gastos com educação</h2>
       <p class="sub">Indicadores que o município declara ao FNDE (Ministério da Educação) no SIOPE. Quando há um mínimo exigido por lei, ele aparece ao lado.</p>
       <div id="siopeDestaques" class="numeros"></div>
-      <details><summary>Ver todos os indicadores</summary><div id="siopeTabela"></div></details>
+      <details><summary>Ver todos os indicadores (números exatos)</summary><div id="siopeTabela"></div></details>
       <div id="siopeOrigem"></div>
     </section>
 

@@ -115,7 +115,7 @@ OBS.contratosTela = (function () {
         'esses contratos não entram nos totais nem no ranking de fornecedores.' : '');
     OBS.numeros($('contratosNumeros'), [
       { rotulo: 'Contratos', valor: qtd(proprios.length) },
-      { rotulo: 'Valor global somado', valor: OBS.graficos.moedaCurta(soma(proprios)), detalhe: 'Valor previsto, não o pago.' },
+      { rotulo: 'Valor global somado', valor: OBS.frases.reais(soma(proprios)), detalhe: `Valor exato: ${moeda(soma(proprios))}. Valor previsto, não o pago.` },
       { rotulo: 'Fornecedores diferentes', valor: qtd(d.fornecedores.length) },
       { rotulo: 'Licitações e compras', valor: qtd(comprasProprias.length) }
     ]);

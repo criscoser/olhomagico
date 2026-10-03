@@ -23,7 +23,8 @@ OBS.contasTela = (function () {
     }
     const f = OBS.contas.faixa(ultimo);
     const frase = el('p', 'frase-media');
-    frase.append(`No ${ultimo.rotulo}, o gasto com pessoal foi de `, el('span', 'valor', pct(ultimo.dtpPct)), ' da receita corrente líquida (ajustada).');
+    const quem = /c[aâ]mara/i.test(poder.nome) ? 'a Câmara' : 'a Prefeitura';   // sujeito certo: o RGF é declarado por cada poder
+    frase.append(`No ${ultimo.rotulo}, ${quem} declarou um gasto com pessoal de `, el('span', 'valor', pct(ultimo.dtpPct)), ' da receita corrente líquida (ajustada).');
     caixa.append(frase);
     if (f) caixa.append(el('p', `faixa faixa-${f.nivel}`, `Isso está ${f.texto}.`));
     caixa.append(OBS.graficos.medidor(ultimo, pct));
@@ -38,7 +39,7 @@ OBS.contasTela = (function () {
     if (poder.periodos.length > 1) {
       // Evolução: uma coluna por período (o mais antigo à esquerda).
       const ordem = poder.periodos.slice().sort((a, b) => (a.ano - b.ano) || (a.periodo - b.periodo));
-      const det = el('details'); det.append(el('summary', '', 'Períodos anteriores'));
+      const det = el('details'); det.append(el('summary', '', 'Ver os períodos anteriores (números exatos)'));
       det.append(OBS.graficos.colunas(ordem.map((p) => ({ rotulo: `${p.periodo}${p.periodicidade}/${String(p.ano).slice(2)}`, valor: p.dtpPct, titulo: p.rotulo })),
         { destaque: ordem.length - 1, formatar: pct, descricao: 'Gasto com pessoal em cada período. Os números estão na tabela abaixo.' }));
       const t = OBS.tabela({ colunas: [{ chave: 'rotulo', titulo: 'Período', ordenavel: false }, { chave: 'dtpPct', titulo: 'Gasto com pessoal', tipo: 'pct', ordenavel: false }], porPagina: 20 });
@@ -85,10 +86,11 @@ OBS.contasTela = (function () {
       const variacao = anterior !== null ? T.variacao(total, anterior) : null;
       const quem = tipo ? `da transferência “${tipo}”` : 'de transferências constitucionais';
       const frase = $('transfFrase'); frase.replaceChildren();
-      frase.append(`De janeiro a ${OBS.MESES[ultimo - 1].toLowerCase()} de ${ano}, Videira recebeu `, el('span', 'valor', moeda(total)), ` ${quem}.`);
+      frase.append(`De janeiro a ${OBS.MESES[ultimo - 1].toLowerCase()} de ${ano}, Videira recebeu `, el('span', 'valor', OBS.frases.reais(total)), ` ${quem}.`);
       if (variacao !== null) {
-        frase.append(` No mesmo período de ${ano - 1}, foram ${moeda(anterior)} (${variacao >= 0 ? 'alta' : 'queda'} de ${pct(Math.abs(Math.round(variacao * 10) / 10))}).`);
+        frase.append(` No mesmo período de ${ano - 1}, foram ${OBS.frases.reais(anterior)} (${variacao >= 0 ? 'alta' : 'queda'} de ${pct(Math.abs(Math.round(variacao * 10) / 10))}).`);
       }
+      $('transfExato').textContent = `Valor exato: ${moeda(total)}` + (anterior !== null ? `; em ${ano - 1}, no mesmo período: ${moeda(anterior)}.` : '.');
       const serie = meses.map((v, i) => ({ rotulo: OBS.mesCurto(i + 1), valor: v, titulo: `${OBS.MESES[i]} de ${ano}${v === null ? ' (sem dado)' : ''}` }));
       $('transfGrafico').replaceChildren(OBS.graficos.colunas(serie, { destaque: ultimo - 1,
         descricao: `Valor recebido em cada mês de ${ano}. Os valores por tipo estão na tabela abaixo.` }),
@@ -134,7 +136,8 @@ OBS.contasTela = (function () {
       const etapa = $('etapaDca').value;
       const funcoes = OBS.contas.funcoes(anoDca, etapa);
       const total = funcoes.reduce((t, f) => t + f.valor, 0);
-      $('dcaFrase').replaceChildren(`Em ${anoDca.ano}, foram `, el('span', 'valor', moeda(total)), ` ${nomesEtapa[etapa]} em ${funcoes.length} áreas.`);
+      $('dcaFrase').replaceChildren(`Em ${anoDca.ano}, foram `, el('span', 'valor', OBS.frases.reais(total)), ` ${nomesEtapa[etapa]} em ${funcoes.length} áreas ` +
+        `(valor exato: ${moeda(total)}), segundo a declaração anual do município ao Tesouro.`);
       const ul = $('dcaLista'); ul.replaceChildren();
       const maximo = funcoes.length ? funcoes[0].valor : 0;
       funcoes.forEach((f) => {
@@ -305,8 +308,9 @@ OBS.contasTela = (function () {
       const ultimo = linhas[linhas.length - 1];
       const frase = $('beneficioFrase'); frase.replaceChildren();
       if (ultimo) {
-        frase.append(`Em ${mesNome(ultimo.mes)}, o ${prog} pagou `, el('span', 'valor', OBS.moeda(ultimo.valor || 0)),
-          typeof ultimo.beneficiados === 'number' ? ` a ${qtd(ultimo.beneficiados)} beneficiários em Videira.` : ' em Videira.');
+        frase.append(`Em ${mesNome(ultimo.mes)}, o ${prog} pagou `, el('span', 'valor', OBS.frases.reais(ultimo.valor || 0)),
+          typeof ultimo.beneficiados === 'number' ? ` a ${qtd(ultimo.beneficiados)} beneficiários em Videira` : ' em Videira',
+          ` (valor exato: ${OBS.moeda(ultimo.valor || 0)}).`);
       }
       $('beneficioGrafico').replaceChildren(
         OBS.graficos.colunas(linhas.map((b) => ({ rotulo: OBS.historico.rotulo(`${b.mes.slice(0, 4)}-${b.mes.slice(4, 6)}`), valor: b.valor, titulo: mesNome(b.mes) })),

@@ -92,5 +92,12 @@ OBS.frases = (function () {
     return `A pauta mais recente publicada pela Câmara é “${p.titulo}”, ${futura ? 'marcada para' : 'de'} ${data}.`;
   }
 
-  return { PROIBIDAS, opiniao, reais, pct, gastoDoMes, transferencias, pessoal, contratos, limitePessoal, pautaCamara };
+  /* Para a TELA: devolve a frase em pedaços, com o trecho (ex.: o valor) dentro de <span class="valor">. */
+  function destacar(frase, trecho) {
+    const i = trecho ? frase.indexOf(trecho) : -1;
+    if (i < 0) return [frase];
+    return [frase.slice(0, i), OBS.el('span', 'valor', trecho), frase.slice(i + trecho.length)];
+  }
+
+  return { PROIBIDAS, opiniao, reais, pct, destacar, gastoDoMes, transferencias, pessoal, contratos, limitePessoal, pautaCamara };
 })();

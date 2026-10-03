@@ -229,7 +229,7 @@ OBS.ui = (function () {
       { chave: 'liquidado', titulo: 'Liquidado', tipo: 'moeda', ordenavel: false },
       { chave: 'pago', titulo: 'Pago', tipo: 'moeda', ordenavel: false }], porPagina: 12, legenda: 'Totais por mês' });
     t.mostrar(totais.slice().reverse());
-    const det = el('details'); det.append(el('summary', '', 'Ver os números de cada mês'), t.elemento);
+    const det = el('details'); det.append(el('summary', '', 'Ver os números exatos'), t.elemento);
     const erros = totais.filter((m) => m.erro).length;
     $('evolucaoConteudo').replaceChildren(
       OBS.graficos.colunas(serie, { destaque: serie.length - 1, descricao: `Valor ${nomes[etapa]} em cada mês. Os números estão na tabela abaixo.` }),
@@ -331,9 +331,12 @@ OBS.ui = (function () {
 
     // Frase principal. (O "valor por morador" foi removido por decisão do projeto: não reintroduzir.)
     // A API é a contabilidade do MUNICÍPIO inteiro: Prefeitura, Câmara, autarquias, fundação e fundos (conferido com a DCA de 2025).
-    $('frase').replaceChildren(`Em ${periodo.nome}, o Município de Videira pagou `, el('span', 'valor', moeda(t.pago)), '.');
+    const hoje = new Date();
+    const parcial = meta.anoMes === `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;   // mês em andamento
+    const F = OBS.frases;
+    $('frase').replaceChildren(...F.destacar(F.gastoDoMes({ anoMes: meta.anoMes, pago: t.pago, parcial }), F.reais(t.pago)));
 
-    let nota = `${res.orgaos.length} órgãos (Prefeitura e suas secretarias, Câmara, autarquias, fundação e fundos) pagaram ` +
+    let nota = `Valor exato: ${moeda(t.pago)}. ${res.orgaos.length} órgãos (Prefeitura e suas secretarias, Câmara, autarquias, fundação e fundos) pagaram ` +
       `${res.credoresQueReceberam.toLocaleString('pt-BR')} credores. A soma inclui pagamentos entre os próprios órgãos do município ` +
       '(por exemplo, contribuições das secretarias ao instituto de previdência dos servidores), que a fonte também registra como despesa. ' +
       `Consultado em ${meta.consultadoEm.toLocaleString('pt-BR')}.`;

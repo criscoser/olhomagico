@@ -16,6 +16,7 @@
 <script src="../js/busca-regras.js"></script>
 <script src="../js/historico.js"></script>
 <script src="../js/frases.js"></script>
+<script src="../js/ouvir.js"></script>
 <script src="../js/componentes/graficos.js"></script>
 <script src="../js/rotas.js"></script>
 <script src="../js/pix-regras.js"></script>
@@ -298,6 +299,15 @@
     F.limitePessoal({ rotulo: 'x', dtpPct: 1, limiteMaximoPct: 54 }), F.pautaCamara({ titulo: 'Pauta', data: '2026-10-06 20:30:00' })
   ].map(F.opiniao).filter(Boolean), []);
   teste('frases: nenhuma frase do Município chama os gastos de "Prefeitura"', /Prefeitura/.test(F.gastoDoMes({ anoMes: '2026-09', pago: 1 }) + F.contratos({ contratos: 1, valorGlobal: 1 }) + F.pessoal({ registros: 1 })), false);
+  // ----- Botão "Ouvir": texto preparado para a voz -----
+  const fala = (t) => OBS.ouvir.paraFala(t);
+  teste('ouvir: dinheiro por extenso vira "de reais"', [fala('pagou R$ 46,2 milhões.'), fala('R$ 1,5 milhão'), fala('R$ 980 mil'), fala('−R$ 71 mil')],
+    ['pagou 46,2 milhões de reais.', '1,5 milhão de reais', '980 mil reais', 'menos 71 mil reais']);
+  teste('ouvir: valor exato com centavos', [fala('Valor exato: R$ 46.165.401,23.'), fala('R$ 999,00')], ['Valor exato: 46.165.401 reais e 23 centavos.', '999 reais']);
+  teste('ouvir: percentual vira "por cento"', fala('gasto de 43,77% da receita'), 'gasto de 43,77 por cento da receita');
+  teste('ouvir: sigla vira o nome completo', fala('recebeu do FPM'), 'recebeu do Fundo de Participação dos Municípios');
+  teste('ouvir: fala dividida por frases e em pedaços de até 200 letras',
+    [OBS.ouvir.pedacos('Primeira frase. Segunda frase!').length, OBS.ouvir.pedacos('a'.repeat(150) + ', ' + 'b'.repeat(150)).every((p) => p.length <= 200)], [2, true]);
   // ----- Resumo diário das despesas (dados/despesas-resumo.js) -----
   const RESUMO = { meses: [
     { anoMes: '2026-08', registros: 10, parcial: false, credoresQueReceberam: 7, total: { empenhado: 3, liquidado: 2, pago: 1 } },

@@ -620,3 +620,7 @@ abbr.sigla:hover, abbr.sigla[aria-expanded="true"] { background:var(--marca-suav
 details.explica-diferenca { margin:var(--esp-3) 0 var(--esp-4); padding:var(--esp-3) var(--esp-4); border:1px solid var(--borda); border-radius:var(--raio); background:var(--cartao-2); }
 details.explica-diferenca ul { padding-left:1.2rem; }
 details.explica-diferenca li { margin:.35rem 0; }
+/* Botão "Ouvir" (logo depois do título de cada tela) e a frase que está sendo lida em voz alta. */
+button.botao-ouvir { display:inline-flex; align-items:center; gap:var(--esp-2); margin:0 0 var(--esp-3); }
+button.botao-ouvir[aria-pressed="true"] { background:var(--marca-suave); }
+.lendo { background:var(--aviso-fundo); outline:2px solid var(--destaque-borda); outline-offset:2px; border-radius:var(--raio-campo); }

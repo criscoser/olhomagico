@@ -3,3 +3,5 @@ __pycache__/
 # dados gerados pelos robôs (o robô do GitHub gera os dele; não guardamos histórico)
 dados/*.js
 dados/*.tmp
+
+recuperados/

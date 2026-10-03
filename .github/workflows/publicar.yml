@@ -45,16 +45,16 @@ jobs:
 
       - name: Recuperar a última versão publicada dos dados
         # Baixa do próprio site os arquivos de ontem. Se uma fonte falhar hoje, o de ontem continua valendo.
+        # SEGURANÇA: os arquivos baixados vão para "recuperados/" e NÃO são usados como vieram. O script lê cada um
+        # como dado puro e o regrava do zero em "dados/": qualquer código que não seja dado é descartado.
+        # (Sem isso, um arquivo adulterado publicado uma vez se perpetuaria a cada publicação.)
         run: |
-          mkdir -p dados
+          mkdir -p dados recuperados
           SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
-          for f in pessoal.js siconfi.js pncp.js transferencias.js dca.js entregas.js siope.js cgu.js camara.js situacao.js; do
-            if curl -fsSL --max-time 60 "$SITE/dados/$f" -o "dados/$f.tmp" && grep -q "window.OBS_" "dados/$f.tmp"; then
-              mv "dados/$f.tmp" "dados/$f"; echo "Recuperado: $f"
-            else
-              rm -f "dados/$f.tmp"; echo "Sem versão anterior de $f (normal na primeira publicação)"
-            fi
+          for f in $(python3 ferramentas/recuperar.py --lista); do
+            curl -fsSL --max-time 60 "$SITE/dados/$f" -o "recuperados/$f" || rm -f "recuperados/$f"
           done
+          python3 ferramentas/recuperar.py recuperados dados
 
       - name: Atualizar as fontes de dados (cada uma separadamente)
         # As chaves vêm do cofre do GitHub (Settings -> Secrets and variables -> Actions).

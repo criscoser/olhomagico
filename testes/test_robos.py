@@ -242,6 +242,40 @@ class TestExtracao(unittest.TestCase):
         self.assertEqual(d["funcoes"][0]["valores"], {"empenhado": 200.0})     # coluna desconhecida ignorada
 
 
+class TestRecuperacao(unittest.TestCase):
+    """Arquivos baixados do site publicado são lidos como DADO PURO e regravados do zero (nada de código passa)."""
+
+    def test_so_o_dado_volta_para_o_site(self):
+        import recuperar
+        with tempfile.TemporaryDirectory() as pasta:
+            origem, destino = Path(pasta) / "recuperados", Path(pasta) / "dados"
+            origem.mkdir()
+            dado = '{"meta":{"geradoEm":"2026-10-02T15:37-03:00"},"servidores":[]}'
+            (origem / "pessoal.js").write_text(f"window.OBS_DADOS_PESSOAL = {dado};\n", encoding="utf-8")            # normal
+            (origem / "siconfi.js").write_text(f'fetch("https://mal.example");\nwindow.OBS_DADOS_SICONFI = {dado};\n',
+                                               encoding="utf-8")                                                  # código ANTES do dado
+            (origem / "pncp.js").write_text(f"window.OBS_DADOS_PNCP = {dado};alert(1);\n", encoding="utf-8")      # código DEPOIS
+            (origem / "dca.js").write_text("alert(1)", encoding="utf-8")                                          # não é dado
+            (origem / "siope.js").write_text("window.OBS_DADOS_SIOPE = [1,2];\n", encoding="utf-8")               # formato errado
+            (origem / "situacao.js").write_text('window.OBS_SITUACAO = {"pncp":{"ok":true}};\n', encoding="utf-8")  # sem "meta": ok
+            (origem / "invasor.js").write_text("alert(1)", encoding="utf-8")                                      # arquivo estranho
+            r = recuperar.recuperar(origem, destino, avisar=lambda *_: None)
+            self.assertEqual((r["pessoal.js"], r["siconfi.js"], r["situacao.js"]), ("recuperado",) * 3)
+            self.assertEqual((r["pncp.js"], r["dca.js"], r["siope.js"]), ("descartado",) * 3)
+            self.assertEqual(r["cgu.js"], "ausente")
+            self.assertNotIn("invasor.js", r)
+            self.assertEqual(sorted(p.name for p in destino.iterdir()), ["pessoal.js", "siconfi.js", "situacao.js"])
+            for arq in destino.iterdir():                     # nenhum resto de código nos arquivos regravados
+                texto = arq.read_text(encoding="utf-8")
+                self.assertNotIn("fetch", texto); self.assertNotIn("alert", texto)
+            self.assertEqual(ler_js(destino / "siconfi.js", "OBS_DADOS_SICONFI")["meta"]["geradoEm"], "2026-10-02T15:37-03:00")
+
+    def test_lista_vem_dos_adaptadores(self):
+        import recuperar
+        self.assertIn("situacao.js", recuperar.ARQUIVOS)
+        self.assertEqual(len(recuperar.ARQUIVOS), 10)
+
+
 class TestCoordenador(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

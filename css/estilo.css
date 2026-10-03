@@ -261,7 +261,16 @@ ul.lista li:first-child { border-top:0; }
 #estado { margin:1.5rem 0; padding:1rem; border-radius:var(--raio); background:var(--cartao); border:1px solid var(--borda); }
 #estado.erro { border-color:var(--erro); }
 details { margin:.4rem 0; } summary { cursor:pointer; font-weight:700; }
-footer { color:var(--texto-2); font-size:var(--letra-corpo); padding:1rem 0 3rem; }
+footer { color:var(--texto-2); font-size:var(--letra-corpo); padding:1rem 0 3rem; margin-top:var(--esp-4); border-top:1px solid var(--borda); }
+.rodape-aviso { margin:0 0 var(--esp-4); }
+/* Redes de quem idealizou o projeto: botões redondos no centro, crédito logo abaixo (como no rodapé da Rádio Videira). */
+.redes { list-style:none; margin:0; padding:0; display:flex; justify-content:center; flex-wrap:wrap; gap:.75rem; }
+.redes a { display:grid; place-items:center; width:2.75rem; height:2.75rem; border-radius:50%; background:var(--marca); color:var(--sobre-marca); box-shadow:var(--sombra-1); }
+.redes a:hover { filter:brightness(1.12); }
+.redes a:focus-visible { outline:3px solid var(--foco); outline-offset:3px; }
+.redes svg { width:1.15rem; height:1.15rem; fill:currentColor; }
+.rodape-credito { margin:var(--esp-3) 0 0; text-align:center; }
+@media (prefers-reduced-motion: no-preference) { .redes a { transition:filter .15s, transform .15s; } .redes a:hover { transform:translateY(-2px); } }
 
 /* ---------- Caixa de apoio (Pix) ---------- */
 dialog { border:1px solid var(--borda); border-radius:var(--raio-grande); box-shadow:var(--sombra-3); background:var(--cartao); color:var(--texto); max-width:26rem; width:calc(100% - 2rem); padding:1.25rem;

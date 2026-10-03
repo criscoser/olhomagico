@@ -34,15 +34,22 @@ OBS.contas.funcoes = function (anoDca, coluna) {
 
 /* ---------- Indicadores de educação (SIOPE) ----------
    Mínimos legais conhecidos. Só são aplicados a indicadores cujo NOME diz que é percentual. */
+/* SÓ os dois indicadores que TÊM mínimo legal, conferidos pelo código do SIOPE E pelo nome (os dois juntos).
+   Antes bastava o nome citar "MDE": indicadores como "aposentadorias ... em relação às despesas com MDE" (que não têm
+   mínimo nenhum) ou o 1.3 (que é um MÁXIMO) apareciam com "mínimo de 25%". Na dúvida, sem mínimo. */
 OBS.contas.MINIMOS_EDUCACAO = [
-  { padrao: /\bMDE\b|manuten[cç][aã]o e desenvolvimento do ensino/i, minimo: 25, base: 'Constituição Federal, art. 212' },
-  { padrao: /FUNDEB.*(remunera[cç][aã]o|profissionais)/i, minimo: 70, base: 'Lei 14.113/2020, art. 26' }
+  { codigo: '1.1', padrao: /^Percentual de aplica[cç][aã]o das receitas de impostos .*MDE/i, minimo: 25, base: 'Constituição Federal, art. 212' },
+  { codigo: '1.2', padrao: /^Percentual de aplica[cç][aã]o do FUNDEB na remunera[cç][aã]o dos profissionais/i, minimo: 70, base: 'Lei 14.113/2020, art. 26' }
 ];
 
 /* Como mostrar o valor de um indicador: pelo nome. "Percentual..." -> %; "Valor/Investimento/R$" -> dinheiro. */
 OBS.contas.tipoIndicador = function (nome) {
-  if (/percentual|%/i.test(nome || '')) return 'pct';
-  if (/R\$|valor|investimento|gasto|custo|despesa/i.test(nome || '')) return 'moeda';
+  const n = String(nome || '');
+  // Primeiro o COMEÇO do nome: "Valor exigido ... (Mínimo de 25%)" é dinheiro, apesar do "%" no fim.
+  if (/^(valor|investimento|despesa|gasto|custo|saldo|super[aá]vit|d[eé]ficit)/i.test(n)) return 'moeda';
+  if (/percentual/i.test(n)) return 'pct';
+  if (/R\$/.test(n)) return 'moeda';
+  if (/%/.test(n)) return 'pct';
   return 'numero';
 };
 
@@ -54,7 +61,7 @@ OBS.contas.AVISO_PARCIAL = 'Dado parcial do ano: o mínimo vale para o ano intei
 /* Se o indicador tem um mínimo legal conhecido, compara. Devolve { minimo, base, cumpre } ou null. */
 OBS.contas.minimoEducacao = function (ind) {
   if (OBS.contas.tipoIndicador(ind.nome) !== 'pct') return null;
-  const regra = OBS.contas.MINIMOS_EDUCACAO.find((r) => r.padrao.test(ind.nome));
+  const regra = OBS.contas.MINIMOS_EDUCACAO.find((r) => r.codigo === ind.codigo && r.padrao.test(ind.nome || ''));
   return regra ? { minimo: regra.minimo, base: regra.base, cumpre: ind.valor >= regra.minimo } : null;
 };
 

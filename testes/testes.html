@@ -173,7 +173,21 @@
   teste('DCA: empenhado ordena e calcula a fatia', OBS.contas.funcoes(DCA, 'empenhado').map((f) => [f.nome, f.fatia]), [['Educação', 75], ['Saúde', 25]]);
   teste('DCA: etapa sem valor fica de fora (não vira zero)', OBS.contas.funcoes(DCA, 'pago').map((f) => [f.nome, f.valor, f.fatia]), [['Saúde', 90, 100]]);
   // ----- Educação (SIOPE) -----
-  teste('SIOPE: mínimo de 25% em MDE', OBS.contas.minimoEducacao({ nome: 'Percentual de aplicação em MDE', valor: 28.08 }), { minimo: 25, base: 'Constituição Federal, art. 212', cumpre: true });
+  const IND = (codigo, nome, valor) => ({ codigo, nome, valor });
+  teste('SIOPE: mínimo de 25% só no indicador 1.1 (MDE)', OBS.contas.minimoEducacao(IND('1.1', 'Percentual de aplicação das receitas de impostos e transferências vinculadas à educação em MDE (mínimo de 25% para estados, DF e municípios)', 28.08)),
+    { minimo: 25, base: 'Constituição Federal, art. 212', cumpre: true });
+  teste('SIOPE: mínimo de 70% só no indicador 1.2 (FUNDEB na remuneração)', OBS.contas.minimoEducacao(IND('1.2', 'Percentual de aplicação do FUNDEB na remuneração dos profissionais da educação (mínimo de 70%) - Inciso XXII', 84.95)).minimo, 70);
+  teste('SIOPE: indicadores que só CITAM MDE não ganham mínimo (aposentadorias, pessoal, o máximo do 1.3...)', [
+    IND('3.1', 'Percentual das despesas com aposentadorias e pensões da área educacional em relação às despesas totais com MDE', 0),
+    IND('3.2', 'Percentual das despesas com pessoal e encargos sociais da área educacional em relação à despesa total com MDE', 0),
+    IND('2.11', 'Percentual de despesas correntes em educação em relação à despesa total em MDE', 0),
+    IND('1.3', 'Percentual de aplicação do FUNDEB em despesas com MDE, que não remuneração dos profissionais da educação (máximo de 30%)', 11.44),
+    IND('8.1', 'Valor exigido de aplicação de impostos em MDE (Mínimo de 25%)', 65410131.76),
+    IND('9.9', 'Percentual de aplicação das receitas de impostos e transferências vinculadas à educação em MDE', 20)
+  ].map(OBS.contas.minimoEducacao), [null, null, null, null, null, null]);
+  teste('SIOPE: "Valor exigido ... (Mínimo de 25%)" é dinheiro, não percentual', ['Valor exigido de aplicação de impostos em MDE (Mínimo de 25%)',
+    'Superávit/Déficit do ente federado no exercício', 'Saldo financeiro do FUNDEB no exercício atual', 'Percentual das receitas do FUNDEB não aplicadas (máximo de 10%)']
+    .map(OBS.contas.tipoIndicador), ['moeda', 'moeda', 'moeda', 'pct']);
   teste('SIOPE: só o 6º bimestre é ano fechado (antes disso não se compara com o mínimo)',
     [4, 6].map((b) => OBS.contas.anoFechado({ ano: 2026, bimestre: b })), [false, true]);
   teste('SIOPE: valor em reais não ganha mínimo percentual', OBS.contas.minimoEducacao({ nome: 'Valor aplicado em MDE (R$)', valor: 10 }), null);

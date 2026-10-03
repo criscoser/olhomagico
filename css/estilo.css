@@ -45,15 +45,17 @@
   --font: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-titulo: var(--font);   /* uma família só: títulos em negrito da mesma letra */
   /* Espaçamentos, raios e sombra */
-  /* Tipografia (base 16 px, proporção 1,2). NADA abaixo de 14 px, e 14 px só em metadados (fonte, período, eixos). */
-  --letra-legenda: .875rem;                                  /* 14 px */
-  --letra-corpo: 1rem;                                       /* 16 px: todo texto de leitura */
-  --letra-destaque: 1.125rem;                                /* 18 px */
-  --letra-h3: clamp(1.125rem, 1.05rem + .35vw, 1.25rem);     /* 18 -> 20 px */
-  --letra-h2: clamp(1.25rem, 1.1rem + .6vw, 1.5rem);         /* 20 -> 24 px */
-  --letra-h1: clamp(1.5rem, 1.25rem + 1.2vw, 2rem);          /* 24 -> 32 px: a pergunta da tela */
-  --letra-frase: clamp(1.375rem, 1.15rem + 1.1vw, 1.75rem);  /* 22 -> 28 px: frase-resposta */
-  --letra-numero: clamp(1.75rem, 1.45rem + 1.5vw, 2.5rem);   /* 28 -> 40 px: número grande */
+  /* Tipografia (decisão do mantenedor em 03/10/2026): TÍTULOS PRINCIPAIS em 16 px (títulos de tela e de seção, frases
+     principais e números em destaque) e TODO O RESTO em 11 px. Quem precisar de letra maior usa o controle
+     "Tamanho da letra" do menu (até 150%), que multiplica todos estes valores. */
+  --letra-legenda: .6875rem;                                 /* 11 px */
+  --letra-corpo: .6875rem;                                   /* 11 px: parágrafos e demais textos */
+  --letra-destaque: 1rem;                                    /* 16 px: frase principal média */
+  --letra-h3: 1rem;                                          /* 16 px */
+  --letra-h2: 1rem;                                          /* 16 px */
+  --letra-h1: 1rem;                                          /* 16 px: a pergunta da tela */
+  --letra-frase: 1rem;                                       /* 16 px: frase-resposta */
+  --letra-numero: 1rem;                                      /* 16 px: número em destaque */
   /* Espaço (base 4 px), raio e elevação */
   --esp-1: .25rem; --esp-2: .5rem; --esp-3: .75rem; --esp-4: 1rem; --esp-5: 1.5rem; --esp-6: 2rem; --esp-7: 3rem; --esp-8: 4rem;
   --raio-campo: 4px; --raio: 8px; --raio-grande: 12px; --raio-pilula: 999px;
@@ -63,6 +65,7 @@
   --sombra-2: 0 -2px 10px rgba(31, 26, 36, .12);             /* barra inferior e folha "Mais" */
   --sombra-3: 0 12px 32px rgba(31, 26, 36, .22);             /* diálogo */
   --largura-lateral: 15rem;   /* menu aberto */
+  --trilho: 4.25rem;          /* menu recolhido (só ícones) */
   color-scheme: light;
 }
 /* TEMA ESCURO: pela preferência do sistema (se a pessoa não escolheu o claro) ou pela escolha no botão.
@@ -123,7 +126,7 @@ a.pular:focus { left:.5rem; top:.5rem; }
 .app { min-height:100vh; }
 .lateral { background:var(--menu-fundo); color:var(--menu-texto); }
 .lateral-topo { display:flex; align-items:center; justify-content:space-between; gap:var(--esp-3); padding:var(--esp-3) var(--esp-4); }
-.marca { margin:0; font-size:1.05rem; line-height:1.1; font-weight:700; }
+.marca { margin:0; font-size:1rem; line-height:1.1; font-weight:700; }
 .marca a { display:inline-flex; align-items:center; gap:.7rem; color:var(--menu-texto); text-decoration:none; }
 .marca-texto { display:flex; flex-direction:column; white-space:nowrap; }
 .marca-texto small { font-family:var(--font); font-size:var(--letra-legenda); font-weight:400; letter-spacing:.02em; opacity:.8; }
@@ -149,13 +152,24 @@ button.item-lateral[aria-pressed="true"] { color:var(--menu-marcador); }
 /* Barra inferior: escondida no computador. */
 .barra-inferior { display:none; }
 
-@media (min-width: 64.0625rem) {   /* acima de 1024 px: menu lateral fixo e aberto */
-  .app { padding-left:var(--largura-lateral); }
-  .lateral { position:fixed; top:0; bottom:0; left:0; z-index:30; width:var(--largura-lateral);
+/* Acima de 1024 px (decisão do mantenedor em 03/10/2026): o menu fica RECOLHIDO, só com os ícones, e abre por cima
+   do conteúdo quando o mouse passa sobre ele. Também abre quando recebe o foco do TECLADO (Tab): sem isso, quem não
+   usa mouse não veria o nome das seções. Os nomes continuam no código (o leitor de tela lê normalmente). */
+@media (min-width: 64.0625rem) {
+  .app { padding-left:var(--trilho); }
+  .lateral { position:fixed; top:0; bottom:0; left:0; z-index:30; width:var(--trilho); overflow:hidden;
     display:flex; flex-direction:column; border-right:1px solid var(--menu-linha); }
   .lateral-corpo { flex:1; justify-content:space-between; overflow-y:auto; overflow-x:hidden; }
-  .lateral-topo { padding:var(--esp-4); }
-  nav.menu a.aba, button.item-lateral { white-space:normal; }
+  .lateral-topo { padding:var(--esp-4) .9rem; }
+  nav.menu, .lateral-rodape { padding-left:.55rem; padding-right:.55rem; }
+  .lateral .rotulo, .lateral .controle-letra { opacity:0; }
+  .lateral:hover, .lateral:focus-within { width:var(--largura-lateral); box-shadow:8px 0 30px rgba(0, 0, 0, .35); }
+  .lateral:hover .rotulo, .lateral:focus-within .rotulo, .lateral:hover .controle-letra, .lateral:focus-within .controle-letra { opacity:1; }
+  nav.menu a.aba, button.item-lateral { white-space:nowrap; }
+}
+@media (min-width: 64.0625rem) and (prefers-reduced-motion: no-preference) {
+  .lateral { transition:width .18s ease, box-shadow .18s ease; }
+  .lateral .rotulo, .lateral .controle-letra { transition:opacity .15s; }
 }
 @media (max-width: 64rem) {        /* até 1024 px: topo com a marca, barra inferior e folha "Mais" */
   .lateral { position:sticky; top:0; z-index:20; }
@@ -172,7 +186,7 @@ button.item-lateral[aria-pressed="true"] { color:var(--menu-marcador); }
   .barra-inferior { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); position:fixed; left:0; right:0; bottom:0; z-index:40;
     background:var(--cartao); border-top:1px solid var(--borda-forte); box-shadow:var(--sombra-2); padding-bottom:env(safe-area-inset-bottom); }
   .aba-inferior { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:60px;
-    padding:4px; border:0; border-radius:0; background:none; color:var(--texto-2); font:inherit; font-size:14px; line-height:1.2;
+    padding:4px; border:0; border-radius:0; background:none; color:var(--texto-2); font:inherit; font-size:11px; line-height:1.2;
     font-weight:400; text-decoration:none; cursor:pointer; position:relative; }
   .aba-inferior .icone { width:24px; height:24px; }
   .aba-inferior[aria-current="page"], .aba-inferior[aria-expanded="true"] { color:var(--marca); font-weight:700; }
@@ -226,7 +240,7 @@ h3 { font-size:var(--letra-h3); line-height:1.3; margin:1rem 0 .25rem; }
 /* ---------- Os três passos (empenhado / liquidado / pago) e ajustes ---------- */
 .etapas { display:grid; gap:1rem; grid-template-columns:repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
 .etapa { border-left:4px solid var(--marca); padding-left:.8rem; }
-.etapa .num { font-size:clamp(1.125rem, .25rem + 4.5vw, 1.375rem);   /* cabe em 320 px sem ficar < 18 px */ font-weight:700; font-family:var(--font-titulo); }
+.etapa .num { font-size:var(--letra-numero); font-weight:700; font-family:var(--font-titulo); }
 .etapa .nome { font-weight:700; }
 .etapa p { margin:.2rem 0 0; color:var(--texto-2); font-size:var(--letra-corpo); }
 
@@ -260,7 +274,7 @@ dialog.apoio { max-width:34rem; }
 dialog.apoio[data-modo="computador"] { max-width:46rem; }
 .apoio-pix { display:grid; gap:var(--esp-4); margin:var(--esp-4) 0; }
 dialog.apoio[data-modo="computador"] .apoio-pix { grid-template-columns:auto 1fr; align-items:start; }
-button.apoio-principal { width:100%; min-height:3rem; font-size:1.05rem; }
+button.apoio-principal { width:100%; min-height:3rem; font-size:var(--letra-destaque); }
 .apoio .passos { margin:var(--esp-3) 0; }
 .aviso-recebedor { margin:var(--esp-3) 0; padding:var(--esp-3) var(--esp-4); border-left:4px solid var(--destaque-borda); border-radius:0 var(--raio) var(--raio) 0; background:var(--aviso-fundo); }
 .apoio-chave { margin-top:var(--esp-3); }
@@ -404,7 +418,7 @@ p, li, dd, td, th, figcaption { overflow-wrap:break-word; }
 .numeros:empty { display:none; }
 .numero { display:flex; flex-direction:column; gap:.15rem; padding:.8rem 1rem; border-radius:var(--raio); background:var(--marca-suave); }
 .numero-rotulo { color:var(--texto-2); font-size:var(--letra-corpo); }
-.numero-valor { font-size:1.25rem; line-height:1.2; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.numero-valor { font-size:var(--letra-numero); line-height:1.2; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .numero-detalhe { color:var(--texto-2); font-size:var(--letra-legenda); }
 
 /* ---------- Duas colunas lado a lado em telas largas ---------- */
@@ -511,7 +525,7 @@ section { box-shadow:var(--sombra); }
 a.kpi { border-top:3px solid var(--marca); }
 a.kpi:hover { border-color:var(--marca); }
 .kpi-rotulo { font-size:var(--letra-legenda); font-weight:700; color:var(--texto-2); letter-spacing:.02em; }
-.kpi-valor { font-size:1.5rem; line-height:1.2; color:var(--destaque-texto); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.kpi-valor { font-size:var(--letra-numero); line-height:1.2; color:var(--destaque-texto); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .kpi-detalhe { font-size:var(--letra-legenda); }
 .kpi-meta { font-size:var(--letra-legenda); color:var(--texto-2); }
 
@@ -545,7 +559,7 @@ a.kpi:hover { border-color:var(--marca); }
 
 /* ---------- Pesquisa de servidor ---------- */
 .linha-busca { display:flex; gap:var(--esp-2); margin:var(--esp-3) 0; }
-.linha-busca input { flex:1; min-width:0; font-size:1.05rem; }
+.linha-busca input { flex:1; min-width:0; font-size:var(--letra-corpo); }
 
 /* ---------- Ficha: cartão de identificação e abas internas ---------- */
 .ficha-id { padding:var(--esp-3) var(--esp-4); border:1px solid var(--borda); border-left:5px solid var(--marca); border-radius:var(--raio); background:var(--cartao); margin:var(--esp-3) 0; }
@@ -568,7 +582,7 @@ button:hover:not(:disabled) { filter:brightness(1.12); }
 button:active:not(:disabled) { transform:translateY(1px); }
 button.sec:hover:not(:disabled) { background:var(--marca-suave); filter:none; }
 .kpi.indisponivel { background:var(--fundo); border-style:dashed; }
-.kpi.indisponivel .kpi-valor { font-size:1rem; color:var(--texto-2); }
+.kpi.indisponivel .kpi-valor { font-size:var(--letra-corpo); color:var(--texto-2); }
 
 /* ---------- Câmara: cartões dos vereadores ---------- */
 ul.cartoes-pessoas { list-style:none; margin:0; padding:0; display:grid; gap:var(--esp-3); grid-template-columns:repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); }
@@ -610,7 +624,7 @@ abbr.sigla:hover, abbr.sigla[aria-expanded="true"] { background:var(--marca-suav
 .cartao-pergunta:hover { border-color:var(--marca); }
 .cartao-pergunta:has(.cartao-pergunta-link:focus-visible) { outline:3px solid var(--foco); outline-offset:2px; }
 .cartao-pergunta-titulo { margin:0; font-size:var(--letra-h3); color:var(--marca); }
-.frase-resposta { margin:0; font-size:clamp(1.125rem, 1.02rem + .5vw, 1.375rem); line-height:1.35; font-weight:700; }
+.frase-resposta { margin:0; font-size:var(--letra-frase); line-height:1.35; font-weight:700; }
 .valor-exato, .cartao-pergunta-meta { margin:0; color:var(--texto-2); font-size:var(--letra-legenda); }
 .cartao-pergunta-link { margin-top:auto; padding-top:var(--esp-2); font-weight:700; }
 .cartao-pergunta-link::after { content:""; position:absolute; inset:0; border-radius:var(--raio); }

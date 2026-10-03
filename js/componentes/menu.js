@@ -1,5 +1,5 @@
 /* MENU
-   - No computador (acima de 1024 px): menu lateral SEMPRE aberto, com o nome de cada seção (só CSS).
+   - No computador (acima de 1024 px): menu RECOLHIDO (só ícones), que abre ao passar o mouse ou com o foco do teclado (só CSS).
    - Até 1024 px: barra inferior com 5 atalhos; o botão "Mais" abre o corpo do menu como uma folha que sobe de baixo.
    Regras de acessibilidade:
      - o botão "Mais" informa se a folha está aberta (aria-expanded);
@@ -66,6 +66,7 @@ OBS.menu = (function () {
       const link = ev.target.closest('a');
       if (!link) return;
       if (!larga.matches) abrir(false);              // celular: escolheu uma seção, a folha fecha
+      else if (ev.detail > 0) link.blur();           // computador, clique do mouse: tira o foco para o menu recolher
     });
     // Tocar fora da folha (no fundo escurecido) fecha; trocar de tela também.
     document.addEventListener('click', (ev) => {

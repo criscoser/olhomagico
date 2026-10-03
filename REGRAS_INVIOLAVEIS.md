@@ -73,10 +73,12 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
 ## Decisões de design aprovadas (Etapas 2 a 7, out/2026) — implementadas
 
 - Arquitetura por perguntas: Gastos, Entradas, Pessoal, Contratos, Limites, Câmara (+ Buscar, Palavras e siglas,
-  Sobre e fontes, Apoie). Barra inferior até 1024 px (Início, Gastos, Pessoal, Buscar, Mais); menu lateral aberto acima.
+  Sobre e fontes, Apoie). Barra inferior até 1024 px (Início, Gastos, Pessoal, Buscar, Mais). Acima de 1024 px, menu
+  lateral RECOLHIDO (só ícones) que abre ao passar o mouse ou com o foco do teclado (decisão do mantenedor, 03/10/2026).
 - Robô gera `dados/despesas-resumo.js` (13 meses × órgão × 3 etapas) para a página inicial não baixar ~800 KB.
 - Paleta **Uva e Ouro** (tema claro padrão, escuro opcional respeitando o sistema); só a fonte Atkinson Hyperlegible,
-  hospedada no site; corpo de 16px, mínimo de 14px só em metadados; alvos de toque de 48px.
+  hospedada no site; alvos de toque de 48px. Letras (decisão do mantenedor, 03/10/2026): títulos principais, frases
+  principais e números em destaque com 16 px; todo o resto com 11 px. O controle "Tamanho da letra" (até 150%) fica.
 - Modelo de 3 camadas (frase → gráfico → números exatos e fonte); glossário único com ⓘ na primeira ocorrência.
 - Inclusão: botão Ouvir (só frase e título do gráfico; escondido sem voz pt-BR), tamanho da letra em 4 passos,
   compartilhar (WhatsApp, copiar link, outros apps; ficha de servidor compartilhada sem nome e sem salário).

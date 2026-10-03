@@ -17,7 +17,7 @@ OBS.situacaoTela = (function () {
       Object.values(s).forEach((f) => {
         const li = el('li');
         li.append(el('strong', '', `${f.nome}: `), `última cópia válida em ${quando(f.ultimoSucesso)}.`);
-        if (f.ok === false) li.append(el('span', 'faixa faixa-2', ` A última tentativa (${quando(f.ultimaTentativa)}) falhou; o site mostra a cópia anterior.`));
+        if (f.ok === false) li.append(el('span', 'falha-fonte', ` A última tentativa (${quando(f.ultimaTentativa)}) falhou; o site mostra a cópia anterior.`));
         linhas.push(li);
       });
     }

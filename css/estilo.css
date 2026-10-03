@@ -352,7 +352,11 @@ p, li, dd, td, th, figcaption { overflow-wrap:break-word; }
 .medidor-marca { position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--texto); }
 .faixa { font-weight:700; margin:.25rem 0; }
 .faixa-0 { color:var(--marca); }
-.faixa-1, .faixa-2, .faixa-3 { color:var(--erro); }
+/* Acima de um limite da LRF: selo âmbar com o texto (nunca vermelho: vermelho é só para erro do site, não para dado). */
+.faixa-1, .faixa-2, .faixa-3 { display:inline-block; padding:var(--esp-1) var(--esp-3); border-left:4px solid var(--destaque-borda);
+  border-radius:0 var(--raio-campo) var(--raio-campo) 0; background:var(--aviso-fundo); color:var(--texto); }
+/* Falha técnica de uma cópia (aba Sobre, situação das fontes): aí sim é erro do site. */
+.falha-fonte { color:var(--erro); font-weight:700; }
 
 /* =====================================================================
    FASE 5: painel inicial, tabelas, gráficos, filtros e fichas
@@ -431,7 +435,8 @@ figure.colunas { margin:.75rem 0; --alt-colunas:9.5rem; --alt-rotulo:1.6rem; }
 .coluna { flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:stretch; }
 .coluna-trilho { position:relative; height:var(--alt-colunas); }
 .coluna-barra { position:absolute; left:8%; right:8%; background:var(--grafico); border-radius:3px 3px 0 0; }
-.coluna-barra.negativa { background:var(--erro); border-radius:0 0 3px 3px; }
+/* Valor negativo (ajuste ou devolução): listrado, para se distinguir sem usar vermelho (não é erro nem juízo). */
+.coluna-barra.negativa { background:repeating-linear-gradient(135deg, var(--grafico) 0 3px, transparent 3px 6px); outline:1px solid var(--grafico); border-radius:0 0 3px 3px; }
 .coluna.destaque .coluna-barra { background:var(--grafico-destaque); }
 .coluna-rotulo { height:var(--alt-rotulo); line-height:var(--alt-rotulo); text-align:center; font-size:var(--letra-legenda); color:var(--texto-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .coluna.destaque .coluna-rotulo { color:var(--texto); font-weight:700; }

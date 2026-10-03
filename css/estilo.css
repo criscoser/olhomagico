@@ -270,6 +270,31 @@ footer { color:var(--texto-2); font-size:var(--letra-corpo); padding:1rem 0 3rem
 .redes a:focus-visible { outline:3px solid var(--foco); outline-offset:3px; }
 .redes svg { width:1.15rem; height:1.15rem; fill:currentColor; }
 .rodape-credito { margin:var(--esp-3) 0 0; text-align:center; }
+.redes-topo { display:none; gap:.5rem; }
+.redes-topo a { width:2.25rem; height:2.25rem; }
+.redes-topo svg { width:1rem; height:1rem; }
+@media (min-width: 64.0625rem) { .redes-topo { display:flex; } }
+
+/* ---------- Ideias do site da Rádio Videira (03/10/2026) ---------- */
+/* Atalhos de meses em abas (como os dias da programação da rádio): um toque troca o mês. */
+.atalhos-meses { display:flex; flex-wrap:wrap; gap:.4rem; margin:var(--esp-3) 0 0; }
+a.atalho-mes { display:inline-flex; align-items:center; min-height:2.5rem; padding:0 .9rem; border-radius:999px; border:1px solid var(--borda-forte);
+  color:var(--texto); text-decoration:none; font-weight:700; font-size:var(--letra-corpo); }
+a.atalho-mes:hover { border-color:var(--marca); }
+a.atalho-mes[aria-current] { background:var(--marca); border-color:var(--marca); color:var(--sobre-marca); }
+/* Pílula com o período no topo do cartão (como a data nas notícias da rádio). */
+.pilula-periodo { align-self:flex-start; margin:0; padding:.2rem .7rem; border-radius:999px; background:var(--marca-suave); color:var(--texto);
+  font-size:var(--letra-legenda); font-weight:700; }
+/* "Ver os detalhes" como botão no fim do cartão (o cartão inteiro continua clicável). */
+.cartao-pergunta-link { align-self:center; margin-top:auto; padding:.55rem 1.4rem; border-radius:999px; background:var(--marca); color:var(--sobre-marca);
+  text-decoration:none; font-weight:700; box-shadow:var(--sombra-1); }
+.cartao-pergunta:hover .cartao-pergunta-link { filter:brightness(1.1); }
+/* Título da página inicial no centro, com um traço embaixo. */
+.titulo-centro { text-align:center; }
+.titulo-centro::after { content:""; display:block; width:3rem; height:3px; margin:.6rem auto 0; border-radius:2px; background:var(--marca); }
+.sub-centro { text-align:center; max-width:40rem; margin-left:auto; margin-right:auto; }
+#aba-inicio .botao-ouvir { display:flex; margin-left:auto; margin-right:auto; }
+#aba-inicio .barra-compartilhar { justify-content:center; }
 @media (prefers-reduced-motion: no-preference) { .redes a { transition:filter .15s, transform .15s; } .redes a:hover { transform:translateY(-2px); } }
 
 /* ---------- Caixa de apoio (Pix) ---------- */
@@ -670,7 +695,6 @@ abbr.sigla:hover, abbr.sigla[aria-expanded="true"] { background:var(--marca-suav
 .cartao-pergunta-titulo { margin:0; font-size:var(--letra-h3); color:var(--marca); }
 .frase-resposta { margin:0; font-size:var(--letra-frase); line-height:1.35; font-weight:700; }
 .valor-exato, .cartao-pergunta-meta { margin:0; color:var(--texto-2); font-size:var(--letra-legenda); }
-.cartao-pergunta-link { margin-top:auto; padding-top:var(--esp-2); font-weight:700; }
 .cartao-pergunta-link::after { content:""; position:absolute; inset:0; border-radius:var(--raio); }
 .cartao-pergunta-link:focus-visible { outline:none; }
 .cartao-pergunta .grafico { margin:var(--esp-2) 0; }

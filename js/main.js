@@ -41,6 +41,14 @@ OBS.consultar = async function (anoMes) {
   const [anoPadrao, mesPadrao] = OBS.mesAnterior(hoje).split('-'); // o mês atual costuma estar incompleto
   // No ano atual, só os meses que já começaram aparecem na lista (mês futuro não tem gasto).
   const escolherMes = OBS.preencherMesAno(OBS.$('selMes'), OBS.$('selAno'), `${anoPadrao}-${mesPadrao}`);
+  // ATALHOS: os 6 meses completos mais recentes como abas ("set/26", "ago/26"...), do mais novo ao mais antigo.
+  const atalhos = OBS.historico.meses(`${anoPadrao}-${mesPadrao}`, 6).reverse().map((am) => {
+    const a = OBS.el('a', 'atalho-mes', OBS.historico.rotulo(am));
+    a.href = `#gastos/${am}`; a.dataset.mes = am; a.setAttribute('aria-label', OBS.periodoDoMes(am).nome);
+    return a;
+  });
+  OBS.$('atalhosMeses').replaceChildren(...atalhos);
+  const marcarAtalho = (anoMes) => atalhos.forEach((a) => { if (a.dataset.mes === anoMes) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
   OBS.$('form').addEventListener('submit', (ev) => {
     ev.preventDefault();
     const anoMes = `${OBS.$('selAno').value}-${OBS.$('selMes').value}`;
@@ -53,6 +61,7 @@ OBS.consultar = async function (anoMes) {
     if (anoMes > esteMes) { OBS.ui.mostrarEstado('Esse mês ainda não chegou. Escolha este mês ou um mês anterior.', true); return; }
     const [a, m] = anoMes.split('-');
     escolherMes(`${a}-${m}`);
+    marcarAtalho(anoMes);
     if (OBS.ui.mesNaTela() !== anoMes) await OBS.consultar(anoMes);
   };
   OBS.ui.ligarEventos();

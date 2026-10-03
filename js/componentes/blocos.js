@@ -43,11 +43,12 @@ OBS.kpi = function (o) {
 OBS.cartaoPergunta = function (o) {
   const { el } = OBS;
   const art = el('article', 'cartao-pergunta' + (o.indisponivel ? ' indisponivel' : ''));
+  if (o.periodo) art.append(el('p', 'pilula-periodo', o.periodo));   // de quando é o dado, à vista no topo
   art.append(el('h2', 'cartao-pergunta-titulo', o.pergunta));
   if (o.frase) art.append(el('p', 'frase-resposta', o.frase));
   if (o.exato) art.append(el('p', 'valor-exato', o.exato));
   if (o.extra) art.append(o.extra);
-  const meta = [o.periodo && `Período: ${o.periodo}`, o.fonte && `Fonte: ${o.fonte}`].filter(Boolean).join(' · ');
+  const meta = o.fonte ? `Fonte: ${o.fonte}` : '';
   if (meta) art.append(el('p', 'cartao-pergunta-meta', meta));
   const seguro = OBS.urlSegura(o.href);
   if (seguro) {

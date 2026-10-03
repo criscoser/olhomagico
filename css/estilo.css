@@ -573,8 +573,14 @@ ul.cartoes-pessoas { list-style:none; margin:0; padding:0; display:grid; gap:var
 
 /* ---------- Siglas: sublinhado pontilhado, balão de explicação e aba "Siglas e termos" ---------- */
 /* A sigla continua com o mesmo texto e a mesma cor; só ganha o pontilhado e vira "tocável". */
-abbr.sigla { text-decoration:underline dotted; text-decoration-thickness:1px; text-underline-offset:.2em; cursor:help; border-radius:3px; }
-abbr.sigla:hover, abbr.sigla[aria-expanded="true"] { text-decoration-style:solid; background:var(--marca-suave); }
+/* Sigla ou termo tocável: o texto continua igual e ganha o sinal ⓘ logo depois (desenhado em SVG: o caractere ⓘ
+   não existe na letra do site). Só a PRIMEIRA vez em cada tela (js/siglas.js). */
+abbr.sigla { text-decoration:none; cursor:pointer; border-radius:3px; white-space:nowrap; }
+abbr.sigla::after { content:""; display:inline-block; width:.85em; height:.85em; margin-left:.15em; vertical-align:-.05em;
+  background-color:var(--marca); -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6.8' fill='none' stroke='black' stroke-width='1.6'/%3E%3Crect x='7.2' y='6.8' width='1.6' height='5' rx='.5'/%3E%3Ccircle cx='8' cy='4.6' r='1'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6.8' fill='none' stroke='black' stroke-width='1.6'/%3E%3Crect x='7.2' y='6.8' width='1.6' height='5' rx='.5'/%3E%3Ccircle cx='8' cy='4.6' r='1'/%3E%3C/svg%3E") center / contain no-repeat; }
+abbr.sigla:hover, abbr.sigla[aria-expanded="true"] { background:var(--marca-suave); }
+.glossario-exemplo, .glossario-cuidado { font-size:var(--letra-corpo); }
+.glossario-cuidado { padding-left:var(--esp-3); border-left:3px solid var(--destaque-borda); }
 .balao-sigla { position:absolute; z-index:60; width:min(22rem, calc(100vw - 1rem)); padding:var(--esp-3) var(--esp-4); padding-right:2.5rem;
   background:var(--cartao-2); color:var(--texto); border:1px solid var(--marca); border-radius:var(--raio); box-shadow:0 10px 28px rgba(0, 0, 0, .35); font-size:var(--letra-corpo); line-height:1.45; }
 .balao-sigla p { margin:0 0 .5rem; }

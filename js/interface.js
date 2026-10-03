@@ -207,7 +207,9 @@ OBS.ui = (function () {
     const caixa = $(idCaixa); caixa.replaceChildren();
     itens.forEach(([nome, valor, texto]) => {
       const d = el('div', 'etapa');
-      d.append(el('div', 'nome', nome), el('div', 'num', moeda(valor)), el('p', '', texto));
+      const n = el('div', 'nome');
+      n.append(...[].concat(nome));   // nome pode ser texto ou pedaços (texto + termo tocável com ⓘ)
+      d.append(n, el('div', 'num', moeda(valor)), el('p', '', texto));
       caixa.append(d);
     });
   }
@@ -370,12 +372,12 @@ OBS.ui = (function () {
     prepararRegistros(ultima.linhas);
     desenharFontes();
     desenharCartoes('etapas', [
-      ['1. Empenhado (reservado)', t.empenhado, 'O município reservou o dinheiro para um gasto (já descontadas as reservas canceladas no período).'],
-      ['2. Liquidado (conferido)', t.liquidado, 'O serviço ou produto foi entregue e conferido.'],
-      ['3. Pago', t.pago, 'O dinheiro saiu da conta do município.']]);
+      [['1. ', OBS.siglas.termoTocavel('Empenhado', 'Empenhado'), ' (reservado)'], t.empenhado, 'O município reservou o dinheiro para um gasto (já descontadas as reservas canceladas no período).'],
+      [['2. ', OBS.siglas.termoTocavel('Liquidado', 'Liquidado'), ' (conferido)'], t.liquidado, 'O serviço ou produto foi entregue e conferido.'],
+      [['3. ', OBS.siglas.termoTocavel('Pago', 'Pago')], t.pago, 'O dinheiro saiu da conta do município.']]);
     desenharCartoes('ajustes', [
-      ['Anulado', t.anulado, 'Reserva de dinheiro que foi cancelada.'],
-      ['Retido', t.retido, 'Parte do valor liquidado que ficou retida (por exemplo, para recolher impostos).']]);
+      [[OBS.siglas.termoTocavel('Anulado', 'Anulado')], t.anulado, 'Reserva de dinheiro que foi cancelada.'],
+      [[OBS.siglas.termoTocavel('Retido', 'Retido')], t.retido, 'Parte do valor liquidado que ficou retida (por exemplo, para recolher impostos).']]);
 
     $('estado').className = 'oculto';
     $('resultado').classList.remove('oculto');

@@ -16,6 +16,15 @@
   // Clicar fora da caixa (no fundo escuro) também fecha.
   caixa.addEventListener('click', (ev) => { if (ev.target === caixa) caixa.close(); });
 
+  // DENTRO DE OUTRO SITE (iframe): um site falso poderia mostrar o Olho Mágico "embrulhado" e pôr um botão ou QR
+  // por cima. O GitHub Pages não deixa proibir isso pelo servidor, então, nesse caso, nada de Pix aparece aqui.
+  let dentroDeOutroSite = true;
+  try { dentroDeOutroSite = window.top !== window.self; } catch (e) { /* navegador bloqueou a comparação: trata como embrulhado */ }
+  if (dentroDeOutroSite) {
+    $('pixDados').replaceChildren(el('p', '', `Por segurança, o Pix só aparece com o site aberto diretamente no endereço ${cfg.SITE_OFICIAL}.`));
+    return;
+  }
+
   // FALHA FECHADA: se o código, a chave e o nome não combinarem, nada de Pix aparece (só um aviso neutro).
   const conferencia = OBS.pixCodigoValido();
   if (!conferencia.ok) {

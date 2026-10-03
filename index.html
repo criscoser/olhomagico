@@ -120,8 +120,8 @@
       <!-- EVOLUÇÃO: gráfico só aparece depois que a série de 12 meses for consultada e validada. -->
       <section aria-labelledby="t-evol-visao" id="sec-evolucao-visao">
         <h2 id="t-evol-visao">Evolução das despesas</h2>
-        <p class="sub" id="evolVisaoTexto">Valor pago em cada um dos 12 meses até o mês escolhido. São 12 consultas ao portal, feitas uma de cada vez.</p>
-        <p><button type="button" class="sec" id="btnEvolVisao">Carregar os 12 meses</button></p>
+        <p class="sub" id="evolVisaoTexto">Valor pago pelo Município em cada um dos 12 meses até o mês escolhido.</p>
+        <p><button type="button" class="sec" id="btnEvolVisao">Atualizar o gráfico</button></p>
         <p class="meta" id="evolVisaoEstado" role="status" aria-live="polite"></p>
         <div id="evolVisao"></div>
       </section>
@@ -193,7 +193,7 @@
     <!-- EVOLUÇÃO: os 12 meses até o mês escolhido (uma consulta por mês, só quando a pessoa pedir). -->
     <section aria-labelledby="t-evolucao" id="sec-evolucao">
       <h2 id="t-evolucao">Como foi nos meses anteriores?</h2>
-      <p class="sub">Compare o mês escolhido com os 11 anteriores. São 12 consultas ao portal, feitas uma de cada vez: pode levar um minuto.</p>
+      <p class="sub">Compare o mês escolhido com os 11 anteriores. Os totais vêm da cópia diária (leve). Para meses fora dela, o site consulta o portal mês a mês (cerca de 800 KB cada).</p>
       <div class="filtros">
         <div><label for="etapaEvolucao">Etapa</label>
           <select id="etapaEvolucao"><option value="pago">Pago</option><option value="liquidado">Liquidado</option><option value="empenhado">Empenhado</option></select></div>

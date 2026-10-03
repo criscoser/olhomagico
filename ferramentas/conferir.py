@@ -24,6 +24,7 @@ DADOS = PASTA.parent / "dados"
 # arquivo, variável, nome amigável, função que diz "quantos itens" (e falha se o formato estiver errado)
 ARQUIVOS = [
     ("pessoal.js", "OBS_DADOS_PESSOAL", "Servidores", lambda d: f"{len(d['servidores'])} registros"),
+    ("despesas-resumo.js", "OBS_DADOS_DESPESAS", "Resumo das despesas (13 meses)", lambda d: f"{len(d['meses'])} meses"),
     ("siconfi.js", "OBS_DADOS_SICONFI", "Gasto com pessoal (LRF)", lambda d: f"{sum(len(p['periodos']) for p in d['poderes'].values())} períodos"),
     ("pncp.js", "OBS_DADOS_PNCP", "Licitações e contratos", lambda d: f"{len(d['compras'])} licitações, {len(d['contratos'])} contratos"),
     ("transferencias.js", "OBS_DADOS_TRANSFERENCIAS", "Repasses da União", lambda d: f"{len(d['registros'])} registros"),

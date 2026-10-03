@@ -247,6 +247,17 @@
   teste('siglas: busca sem acento', OBS.siglas.filtrar(OBS.siglas.TERMOS, 'inexigibilidade lei').map((t) => t.termo), ['Inexigibilidade']);
   teste('siglas: endereço da sigla', OBS.siglas.slug('ADO 25'), 'ado-25');
   teste('rota da aba de siglas', OBS.rotas.ler('#siglas/sigla-fpm'), { nome: 'siglas', resto: 'sigla-fpm' });
+  // ----- Resumo diário das despesas (dados/despesas-resumo.js) -----
+  const RESUMO = { meses: [
+    { anoMes: '2026-08', registros: 10, parcial: false, credoresQueReceberam: 7, total: { empenhado: 3, liquidado: 2, pago: 1 } },
+    { anoMes: '2026-09', registros: 0, parcial: false, credoresQueReceberam: 0, total: { empenhado: 0, liquidado: 0, pago: 0 } },
+    { anoMes: '2026-10', registros: 5, parcial: true, credoresQueReceberam: 2, total: { empenhado: 9, liquidado: 8, pago: 7 } }] };
+  teste('resumo: totais por mês, separados e com mês parcial marcado', OBS.historico.doResumo(RESUMO, ['2026-08', '2026-10']),
+    [{ anoMes: '2026-08', empenhado: 3, liquidado: 2, pago: 1, vazio: false, parcial: false, credoresQueReceberam: 7 },
+     { anoMes: '2026-10', empenhado: 9, liquidado: 8, pago: 7, vazio: false, parcial: true, credoresQueReceberam: 2 }]);
+  teste('resumo: mês sem registros fica "vazio" (não vira zero sem aviso)', OBS.historico.doResumo(RESUMO, ['2026-09'])[0].vazio, true);
+  teste('resumo: faltou um mês -> null (o site consulta ao vivo)', OBS.historico.doResumo(RESUMO, ['2026-07', '2026-08']), null);
+  teste('resumo: arquivo ausente -> null', OBS.historico.doResumo(null, ['2026-08']), null);
   // ----- Pix: o código só vale se CRC, chave, conta, moeda, país e nome baterem (senão, falha fechada) -----
   const PIX = OBS.config.PIX_COPIA_E_COLA;
   const ESPERADO = { chave: OBS.config.PIX_CHAVE, recebedor: OBS.config.PIX_RECEBEDOR };

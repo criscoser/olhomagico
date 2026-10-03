@@ -213,16 +213,18 @@ OBS.ui = (function () {
   }
 
   /* ================= EVOLUÇÃO: 12 meses até o mês escolhido ================= */
-  let evolucao = null;   // resultado da última busca de 12 meses (fica na memória para trocar a etapa sem consultar de novo)
+  let evolucao = null;   // totais dos 12 meses (ficam na memória para trocar a etapa sem consultar de novo)
+  let evolucaoFonte = '';
 
   function desenharEvolucao() {
     if (!evolucao) return;
     const etapa = $('etapaEvolucao').value;
     const nomes = { pago: 'pago', liquidado: 'liquidado', empenhado: 'empenhado' };
-    const totais = OBS.historico.totaisPorMes(evolucao);
-    const serie = totais.map((m) => ({ rotulo: OBS.historico.rotulo(m.anoMes), valor: m[etapa], titulo: OBS.periodoDoMes(m.anoMes).nome + (m.erro ? ' (não respondeu)' : '') }));
+    const totais = evolucao;
+    const serie = totais.map((m) => ({ rotulo: OBS.historico.rotulo(m.anoMes), valor: m[etapa],
+      titulo: OBS.periodoDoMes(m.anoMes).nome + (m.erro ? ' (não respondeu)' : '') + (m.parcial ? ' (parcial)' : '') }));
     const t = OBS.tabela({ colunas: [
-      { chave: 'anoMes', titulo: 'Mês', formatar: (v) => OBS.periodoDoMes(v).nome, ordenavel: false },
+      { chave: 'anoMes', titulo: 'Mês', formatar: (v, l) => OBS.periodoDoMes(v).nome + (l.parcial ? ' (parcial)' : ''), ordenavel: false },
       { chave: 'empenhado', titulo: 'Empenhado', tipo: 'moeda', ordenavel: false },
       { chave: 'liquidado', titulo: 'Liquidado', tipo: 'moeda', ordenavel: false },
       { chave: 'pago', titulo: 'Pago', tipo: 'moeda', ordenavel: false }], porPagina: 12, legenda: 'Totais por mês' });
@@ -233,7 +235,8 @@ OBS.ui = (function () {
       OBS.graficos.colunas(serie, { destaque: serie.length - 1, descricao: `Valor ${nomes[etapa]} em cada mês. Os números estão na tabela abaixo.` }),
       el('p', 'meta', `Colunas: valor ${nomes[etapa]} em cada mês; a última é o mês escolhido.` +
         (erros ? ` ${erros} mês(es) não responderam e ficaram em branco.` : '') +
-        ' Pagamentos se concentram em alguns meses (13º salário, etapas de obras): compare com cuidado.'),
+        (totais.some((m) => m.parcial) ? ' O último mês ainda está em andamento (valor parcial).' : '') +
+        ' Pagamentos se concentram em alguns meses (13º salário, etapas de obras): compare com cuidado. ' + evolucaoFonte),
       det);
   }
 
@@ -241,7 +244,16 @@ OBS.ui = (function () {
     if (!ultima) return;
     const botao = $('btnEvolucao'); botao.disabled = true;
     const meses = OBS.historico.meses(ultima.anoMes, 12);
-    evolucao = await OBS.historico.varios(meses, (feitos, total) => { $('evolucaoEstado').textContent = `Consultando: ${feitos} de ${total} meses…`; });
+    // Primeiro a cópia diária do robô (poucos KB); se faltar algum mês, consulta o portal mês a mês (~800 KB cada).
+    const resumo = await OBS.dados.despesasResumo();
+    evolucao = OBS.historico.doResumo(resumo, meses);
+    if (evolucao) {
+      evolucaoFonte = `Fonte: API de despesas da Prefeitura, cópia diária de ${new Date(resumo.meta.geradoEm).toLocaleDateString('pt-BR')}.`;
+    } else {
+      const resultado = await OBS.historico.varios(meses, (feitos, total) => { $('evolucaoEstado').textContent = `Consultando o portal: ${feitos} de ${total} meses (cerca de 800 KB cada)…`; });
+      evolucao = OBS.historico.totaisPorMes(resultado);
+      evolucaoFonte = 'Fonte: API de despesas da Prefeitura, consulta ao vivo.';
+    }
     $('evolucaoEstado').textContent = `${OBS.periodoDoMes(meses[0]).nome} a ${OBS.periodoDoMes(meses[11]).nome}.`;
     botao.disabled = false;
     desenharEvolucao();
@@ -333,6 +345,7 @@ OBS.ui = (function () {
     ultima = { linhas: meta.linhas || [], periodo, anoMes: meta.anoMes, meta: { url: urlBruta, consultadoEm: meta.consultadoEm, descartadas: meta.descartadas } };
     // Ao trocar de mês, a evolução antiga some (ela era dos 12 meses até o mês anterior escolhido).
     evolucao = null; $('evolucaoConteudo').replaceChildren(); $('evolucaoEstado').textContent = '';
+    OBS.dados.despesasResumo().then((r) => { if (OBS.historico.doResumo(r, OBS.historico.meses(meta.anoMes, 12))) carregarEvolucao(); });
     $('fonteLinha').replaceChildren(`${meta.recebidas.toLocaleString('pt-BR')} registros recebidos da `, link('API oficial de despesas', urlBruta), '.');
     $('origemGastos').replaceChildren(OBS.origem({
       fonte: 'API de Dados Abertos (Contabilidade), Portal da Transparência de Videira',

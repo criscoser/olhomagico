@@ -61,6 +61,21 @@ OBS.historico = {
     });
   },
 
+  /* Totais por mês a partir do RESUMO DIÁRIO do robô (dados/despesas-resumo.js), no mesmo formato de totaisPorMes.
+     Devolve null se faltar algum dos meses pedidos (aí o site consulta a API ao vivo). "parcial" = mês em andamento. */
+  doResumo(resumo, listaMeses) {
+    if (!resumo || !Array.isArray(resumo.meses)) return null;
+    const porMes = new Map(resumo.meses.map((m) => [m.anoMes, m]));
+    const saida = [];
+    for (const anoMes of listaMeses) {
+      const m = porMes.get(anoMes);
+      if (!m || !m.total) return null;
+      saida.push({ anoMes, empenhado: m.total.empenhado, liquidado: m.total.liquidado, pago: m.total.pago,
+        vazio: m.registros === 0, parcial: Boolean(m.parcial), credoresQueReceberam: m.credoresQueReceberam });
+    }
+    return saida;
+  },
+
   /* "2026-03" -> "mar/26" (rótulo curto para gráficos). */
   rotulo(anoMes) {
     const [ano, mes] = anoMes.split('-');

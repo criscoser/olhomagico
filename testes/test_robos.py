@@ -107,6 +107,27 @@ VEREADORES = [{"nome": f"VEREADOR FICTICIO {i}", "partido": "XYZ", "funcao": "Ve
 PAUTAS = [{"data": "06/10/2026", "titulo": f"Pauta fictícia {i}", "link": f"https://www.camaravideira.sc.gov.br/pauta/{i}"} for i in range(1, 61)]
 
 
+# Despesas de um mês (formato real da API de despesas). Casos difíceis de propósito:
+# mesmo CNPJ com dois nomes, credor só com empenho (pago 0), estorno negativo, valor inválido e CPF de pessoa física.
+DESPESAS_LINHAS = [
+    {"orgaoDescricao": "SECRETARIA A", "cpfCnpjCredor": "05.002.371/0001-26", "nomeCredor": "INSTITUTO", "valorEmpenhado": "10.00",
+     "valorAnulado": "0", "valorLiquidado": "10.00", "valorRetido": "1.50", "valorPago": "10.00"},
+    {"orgaoDescricao": "INSTITUTO", "cpfCnpjCredor": "05002371000126", "nomeCredor": "FOLHA APOSENTADOS", "valorEmpenhado": "30.00",
+     "valorAnulado": "2.00", "valorLiquidado": "30.00", "valorRetido": "0", "valorPago": "30.00"},
+    {"orgaoDescricao": "SECRETARIA A", "cpfCnpjCredor": "11.222.333/0001-44", "nomeCredor": "SO EMPENHO LTDA", "valorEmpenhado": "99.00",
+     "valorAnulado": "0", "valorLiquidado": "0", "valorRetido": "0", "valorPago": "0"},
+    {"orgaoDescricao": "SECRETARIA B", "cpfCnpjCredor": "99.888.777/0001-66", "nomeCredor": "ESTORNO SA", "valorEmpenhado": "-5.00",
+     "valorAnulado": "5.00", "valorLiquidado": "-5.00", "valorRetido": "0", "valorPago": "-5.00"},
+    {"orgaoDescricao": "SECRETARIA B", "cpfCnpjCredor": "123.456.789-01", "nomeCredor": "PESSOA FISICA", "valorEmpenhado": "100.55",
+     "valorAnulado": "", "valorLiquidado": "100.55", "valorRetido": None, "valorPago": "100.55"},
+    {"orgaoDescricao": "", "cpfCnpjCredor": "", "nomeCredor": "SEM DOCUMENTO", "valorEmpenhado": "1.10",
+     "valorAnulado": "0", "valorLiquidado": "1.10", "valorRetido": "0", "valorPago": "1.10"},
+    {"orgaoDescricao": "SECRETARIA B", "cpfCnpjCredor": "", "nomeCredor": "VALOR INVALIDO", "valorEmpenhado": "abc",
+     "valorAnulado": "0", "valorLiquidado": "1", "valorRetido": "0", "valorPago": "1"},
+]
+MES_COM_DESPESAS = f"{date.today().month:02d}/{date.today().year}"   # só o mês atual tem dados no servidor falso
+
+
 class ServidorFalso(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
@@ -135,6 +156,11 @@ class ServidorFalso(BaseHTTPRequestHandler):
         if u.path.endswith("/api/transparencia-pessoal-funcionarios"):
             p = int(q.get("pagina", 1)); fatia = SERVIDORES[(p - 1) * 100: p * 100]
             return self._json({"registros": fatia, "paginaAtual": str(p), "totalPaginas": 2, "totalRegistros": len(SERVIDORES)})
+        if u.path.endswith("/api/WCPDadosAbertos/despesas"):
+            if "%2F" in self.path.upper():          # a API real responde 400 se as barras vierem codificadas
+                return self._json({"status": "erro"}, 400)
+            linhas = DESPESAS_LINHAS if q["dataInicial"].endswith(MES_COM_DESPESAS) else []
+            return self._json({"status": "ok", "retorno": linhas})
         if u.path.endswith("/rgf"):
             if q["an_exercicio"] == ANO_ANT and q["in_periodicidade"] == "Q" and (q["co_poder"] == "E" or q["nr_periodo"] == "3"):
                 return self._json({"items": RGF_EXEC, "hasMore": False})
@@ -273,7 +299,52 @@ class TestRecuperacao(unittest.TestCase):
     def test_lista_vem_dos_adaptadores(self):
         import recuperar
         self.assertIn("situacao.js", recuperar.ARQUIVOS)
-        self.assertEqual(len(recuperar.ARQUIVOS), 10)
+        self.assertEqual(len(recuperar.ARQUIVOS), 11)
+        self.assertIn("despesas-resumo.js", recuperar.ARQUIVOS)
+
+
+class TestDespesasResumo(unittest.TestCase):
+    """O resumo diário das despesas precisa dar EXATAMENTE os mesmos números que o site calcula ao vivo."""
+
+    def test_somas(self):
+        from fontes import despesas
+        s = despesas.somar(DESPESAS_LINHAS)
+        self.assertEqual(s["total"], {"empenhado": 235.65, "liquidado": 136.65, "pago": 136.65, "anulado": 7.0, "retido": 1.5})
+        self.assertEqual((s["registros"], s["descartadas"], s["credoresQueReceberam"]), (7, 1, 3))   # só pago > 0 "recebeu"
+        self.assertEqual([(o["nome"], o["pago"]) for o in s["orgaos"]],
+                         [("SECRETARIA B", 95.55), ("INSTITUTO", 30.0), ("SECRETARIA A", 10.0), ("(órgão não informado)", 1.1)])
+        texto = json.dumps(s, ensure_ascii=False)
+        for proibido in ("123.456.789", "12345678901", "PESSOA FISICA", "INSTITUTO\", \"empenhado\": 10"):  # nada de CPF nem nome de credor
+            self.assertNotIn(proibido, texto)
+
+    def test_mesmos_numeros_do_site(self):
+        """Roda as contas do SITE (js/agregacao.js, no Node) sobre os mesmos dados e compara com o robô."""
+        from fontes import despesas
+        programa = r"""
+        const vm = require('vm'), fs = require('fs'), path = require('path');
+        const raiz = process.argv[1], linhas = JSON.parse(process.argv[2]);
+        const ctx = { console }; ctx.window = ctx; vm.createContext(ctx);
+        for (const a of ['js/config.js', 'js/utilitarios.js', 'js/fontes/despesas.js', 'js/agregacao.js'])
+          vm.runInContext(fs.readFileSync(path.join(raiz, a), 'utf8'), ctx);
+        const { validas, descartadas } = ctx.OBS.fontes.despesas.validar(linhas);
+        const r = ctx.OBS.agregar(validas);
+        const c = (n) => Math.round(n * 100) / 100;
+        console.log(JSON.stringify({ total: Object.fromEntries(Object.entries(r.total).map(([k, v]) => [k, c(v)])),
+          descartadas: descartadas.length, credores: r.credoresQueReceberam, orgaos: r.orgaos.map((o) => [o.nome, c(o.pago)]) }));
+        """
+        site = json.loads(subprocess.run(["node", "-e", programa, str(RAIZ), json.dumps(DESPESAS_LINHAS)],
+                                         capture_output=True, text=True, encoding="utf-8", check=True).stdout)
+        robo = despesas.somar(DESPESAS_LINHAS)
+        self.assertEqual(site["total"], robo["total"])
+        self.assertEqual((site["descartadas"], site["credores"]), (robo["descartadas"], robo["credoresQueReceberam"]))
+        self.assertEqual(site["orgaos"], [[o["nome"], o["pago"]] for o in robo["orgaos"]])
+
+    def test_meses_e_endereco(self):
+        from fontes import despesas
+        meses = despesas.lista_meses(date(2026, 1, 15))
+        self.assertEqual((len(meses), meses[0], meses[-1]), (13, (2025, 1), (2026, 1)))
+        url = despesas.url_mes({"portal_atende": "https://x.atende.net/"}, 2028, 2)
+        self.assertEqual(url, "https://x.atende.net/api/WCPDadosAbertos/despesas?dataInicial=01/02/2028&dataFinal=29/02/2028")
 
 
 class TestConferenciaPix(unittest.TestCase):
@@ -332,6 +403,13 @@ class TestCoordenador(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stdout)
             self.assertIn("[cgu] PULADO", r.stdout)
             self.assertFalse((Path(pasta) / "dados" / "cgu.js").exists())
+            # Resumo das despesas: 13 meses, só o mês atual com dados (parcial), sem CPF nem nomes.
+            d = ler_js(Path(pasta) / "dados" / "despesas-resumo.js", "OBS_DADOS_DESPESAS")
+            self.assertEqual(len(d["meses"]), 13)
+            atual = d["meses"][-1]
+            self.assertEqual((atual["parcial"], atual["total"]["pago"], atual["credoresQueReceberam"]), (True, 136.65, 3))
+            self.assertTrue(all(m["registros"] == 0 for m in d["meses"][:-1]))
+            self.assertNotIn("PESSOA FISICA", (Path(pasta) / "dados" / "despesas-resumo.js").read_text(encoding="utf-8"))
 
     def test_cgu_e_camara_com_chave_e_sem_vazar_o_token(self):
         with tempfile.TemporaryDirectory() as pasta:

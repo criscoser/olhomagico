@@ -35,6 +35,8 @@ OBS.dados = (function () {
   const situacao = () => arquivo('situacao.js', 'OBS_SITUACAO');
   const cgu = () => arquivo('cgu.js', 'OBS_DADOS_CGU');
   const camara = () => arquivo('camara.js', 'OBS_DADOS_CAMARA');
+  // Totais das despesas dos últimos 13 meses (cópia diária do robô): poucos KB, em vez de ~800 KB por mês ao vivo.
+  const despesasResumo = () => arquivo('despesas-resumo.js', 'OBS_DADOS_DESPESAS');
 
-  return { pessoal, pncp, siconfi, transferencias, dca, siope, entregas, situacao, cgu, camara };
+  return { pessoal, pncp, siconfi, transferencias, dca, siope, entregas, situacao, cgu, camara, despesasResumo };
 })();

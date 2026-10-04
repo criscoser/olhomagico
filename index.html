@@ -65,6 +65,7 @@
            Os ícones são só enfeite (aria-hidden); o nome de cada seção está sempre no texto do link. -->
       <nav class="menu" id="menuPrincipal" aria-label="Seções do site">
         <a class="aba" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="rotulo">Início</span></a>
+        <a class="aba" href="#municipio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg><span class="rotulo">Município</span></a>
         <a class="aba" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span class="rotulo">Gastos</span></a>
         <a class="aba" href="#pessoal"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span class="rotulo">Pessoal</span></a>
         <a class="aba" href="#contratos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 13h8M9 17h6"/></svg><span class="rotulo">Contratos</span></a>
@@ -126,6 +127,8 @@
         <a class="botao-contorno" href="#busca">Pesquisar um nome</a>
       </div>
     </section>
+    <!-- VIDEIRA EM NÚMEROS: população, área, PIB e receita do ano (js/municipio-tela.js). Some se não houver dado. -->
+    <section class="faixa-numeros oculto" id="faixaNumeros" aria-label="Videira em números"></section>
     <h1 class="titulo-pagina">Videira em 6 perguntas</h1>
     <p class="sub sub-centro">Respostas curtas, cada uma com o período e a fonte oficial. Toque em uma pergunta para ver os detalhes e os números exatos.</p>
     <div id="inicioEstado" role="status" aria-live="polite"></div>
@@ -450,11 +453,21 @@
        Cada seção só aparece se a fonte dela tiver dados (as seções são desenhadas por js/contas-tela.js). -->
   <div id="aba-entradas" class="oculto">
     <h1 class="titulo-pagina">De onde vem o dinheiro?</h1>
-    <p class="nota">Dinheiro do Governo Federal que chega a Videira. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos”.</p>
-    <p class="aviso-faltando">Ainda não aparecem aqui os impostos da cidade (como IPTU e ISS) e as outras receitas próprias do Município: não há uma fonte aberta delas integrada a este site.</p>
+    <p class="nota">Quanto o Município recebe (impostos da cidade, repasses da União e do Estado e outras receitas) e o dinheiro federal que chega a Videira. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos”.</p>
     <nav class="sumario oculto" id="sumarioEntradas" aria-label="Seções desta página"></nav>
     <div id="entradasEstado" role="status" aria-live="polite"></div>
     <div id="entradasDesatualizado"></div>
+
+    <!-- RECEITAS DO MUNICÍPIO: do Relatório Resumido da Execução Orçamentária (RREO), cópia diária (dados/rreo.js). -->
+    <section aria-labelledby="t-receitas" id="sec-receitas" class="oculto">
+      <h2 id="t-receitas">Quanto o Município recebe</h2>
+      <p class="sub">Todas as receitas da Prefeitura no ano: impostos cobrados pela cidade (como IPTU e ISS), repasses da União e do Estado, rendimentos e outras. “Previsto” é o que o orçamento esperava para o ano; “recebido” é o que já entrou.</p>
+      <p class="frase-media" id="receitasFrase"></p>
+      <p class="valor-exato" id="receitasExato"></p>
+      <div id="receitasTabela"></div>
+      <div id="receitas12"></div>
+      <div id="receitasOrigem"></div>
+    </section>
 
     <section aria-labelledby="t-transf" id="sec-transferencias" class="oculto">
       <h2 id="t-transf">Dinheiro que a União repassa ao município</h2>
@@ -669,6 +682,8 @@
         <li><a href="https://siconfi.tesouro.gov.br/" target="_blank" rel="noopener">SICONFI (Tesouro Nacional)</a>: Relatório de Gestão Fiscal (gasto com pessoal e limites da LRF), contas anuais (despesa por área) e extrato de entregas.</li>
         <li><a href="https://www.tesourotransparente.gov.br/" target="_blank" rel="noopener">Tesouro Nacional, transferências constitucionais</a>: repasses obrigatórios da União ao município.</li>
         <li><a href="https://www.fnde.gov.br/siope" target="_blank" rel="noopener">SIOPE (FNDE)</a>: indicadores de gastos com educação.</li>
+        <li><a href="https://siconfi.tesouro.gov.br/" target="_blank" rel="noopener">Relatório Resumido da Execução Orçamentária (RREO, no SICONFI)</a>: receitas previstas e recebidas pelo Município no ano.</li>
+        <li><a href="https://sidra.ibge.gov.br/" target="_blank" rel="noopener">IBGE (SIDRA)</a>: população (Censo 2022 e estimativa anual), área, densidade e PIB do município (tabelas 4714, 6579 e 5938).</li>
         <li><a href="https://portaldatransparencia.gov.br/" target="_blank" rel="noopener">Portal da Transparência do Governo Federal (CGU)</a>: convênios federais com Videira e totais mensais do Bolsa Família e do BPC (consulta com chave de acesso, guardada só no robô).</li>
         <li><a href="https://www.camaravideira.sc.gov.br/dadosabertos" target="_blank" rel="noopener">Dados abertos da Câmara de Videira</a>: vereadores em exercício e pautas das sessões (consulta com token, guardado só no robô).</li>
         <li><a href="https://videira.atende.net/transparencia/item/pagamentos" target="_blank" rel="noopener">Consulta de Pagamentos</a>: cada pagamento, com empenho e licitação (só no portal oficial).</li>
@@ -693,6 +708,8 @@
           <tr><td>SIOPE (educação)</td><td>Documentada</td><td>Aberto</td></tr>
           <tr><td>Portal da Transparência federal (CGU)</td><td>Documentada</td><td>Com chave de acesso, guardada só no robô</td></tr>
           <tr><td>Câmara de Videira</td><td>Observada</td><td>Com token, guardado só no robô</td></tr>
+          <tr><td>Receitas (RREO, no SICONFI)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>IBGE (SIDRA)</td><td>Documentada</td><td>Aberto</td></tr>
         </tbody>
       </table></div>
       <p class="meta">Código-fonte sob licença MIT. A licença vale só para o código: os dados, documentos e imagens das fontes oficiais seguem as regras de cada fonte.</p>
@@ -710,9 +727,18 @@
 
     <section aria-labelledby="t-falta">
       <h2 id="t-falta">O que ainda não está aqui</h2>
-      <p>Remuneração mensal completa e diárias de cada servidor (só no portal oficial, com proteção contra acesso automático), receitas próprias, orçamento previsto, restos a pagar, obras, emendas parlamentares, e os projetos de lei e votações da Câmara. Só vão aparecer quando houver uma fonte oficial que possa ser consultada e conferida, sem números inventados.</p>
+      <p>Remuneração mensal completa e diárias de cada servidor (só no portal oficial, com proteção contra acesso automático), orçamento de despesas por programa, restos a pagar, obras, emendas parlamentares, e os projetos de lei e votações da Câmara. Só vão aparecer quando houver uma fonte oficial que possa ser consultada e conferida, sem números inventados.</p>
     </section>
   </div><!-- fim da aba sobre -->
+
+  <!-- ================= MUNICÍPIO: "Como é Videira?" (IBGE, cópia diária em dados/ibge.js; js/municipio-tela.js) ================= -->
+  <div id="aba-municipio" class="oculto">
+    <h1 class="titulo-pagina">Como é Videira?</h1>
+    <p class="sub sub-centro">Quantas pessoas moram aqui, o tamanho do território e quanto a cidade produz. Cada número mostra o seu ano e a sua fonte.</p>
+    <div id="municipioEstado" role="status" aria-live="polite"></div>
+    <div id="municipioDesatualizado"></div>
+    <div id="municipioConteudo"></div>
+  </div><!-- fim da aba município -->
 
   <!-- ================= LEIS E DIREITOS =================
        Resumo do documento completo docs/FUNDAMENTO_JURIDICO.md (03/10/2026). Material de orientação, não parecer jurídico. -->
@@ -911,6 +937,8 @@
 <script src="js/apoio.js"></script>
 <script src="js/pessoal-tela.js"></script>
 <script src="js/contratos-tela.js"></script>
+<script src="js/receitas-regras.js"></script>
+<script src="js/municipio-tela.js"></script>
 <script src="js/contas-tela.js"></script>
 <script src="js/inicio-tela.js"></script>
 <script src="js/busca-tela.js"></script>

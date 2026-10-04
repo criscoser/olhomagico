@@ -33,6 +33,8 @@ ARQUIVOS = [
     ("siope.js", "OBS_DADOS_SIOPE", "Educação (SIOPE)", lambda d: f"{sum(len(p['indicadores']) for p in d['periodos'])} indicadores"),
     ("cgu.js", "OBS_DADOS_CGU", "Convênios e benefícios (CGU)", lambda d: f"{len(d['convenios'])} convênios, {len(d['beneficios'])} benefícios"),
     ("camara.js", "OBS_DADOS_CAMARA", "Câmara", lambda d: f"{len(d['vereadores'])} vereadores, {len(d['pautas'])} pautas"),
+    ("ibge.js", "OBS_DADOS_IBGE", "Números do município (IBGE)", lambda d: f"{len(d['indicadores'])} indicadores"),
+    ("rreo.js", "OBS_DADOS_RREO", "Receitas (RREO)", lambda d: f"{d['receitas']['periodo']}, {len(d['receitas']['categorias'])} categorias"),
 ]
 
 

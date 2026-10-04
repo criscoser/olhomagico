@@ -3,14 +3,14 @@
 
      #inicio                  painel com os principais números
      #gastos/2026-09          despesas de um mês (o período fica no endereço)
-     #gastos, #entradas, #pessoal, #contratos, #limites, #camara, #glossario, #direitos, #sobre   abas (uma pergunta por tela)
+     #municipio, #gastos, #entradas, #pessoal, #contratos, #limites, #camara, #glossario, #direitos, #sobre   abas (uma pergunta por tela)
      #glossario/sigla-fpm     palavras e siglas, já na explicação de uma sigla
      #entradas/transferencias aba + seção (rola até a seção "sec-transferencias")
    Endereços ANTIGOS (#servidores, #contas/..., #siglas/...) são trocados pelos novos (links compartilhados continuam valendo).
      #busca/termo             resultado da pesquisa geral
      #servidor/ID, #fornecedor/CHAVE, #contrato/ID           fichas de detalhe */
 OBS.rotas = (function () {
-  const ABAS = ['inicio', 'gastos', 'entradas', 'pessoal', 'contratos', 'limites', 'camara', 'glossario', 'direitos', 'sobre'];
+  const ABAS = ['inicio', 'municipio', 'gastos', 'entradas', 'pessoal', 'contratos', 'limites', 'camara', 'glossario', 'direitos', 'sobre'];
   const FICHAS = { servidor: 'pessoal', fornecedor: 'contratos', contrato: 'contratos' };  // ficha -> aba "mãe" no menu
 
   /* Endereços antigos -> novos (a organização por perguntas mudou os nomes). Só o começo do endereço é trocado. */
@@ -95,7 +95,7 @@ OBS.rotas = (function () {
       return;
     }
     // Entradas, Limites e a despesa por área (em Gastos) são desenhadas pela mesma tela (js/contas-tela.js).
-    const abrir = { inicio: OBS.inicioTela, gastos: OBS.contasTela, entradas: OBS.contasTela, pessoal: OBS.pessoalTela, contratos: OBS.contratosTela,
+    const abrir = { inicio: OBS.inicioTela, municipio: OBS.municipioTela, gastos: OBS.contasTela, entradas: OBS.contasTela, pessoal: OBS.pessoalTela, contratos: OBS.contratosTela,
       limites: OBS.contasTela, camara: OBS.camaraTela, glossario: OBS.siglasTela, sobre: OBS.situacaoTela }[aba];
     if (resto) {
       if (abrir) await abrir.abrir();

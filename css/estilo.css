@@ -52,10 +52,10 @@
   --font-titulo: var(--font);   /* uma família só: títulos em negrito da mesma letra */
   /* Espaçamentos, raios e sombra */
   /* Tipografia (decisão do mantenedor em 03/10/2026): TÍTULOS PRINCIPAIS em 16 px (títulos de tela e de seção, frases
-     principais e números em destaque) e TODO O RESTO em 11 px. Quem precisar de letra maior usa o controle
+     principais e números em destaque) e TODO O RESTO em 12 px (era 11 px; aumentado pelo mantenedor no mesmo dia). Quem precisar de letra maior usa o controle
      "Tamanho da letra" do menu (até 150%), que multiplica todos estes valores. */
-  --letra-legenda: .6875rem;                                 /* 11 px */
-  --letra-corpo: .6875rem;                                   /* 11 px: parágrafos e demais textos */
+  --letra-legenda: .75rem;                                   /* 12 px */
+  --letra-corpo: .75rem;                                     /* 12 px: parágrafos e demais textos */
   --letra-destaque: 1rem;                                    /* 16 px: frase principal média */
   --letra-h3: 1rem;                                          /* 16 px */
   --letra-h2: 1rem;                                          /* 16 px */
@@ -771,7 +771,7 @@ button.item-letra:disabled { opacity:.45; cursor:not-allowed; }
   .controle-letra { padding:0; flex-wrap:nowrap; gap:.25rem; }
   .rotulo-letra { flex:none; }
   .lateral-rodape button.item-letra { min-width:2.25rem; min-height:2.25rem; }
-  nav.menu { grid-column:1 / -1; grid-row:2; flex-direction:row; justify-content:space-between; align-items:center; gap:0;
+  nav.menu { grid-column:1 / -1; grid-row:2; flex-direction:row; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0 .4rem;
     padding:0; border-top:1px solid var(--menu-linha); }
   nav.menu a.aba { width:auto; gap:.3rem; min-height:2.5rem; padding:.25rem .3rem; background:none; color:var(--menu-texto);
     text-transform:uppercase; font-size:.6875rem; letter-spacing:.03em; white-space:nowrap; }
@@ -860,3 +860,7 @@ table.tabela-simples { width:100%; border-collapse:collapse; font-size:var(--let
 .tabela-simples th, .tabela-simples td { padding:.5rem .7rem; text-align:left; vertical-align:top; border-top:1px solid var(--borda); }
 .tabela-simples thead th { border-top:0; background:var(--marca-suave); }
 .tabela-simples th, .tabela-simples td { overflow-wrap:anywhere; hyphens:auto; }
+/* Faixa "Videira em números" (página inicial) */
+.faixa-numeros { margin:0 0 var(--esp-5); padding:var(--esp-4) var(--esp-5); background:var(--cartao); border:1px solid var(--borda); border-top:4px solid var(--amarelo-vivo); border-radius:var(--raio-grande); }
+.faixa-numeros h2 { margin:0 0 var(--esp-3); }
+.faixa-numeros .numeros { margin:0 0 var(--esp-3); }

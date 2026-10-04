@@ -9,7 +9,7 @@ COORDENADOR DOS ROBÔS: atualiza todas as fontes de dados, cada uma SEPARADAMENT
 
 Como rodar (dentro da pasta do projeto):
   python ferramentas/atualizar.py                 -> todas as fontes
-  python ferramentas/atualizar.py --so pessoal    -> só uma (pessoal, despesas, siconfi, pncp, transferencias, dca, entregas, siope, cgu, camara)
+  python ferramentas/atualizar.py --so pessoal    -> só uma (pessoal, despesas, siconfi, pncp, transferencias, dca, entregas, siope, cgu, camara, ibge, rreo)
 """
 import argparse
 import json
@@ -20,11 +20,11 @@ PASTA = Path(__file__).resolve().parent
 sys.path.insert(0, str(PASTA))  # para achar comum.py e a pasta fontes/
 
 from comum import Bloqueado, SemChave, agora_iso, esconder_chaves, gravar_js, ler_js  # noqa: E402
-from fontes import pessoal, despesas, siconfi, pncp, transferencias, dca, entregas, siope, cgu, camara  # noqa: E402
+from fontes import pessoal, despesas, siconfi, pncp, transferencias, dca, entregas, siope, cgu, camara, ibge, rreo  # noqa: E402
 
 # Ordem de execução. Para incluir uma fonte nova: crie o adaptador em fontes/ e acrescente aqui.
 FONTES = {"pessoal": pessoal, "despesas": despesas, "siconfi": siconfi, "pncp": pncp, "transferencias": transferencias,
-          "dca": dca, "entregas": entregas, "siope": siope, "cgu": cgu, "camara": camara}
+          "dca": dca, "entregas": entregas, "siope": siope, "cgu": cgu, "camara": camara, "ibge": ibge, "rreo": rreo}
 PASTA_DADOS = PASTA.parent / "dados"
 VARIAVEL_SITUACAO = "OBS_SITUACAO"
 

@@ -18,7 +18,7 @@ from urllib.parse import urlparse, parse_qs
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "ferramentas"))
 from comum import numero, mascarar_documento, ler_js, gravar_js  # noqa: E402
-from fontes import siconfi, pncp, pessoal, transferencias, dca, entregas, siope, cgu, camara  # noqa: E402
+from fontes import siconfi, pncp, pessoal, transferencias, dca, entregas, siope, cgu, camara, ibge, rreo  # noqa: E402
 import comum  # noqa: E402
 
 # Anos RELATIVOS ao ano atual: assim os testes não quebram na virada do ano (e não travam a publicação).
@@ -26,6 +26,37 @@ ANO = date.today().year
 ANO_ANT, ANO_ANT2 = str(ANO - 1), str(ANO - 2)
 
 # ---------------- Dados fictícios no formato real das fontes ----------------
+CAB = {"D2C": "Variável (Código)", "D3C": "Ano (Código)", "V": "Valor"}   # 1ª linha do SIDRA é o cabeçalho
+SIDRA = {
+    "4714": [CAB, {"D2C": "93", "D3C": "2022", "V": "55466"}, {"D2C": "6318", "D3C": "2022", "V": "384.127"},
+             {"D2C": "614", "D3C": "2022", "V": "144.39"}],
+    "6579": [CAB, {"D2C": "9324", "D3C": "2025", "V": "59000"}, {"D2C": "9324", "D3C": "2026", "V": "59839"}],
+    "5938": [CAB, {"D2C": "37", "D3C": "2021", "V": "3456102"}, {"D2C": "37", "D3C": "2023", "V": "4129523"},
+             {"D2C": "497", "D3C": "2023", "V": "0.80"}, {"D2C": "498", "D3C": "2021", "V": "2995839"},
+             {"D2C": "498", "D3C": "2023", "V": "..."}, {"D2C": "513", "D3C": "2021", "V": "266365"},
+             {"D2C": "517", "D3C": "2021", "V": "990766"}, {"D2C": "6575", "D3C": "2021", "V": "1432744"},
+             {"D2C": "525", "D3C": "2021", "V": "305964"}, {"D2C": "543", "D3C": "2023", "V": "-"}],
+}
+
+
+def rreo_linha(anexo, cod, coluna, valor):
+    return {"anexo": anexo, "cod_conta": cod, "conta": cod, "coluna": coluna, "valor": valor}
+
+
+RREO_ITENS = [
+    rreo_linha("RREO-Anexo 01", "ReceitasExcetoIntraOrcamentarias", "PREVISÃO ATUALIZADA (a)", 431100972.64),
+    rreo_linha("RREO-Anexo 01", "ReceitasExcetoIntraOrcamentarias", "Até o Bimestre (c)", 327884990.19),
+    rreo_linha("RREO-Anexo 01", "ReceitasCorrentes", "PREVISÃO ATUALIZADA (a)", 396154559.30),
+    rreo_linha("RREO-Anexo 01", "ReceitasCorrentes", "Até o Bimestre (c)", 318935007.63),
+    rreo_linha("RREO-Anexo 01", "ReceitasCorrentes", "No Bimestre (b)", 81564965.23),
+    rreo_linha("RREO-Anexo 01", "ReceitaTributaria", "PREVISÃO ATUALIZADA (a)", 73006510.00),
+    rreo_linha("RREO-Anexo 01", "ReceitaTributaria", "Até o Bimestre (c)", 58843782.15),
+    rreo_linha("RREO-Anexo 01", "ReceitasDeCapital", "PREVISÃO ATUALIZADA (a)", 34946413.34),
+    rreo_linha("RREO-Anexo 01", "ReceitasDeCapital", "Até o Bimestre (c)", 8949982.56),
+    rreo_linha("RREO-Anexo 03", "ISSLiquidoExcetoTransferenciasEFUNDEB", "TOTAL (ÚLTIMOS 12 MESES)", 38177944.67),
+    rreo_linha("RREO-Anexo 03", "ISSLiquidoExcetoTransferenciasEFUNDEB", "<MR>", 3000000.00),
+]
+
 RGF_EXEC = [
     {"anexo": "RGF-Anexo 01", "conta": "DESPESA TOTAL COM PESSOAL - DTP (VI) = (IIIa + IIIb)", "coluna": "Valor", "valor": 171234364.14},
     {"anexo": "RGF-Anexo 01", "conta": "DESPESA TOTAL COM PESSOAL - DTP (VI) = (IIIa + IIIb)", "coluna": "% sobre a RCL Ajustada", "valor": 41.78},
@@ -161,6 +192,11 @@ class ServidorFalso(BaseHTTPRequestHandler):
                 return self._json({"status": "erro"}, 400)
             linhas = DESPESAS_LINHAS if q["dataInicial"].endswith(MES_COM_DESPESAS) else []
             return self._json({"status": "ok", "retorno": linhas})
+        if u.path.startswith("/sidra/t/"):
+            return self._json(SIDRA.get(u.path.split("/")[3], []))
+        if u.path.endswith("/rreo"):
+            ok = q["an_exercicio"] == ANO_ANT and q["nr_periodo"] == "6" and q["id_ente"] == "4219309"
+            return self._json({"items": RREO_ITENS if ok else [], "hasMore": False})
         if u.path.endswith("/rgf"):
             if q["an_exercicio"] == ANO_ANT and q["in_periodicidade"] == "Q" and (q["co_poder"] == "E" or q["nr_periodo"] == "3"):
                 return self._json({"items": RGF_EXEC, "hasMore": False})
@@ -268,6 +304,47 @@ class TestExtracao(unittest.TestCase):
         self.assertEqual(d["funcoes"][0]["valores"], {"empenhado": 200.0})     # coluna desconhecida ignorada
 
 
+class TestIbgeERreo(unittest.TestCase):
+    def test_ibge_sem_dado_vira_nulo_nunca_zero(self):
+        self.assertIsNone(ibge.valor_sidra("..."))
+        self.assertIsNone(ibge.valor_sidra("-"))
+        self.assertEqual(ibge.valor_sidra("384.127"), 384.127)
+
+    def test_ibge_cada_numero_com_o_seu_ano_e_setores_conferidos(self):
+        urls = {t: f"http://x/{t}" for t in SIDRA}
+        i = ibge.montar(SIDRA, urls, avisar=lambda *_: None)
+        self.assertEqual(i["pib"]["valor"], 4129523000)                 # mil reais -> reais
+        self.assertEqual(i["pib"]["ano"], 2023)                         # o mais recente com dado
+        self.assertEqual(i["populacaoEstimada"]["valor"], 59839)
+        self.assertEqual(i["valorAdicionado"]["ano"], 2021)              # 2023 veio "...": fica o de 2021
+        self.assertNotIn("impostosProdutos", i)                          # "-" não vira zero: some
+        self.assertEqual(sum(i[k]["valor"] for k in ibge.SETORES), i["valorAdicionado"]["valor"])
+
+    def test_ibge_setores_que_nao_somam_saem(self):
+        quebrado = dict(SIDRA, **{"5938": [r if r.get("D2C") != "517" else dict(r, V="1") for r in SIDRA["5938"]]})
+        i = ibge.montar(quebrado, {t: "u" for t in SIDRA}, avisar=lambda *_: None)
+        self.assertFalse(any(k in i for k in ibge.SETORES + ["valorAdicionado"]))
+        self.assertIn("pib", i)
+
+    def test_rreo_extrai_previsto_e_recebido(self):
+        r = rreo.extrair(RREO_ITENS, 2026, 4)
+        self.assertEqual(r["periodo"], "janeiro a agosto de 2026")
+        self.assertEqual(r["periodo12Meses"], "setembro de 2025 a agosto de 2026")
+        self.assertEqual(r["total"]["realizado"], 327884990.19)
+        self.assertEqual(r["total"]["previsto"], 431100972.64)
+        self.assertEqual([c["codigo"] for c in r["categorias"]], ["ReceitaTributaria", "ReceitasDeCapital"])
+        self.assertEqual(r["ultimos12Meses"], [{"codigo": "ISSLiquidoExcetoTransferenciasEFUNDEB", "nome": "ISS",
+                                                "origem": "imposto do Município", "valor": 38177944.67}])
+
+    def test_rreo_soma_que_nao_confere_nao_publica(self):
+        errado = [dict(x, valor=1.0) if x["cod_conta"] == "ReceitasDeCapital" and "Bimestre (c)" in x["coluna"] else x for x in RREO_ITENS]
+        with self.assertRaises(RuntimeError):
+            rreo.extrair(errado, 2026, 4)
+
+    def test_rreo_sem_total_devolve_nada(self):
+        self.assertIsNone(rreo.extrair([x for x in RREO_ITENS if x["cod_conta"] != "ReceitasExcetoIntraOrcamentarias"], 2026, 4))
+
+
 class TestRecuperacao(unittest.TestCase):
     """Arquivos baixados do site publicado são lidos como DADO PURO e regravados do zero (nada de código passa)."""
 
@@ -299,7 +376,9 @@ class TestRecuperacao(unittest.TestCase):
     def test_lista_vem_dos_adaptadores(self):
         import recuperar
         self.assertIn("situacao.js", recuperar.ARQUIVOS)
-        self.assertEqual(len(recuperar.ARQUIVOS), 11)
+        self.assertEqual(len(recuperar.ARQUIVOS), 13)   # 12 fontes + situação
+        self.assertIn("ibge.js", recuperar.ARQUIVOS)
+        self.assertIn("rreo.js", recuperar.ARQUIVOS)
         self.assertIn("despesas-resumo.js", recuperar.ARQUIVOS)
 
 
@@ -390,7 +469,7 @@ class TestCoordenador(unittest.TestCase):
         mun = {"nome": "Exemplo", "uf": "SC", "codigo_ibge": "4219309", "cnpj": "83039842000184",
                "portal_atende": self.base, "siconfi": self.base, "pncp": self.base + ("/quebrado" if quebrar_pncp else ""),
                "codigo_siope": "421930", "codigo_tesouro_transferencias": "8379", "codigo_uf_tesouro_transferencias": "24",
-               "tesouro_transferencias": self.base, "siope": self.base,
+               "tesouro_transferencias": self.base, "siope": self.base, "sidra": self.base + "/sidra",
                "cgu": self.base + "/cgu", "camara_api": self.base + "/web-aplicativo.php"}
         arq = Path(pasta) / "municipio.json"; arq.write_text(json.dumps(mun))
         return subprocess.run([sys.executable, str(RAIZ / "ferramentas" / "atualizar.py"), "--municipio", str(arq),

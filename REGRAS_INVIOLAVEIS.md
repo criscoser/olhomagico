@@ -82,7 +82,7 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
   para estrutura e links, branco de fundo, verde nos botões de ação, amarelo para destaque e vermelho só para erro e
   limite máximo da lei. O azul é mais escuro que o do portal oficial (#1358a4). Tema claro padrão, escuro opcional; só a fonte Atkinson Hyperlegible,
   hospedada no site; alvos de toque de 48px. Letras (decisão do mantenedor, 03/10/2026): títulos principais, frases
-  principais e números em destaque com 16 px; todo o resto com 11 px. O controle "Tamanho da letra" (até 150%) fica.
+  principais e números em destaque com 16 px; todo o resto com 12 px (era 11 px; aumentado em 03/10/2026). O controle "Tamanho da letra" (até 150%) fica.
 - Modelo de 3 camadas (frase → gráfico → números exatos e fonte); glossário único com ⓘ na primeira ocorrência.
 - Inclusão: botão Ouvir (só frase e título do gráfico; escondido sem voz pt-BR), tamanho da letra em 4 passos,
   compartilhar (WhatsApp, copiar link, outros apps; ficha de servidor compartilhada sem nome e sem salário).
@@ -95,3 +95,10 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
 - Diagnóstico de 03/10/2026: fontes marcadas como "documentada" ou "observada" (Sobre e fontes). As propostas de que o
   diagnóstico discordou do briefing (histórico em repositório separado, piloto, revisão em níveis, letra, coleta de
   gastos por robô, ligação só por código) estão PARADAS até nova decisão do mantenedor.
+- Tela **Município** (`#municipio`) e faixa "Videira em números" na página inicial: IBGE/SIDRA (tabelas 4714, 6579 e
+  5938, nível municipal), cada número com o seu ano. PIB NUNCA aparece sem o aviso "não é dinheiro da Prefeitura".
+  A tabela 6784 (PIB per capita) só tem o Brasil: não usar para município. Sem taxa de desemprego por município
+  (o IBGE não publica). Nada de "por habitante".
+- **Receitas** (aba Entradas): RREO do SICONFI, previsto x recebido no ano (Anexo 1) e origens nos últimos 12 meses
+  (Anexo 3), em seções separadas porque os períodos são diferentes. O robô confere correntes + capital = total ao
+  centavo; se não conferir, não publica.

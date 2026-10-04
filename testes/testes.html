@@ -16,6 +16,7 @@
 <script src="../js/busca-regras.js"></script>
 <script src="../js/historico.js"></script>
 <script src="../js/frases.js"></script>
+<script src="../js/receitas-regras.js"></script>
 <script src="../js/ouvir.js"></script>
 <script src="../js/compartilhar.js"></script>
 <script src="../js/componentes/graficos.js"></script>
@@ -204,6 +205,12 @@
   teste('histograma: nenhum valor se perde', fx.reduce((t, f) => t + f.quantidade, 0), 5);
   teste('histograma: o maior valor cai na última faixa', fx[fx.length - 1].quantidade >= 1 && fx[fx.length - 1].ate > 9999.99, true);
   teste('histograma: lista vazia', OBS.graficos.faixas([null, undefined]), []);
+  teste('receitas: % do previsto com uma casa', [OBS.receitas.percentual(327884990.19, 431100972.64), OBS.receitas.percentual(5, 0), OBS.receitas.percentual(null, 10)], [76.1, null, null]);
+  const fraseRec = OBS.receitas.frase({ periodo: 'janeiro a agosto de 2026', total: { realizado: 327884990.19, previsto: 431100972.64 } });
+  teste('receitas: frase do ano', fraseRec.replace(/ /g, ' '), 'De janeiro a agosto de 2026, o Município de Videira recebeu R$ 327,9 milhões em receitas, 76,1% do previsto para o ano (R$ 431,1 milhões), segundo o relatório que ele mesmo enviou ao Tesouro Nacional.');
+  teste('receitas: frase sem opinião', OBS.frases.opiniao(fraseRec), null);
+  teste('receitas: sem previsão, a frase não inventa %', OBS.receitas.frase({ periodo: 'janeiro a fevereiro de 2026', total: { realizado: 10, previsto: null } }).includes('%'), false);
+  teste('números: decimal brasileiro', [OBS.receitas.decimal(384.127), OBS.receitas.decimal(null)], ['384,1', '—']);
   teste('gráfico: eixo com passo redondo', OBS.graficos.eixo([46165401.23, 30000000, 12000000]), { base: 0, topo: 60000000, marcas: [0, 20000000, 40000000, 60000000] });
   teste('gráfico: eixo com negativo', OBS.graficos.eixo([-5, 10, null]), { base: -5, topo: 10, marcas: [-5, 0, 5, 10] });
   teste('gráfico: eixo sem valores', OBS.graficos.eixo([null]), { base: 0, topo: 1, marcas: [0, 1] });

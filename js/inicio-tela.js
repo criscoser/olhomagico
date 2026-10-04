@@ -89,6 +89,7 @@ OBS.inicioTela = (function () {
       () => cartaoContratos(sit), () => cartaoLimites(sic), () => cartaoCamara(cam)]
       .map((f) => { try { return f(); } catch (e) { console.error('Cartão do início:', e); return null; } }).filter(Boolean);
     caixa.replaceChildren(...cartoes);
+    OBS.municipioTela.faixaInicio($('faixaNumeros')).catch((e) => console.error('Faixa de números:', e));
   }
 
   function abrir() { iniciado = iniciado || carregar(); return iniciado; }

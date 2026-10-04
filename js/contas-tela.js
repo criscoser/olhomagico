@@ -337,12 +337,52 @@ OBS.contasTela = (function () {
     return true;
   }
 
+  /* ================= 8) Receitas do Município (RREO: o que foi previsto e o que já entrou) ================= */
+  function desenharReceitas(d) {
+    const r = d && d.receitas;
+    if (!r || !r.total || typeof r.total.realizado !== 'number') return false;
+    const R = OBS.receitas;
+    const frase = R.frase(r);
+    $('receitasFrase').replaceChildren(...OBS.frases.destacar(frase, OBS.frases.reais(r.total.realizado)));
+    $('receitasExato').textContent = `Valor exato: ${moeda(r.total.realizado)} recebidos de ${moeda(r.total.previsto)} previstos. ` +
+      'Não inclui as receitas internas (de um órgão do Município para outro).';
+    const t = OBS.tabela({ colunas: [
+      { chave: 'nome', titulo: 'Tipo de receita', ordenavel: false },
+      { chave: 'previsto', titulo: 'Previsto para o ano', tipo: 'moeda', ordenavel: false },
+      { chave: 'realizado', titulo: `Recebido (${r.periodo})`, tipo: 'moeda', ordenavel: false },
+      { chave: 'pct', titulo: '% do previsto', formatar: (v) => (v === null ? '—' : OBS.frases.pct(v)), ordenavel: false }],
+      porPagina: 20, legenda: 'Receitas por tipo' });
+    t.mostrar(r.categorias.map((c) => Object.assign({}, c, { pct: R.percentual(c.realizado, c.previsto) })));
+    const det = el('details');
+    det.append(el('summary', '', 'Ver os números exatos (previsto e recebido)'), t.elemento);
+    $('receitasTabela').replaceChildren(
+      OBS.graficos.barras(r.categorias.filter((c) => typeof c.realizado === 'number').map((c) => {
+        const p = R.percentual(c.realizado, c.previsto);
+        return { rotulo: c.nome, valor: c.realizado, detalhe: p === null ? 'sem previsão no relatório' : `${OBS.frases.pct(p)} do previsto para o ano` };
+      })), det);
+    const doze = r.ultimos12Meses || [];
+    if (doze.length) {
+      $('receitas12').replaceChildren(el('h3', '', `Principais origens nos últimos 12 meses (${r.periodo12Meses})`),
+        OBS.graficos.barras(doze.map((o) => ({ rotulo: o.nome, valor: o.valor, detalhe: o.origem }))),
+        el('p', 'meta', 'Período diferente do quadro acima: são os 12 meses até o fim do relatório, usados no cálculo da receita corrente líquida (Anexo 3 do relatório). ' +
+          'IPTU, ISS e ITBI são impostos cobrados pelo próprio Município; FPM vem da União; ICMS e IPVA vêm da parte que o Estado repassa.'));
+    } else $('receitas12').replaceChildren();
+    $('receitasOrigem').replaceChildren(OBS.origem({
+      fonte: d.meta.fonte, url: d.meta.url, urlTexto: 'abrir a consulta no SICONFI (JSON)',
+      tipo: 'Receitas previstas e recebidas, por tipo (Anexo 1) e por origem nos últimos 12 meses (Anexo 3)',
+      periodo: `${r.periodo} (${r.bimestre}º bimestre)`,
+      metodo: 'Cópia diária feita por robô. O robô confere que receitas correntes + receitas de capital = total, ao centavo; se não conferir, nada é publicado.',
+      limitacao: 'São números declarados pelo Município ao Tesouro. O relatório sai a cada dois meses, até 30 dias depois do fim do bimestre.'
+    }));
+    return true;
+  }
+
   /* As seções desta tela ficam em TRÊS abas (organização por perguntas):
        Entradas (#entradas): repasses, convênios e benefícios;   Limites (#limites): pessoal x LRF, educação e relatórios;
        Gastos (#gastos): despesa do ano fechado por área.
      Tudo é desenhado de uma vez, na primeira vez que qualquer uma dessas abas é aberta. */
   const ABAS = [
-    { aba: 'entradas', estado: 'entradasEstado', sumario: 'sumarioEntradas', avisos: 'entradasDesatualizado', fontes: ['transferencias', 'cgu'],
+    { aba: 'entradas', estado: 'entradasEstado', sumario: 'sumarioEntradas', avisos: 'entradasDesatualizado', fontes: ['rreo', 'transferencias', 'cgu'],
       vazio: 'Os dados do Tesouro e da CGU ainda não estão disponíveis. Eles são atualizados uma vez por dia.' },
     { aba: 'limites', estado: 'limitesEstado', sumario: 'sumarioLimites', avisos: 'limitesDesatualizado', fontes: ['siconfi', 'siope', 'entregas'],
       vazio: 'Os dados do Tesouro e do FNDE ainda não estão disponíveis. Eles são atualizados uma vez por dia.' },
@@ -351,9 +391,10 @@ OBS.contasTela = (function () {
 
   async function carregar() {
     ABAS.forEach((a) => { if (a.estado) $(a.estado).textContent = 'Carregando…'; });
-    const [sic, tr, dc, si, en, cg] = await Promise.all([OBS.dados.siconfi(), OBS.dados.transferencias(), OBS.dados.dca(), OBS.dados.siope(), OBS.dados.entregas(), OBS.dados.cgu()]);
+    const [sic, tr, dc, si, en, cg, rr] = await Promise.all([OBS.dados.siconfi(), OBS.dados.transferencias(), OBS.dados.dca(), OBS.dados.siope(), OBS.dados.entregas(), OBS.dados.cgu(), OBS.dados.rreo()]);
     const secoes = [
       ['sec-pessoal', 'Gasto com pessoal', () => desenharLrf(sic)],
+      ['sec-receitas', 'Receitas do Município', () => desenharReceitas(rr)],
       ['sec-transferencias', 'Repasses da União', () => desenharTransferencias(tr)],
       ['sec-convenios', 'Convênios federais', () => desenharConvenios(cg)],
       ['sec-beneficios', 'Benefícios às famílias', () => desenharBeneficios(cg)],

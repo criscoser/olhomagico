@@ -127,3 +127,7 @@ Regras de categorização e normalização de vínculos de RH devem ser expandid
 
 - **Integração do Poder Legislativo (Câmara Municipal)**: Planejamento para consumo de pautas, subsídios e folha de pagamento via API interna da Câmara.
   - _Premissa de Segurança_: Devido à exigência de tokens de autenticação privados, a arquitetura proíbe o tráfego dessas credenciais no client-side. A integração exige o desenvolvimento de uma camada proxy intermediária (_Serverless Function_), garantindo que chaves privadas permaneçam inacessíveis ao usuário final.
+
+## Licença
+
+Código-fonte sob licença MIT (veja `LICENSE`). A licença vale só para o código: dados, documentos e imagens das fontes oficiais seguem as regras de cada fonte. Fundamento jurídico do projeto: `docs/FUNDAMENTO_JURIDICO.md`.

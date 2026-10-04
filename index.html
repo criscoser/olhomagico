@@ -72,6 +72,7 @@
         <a class="aba" href="#limites"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg><span class="rotulo">Limites da lei</span></a>
         <a class="aba" href="#camara"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M2 21h20"/><path d="M9 21v-6h6v6"/><path d="M12 2v2"/></svg><span class="rotulo">Câmara</span></a>
         <a class="aba" href="#glossario"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7h6M9 10.5h4"/></svg><span class="rotulo">Palavras e siglas</span></a>
+        <a class="aba" href="#direitos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v17M6 21h12M4 7h16"/><path d="M7 7l-3 6a3 3 0 0 0 6 0z"/><path d="M17 7l-3 6a3 3 0 0 0 6 0z"/></svg><span class="rotulo">Leis e direitos</span></a>
         <a class="aba" href="#sobre"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="rotulo">Sobre e fontes</span></a>
       </nav>
       <!-- RODAPÉ DO MENU: apoio (só aparece com chave Pix em js/config.js) e tema claro/escuro. -->
@@ -116,12 +117,33 @@
   <p class="aviso-independente" role="note"><strong>Portal independente.</strong> Os dados são organizados a partir de fontes públicas oficiais. Consulte sempre os documentos originais.</p>
   <!-- ================= INÍCIO: painel com os principais números (cada quadro só aparece se houver dado) ================= -->
   <div id="aba-inicio">
-    <h1 class="titulo-pagina titulo-centro">Videira em 6 perguntas</h1>
+    <!-- ABERTURA: nome do projeto e os dois caminhos mais usados. -->
+    <section class="abertura" aria-label="Apresentação">
+      <p class="abertura-titulo">Olho Mágico</p>
+      <p class="abertura-sub">Para onde vai o dinheiro público de Videira, em palavras simples.</p>
+      <div class="abertura-acoes">
+        <a class="botao-verde" href="#gastos">Ver os gastos</a>
+        <a class="botao-contorno" href="#busca">Pesquisar um nome</a>
+      </div>
+    </section>
+    <h1 class="titulo-pagina">Videira em 6 perguntas</h1>
     <p class="sub sub-centro">Respostas curtas, cada uma com o período e a fonte oficial. Toque em uma pergunta para ver os detalhes e os números exatos.</p>
     <div id="inicioEstado" role="status" aria-live="polite"></div>
     <!-- CARTÕES-PERGUNTA (js/inicio-tela.js): um por pergunta, na mesma ordem do menu. Usam só as cópias diárias
          (arquivos pequenos): a página inicial não consulta a API de ~800 KB. -->
     <div class="cartoes-pergunta" id="cartoesPergunta"></div>
+    <!-- FAIXA "SOBRE": o que é o projeto, com o logo em destaque e o caminho para as leis e as fontes. -->
+    <section class="faixa-sobre" aria-labelledby="t-faixa-sobre">
+      <div class="faixa-sobre-arte" aria-hidden="true">
+        <svg viewBox="0 0 16 16" focusable="false"><g class="logo-uva"><circle cx="8" cy="4.6" r="2.2"/><circle cx="12.2" cy="4.6" r="2.2"/><circle cx="5.9" cy="8.4" r="2.2"/><circle cx="10.1" cy="8.4" r="2.2"/><circle cx="8" cy="12.2" r="2.2"/></g><circle class="logo-aro" cx="3.8" cy="4.6" r="2.6"/><circle class="logo-lente" cx="3.8" cy="4.6" r="1.2"/></svg>
+      </div>
+      <div>
+        <p class="faixa-sobre-pre">Olho Mágico</p>
+        <h2 class="faixa-sobre-titulo" id="t-faixa-sobre">Dinheiro público, em palavras simples</h2>
+        <p>Um portal independente, feito por um cidadão videirense, que organiza os dados oficiais de transparência do município: quanto foi pago, a quem, quem trabalha para a cidade e o que foi contratado. Cada número tem período e fonte, para qualquer pessoa conferir. Saber essas informações é um direito garantido por lei.</p>
+        <p><a class="botao-verde" href="#direitos">Conheça seus direitos</a></p>
+      </div>
+    </section>
   </div>
 
   <!-- ================= PESQUISA GERAL (resultado) ================= -->
@@ -655,6 +677,27 @@
       <p class="meta">As duas consultas “só no portal oficial” são protegidas contra acesso automático, e este site respeita essa proteção.</p>
     </section>
 
+    <!-- COMO CADA FONTE É ACESSADA: separa o que tem documentação oficial do que só foi visto em uso.
+         Atualizar a data quando a conferência for refeita. -->
+    <section aria-labelledby="t-acesso-fontes">
+      <h2 id="t-acesso-fontes">Como cada fonte é acessada</h2>
+      <p>Nem toda fonte tem documentação oficial publicada. Para não tratar tudo como igual, separamos: <strong>documentada</strong> (há manual ou página oficial explicando o acesso) e <strong>observada</strong> (funciona e é usada todo dia, mas não localizamos documentação oficial). Conferência feita em 03/10/2026.</p>
+      <div class="rolagem-simples"><table class="tabela-simples">
+        <thead><tr><th scope="col">Fonte</th><th scope="col">Documentação</th><th scope="col">Acesso</th></tr></thead>
+        <tbody>
+          <tr><td>Gastos (API de Dados Abertos do portal)</td><td>Documentada</td><td>Aberto, até 10 consultas por minuto</td></tr>
+          <tr><td>Pessoal (API de Pessoal do portal)</td><td>Observada</td><td>Aberto</td></tr>
+          <tr><td>PNCP (contratações e contratos)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>SICONFI (contas e relatórios fiscais)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>Tesouro Nacional (transferências)</td><td>Observada</td><td>Aberto</td></tr>
+          <tr><td>SIOPE (educação)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>Portal da Transparência federal (CGU)</td><td>Documentada</td><td>Com chave de acesso, guardada só no robô</td></tr>
+          <tr><td>Câmara de Videira</td><td>Observada</td><td>Com token, guardado só no robô</td></tr>
+        </tbody>
+      </table></div>
+      <p class="meta">Código-fonte sob licença MIT. A licença vale só para o código: os dados, documentos e imagens das fontes oficiais seguem as regras de cada fonte.</p>
+    </section>
+
     <section aria-labelledby="t-privacidade">
       <h2 id="t-privacidade">Privacidade</h2>
       <p>Pagamentos da Prefeitura e nomes, cargos e salários de servidores são <strong>informações públicas</strong> pela Lei de Acesso à Informação (Lei 12.527/2011). Mesmo assim, mostramos só o necessário:</p>
@@ -670,6 +713,103 @@
       <p>Remuneração mensal completa e diárias de cada servidor (só no portal oficial, com proteção contra acesso automático), receitas próprias, orçamento previsto, restos a pagar, obras, emendas parlamentares, e os projetos de lei e votações da Câmara. Só vão aparecer quando houver uma fonte oficial que possa ser consultada e conferida, sem números inventados.</p>
     </section>
   </div><!-- fim da aba sobre -->
+
+  <!-- ================= LEIS E DIREITOS =================
+       Resumo do documento completo docs/FUNDAMENTO_JURIDICO.md (03/10/2026). Material de orientação, não parecer jurídico. -->
+  <div id="aba-direitos" class="oculto">
+    <h1 class="titulo-pagina">Por que você tem direito a estas informações?</h1>
+    <p class="sub sub-centro">As leis que garantem o acesso aos dados públicos e os motivos pelos quais, mesmo assim, eles ainda são difíceis de encontrar.</p>
+    <p class="aviso-juridico">Este resumo é material de orientação, não parecer jurídico. A aplicação de cada lei depende do órgão, do tipo de informação, das leis locais e da data dos fatos. Ninguém deve ser acusado com base só neste texto.</p>
+
+    <section aria-labelledby="t-dir-pergunta">
+      <h2 id="t-dir-pergunta">A pergunta do Olho Mágico</h2>
+      <p>Não basta perguntar se o órgão publicou alguma coisa. Importa também saber se a informação está onde deveria, se dá para encontrá-la sem conhecer o nome do sistema, se dá para entender, baixar em formato reutilizável, ligar a despesa ao empenho, ao pagamento, ao contrato e ao fornecedor, e se o histórico continua acessível.</p>
+      <p>Ter um portal não garante tudo isso. E uma dificuldade técnica isolada também não prova, sozinha, que alguém descumpriu a lei.</p>
+    </section>
+
+    <section aria-labelledby="t-dir-leis">
+      <h2 id="t-dir-leis">As leis, em poucas palavras</h2>
+      <ul class="leis">
+        <li><h3>Constituição Federal</h3>
+          <p>Todos têm direito de receber informações dos órgãos públicos (art. 5º, XXXIII). A publicidade é princípio da administração pública (art. 37). A administração deve permitir a consulta à documentação do governo (art. 216, § 2º).</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Lei de Acesso à Informação (12.527/2011)</h3>
+          <p>O órgão deve publicar, sem que ninguém peça, despesas, repasses, licitações, contratos e obras (art. 8º). Os sites oficiais devem ter busca, relatórios em formatos abertos, acesso automatizado em formato legível por máquina, dados atualizados e acessibilidade (art. 8º, § 3º).</p>
+          <p>Qualquer pessoa pode pedir uma informação sem dizer o motivo (art. 10). A resposta vem na hora ou em até 20 dias, prorrogáveis por mais 10 com justificativa (art. 11).</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Lei de Responsabilidade Fiscal (LC 101/2000 e LC 131/2009)</h3>
+          <p>Planos, orçamentos, prestações de contas e relatórios fiscais devem ser divulgados também pela internet (art. 48). A execução da despesa deve ser mostrada no momento em que acontece, com o bem ou serviço, quem recebeu e, quando houver, a licitação (art. 48-A).</p>
+          <p>Empenhado, liquidado e pago são etapas diferentes: um valor empenhado ainda não foi pago.</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp101.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Licitações e Contratos (14.133/2021)</h3>
+          <p>Os atos da licitação são públicos (art. 13). Editais, contratos e aditivos devem ser divulgados no Portal Nacional de Contratações Públicas, o PNCP (arts. 54, 94 e 174), que deve oferecer os dados em formato aberto.</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Lei Geral de Proteção de Dados (13.709/2018)</h3>
+          <p>Protege dados pessoais, mas não revoga a Lei de Acesso à Informação. As duas valem juntas: cada campo é avaliado, e uma base com alguns dados pessoais não fica inteira em segredo por causa deles.</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Governo Digital (14.129/2021)</h3>
+          <p>Trata de dados abertos: bases não pessoais públicas como regra, legíveis por máquina, descritas, atualizadas e com histórico (art. 29). Vale diretamente para o governo federal; estados e municípios precisam adotá-la por norma própria (art. 2º).</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14129.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-dir-dificil">
+      <h2 id="t-dir-dificil">Por que ainda é difícil encontrar os dados</h2>
+      <p>São causas possíveis, a serem demonstradas caso a caso, não acusações:</p>
+      <ul>
+        <li><strong>Sistemas separados:</strong> contabilidade, folha, licitações e portal podem ser sistemas diferentes, que não se conversam.</li>
+        <li><strong>Dependência de fornecedores:</strong> a empresa contratada define formato, exportação e documentação. Isso não transfere a ela o dever do órgão.</li>
+        <li><strong>PDF e imagem:</strong> bons para ler, ruins para pesquisar, comparar e reutilizar.</li>
+        <li><strong>Dados só pelo navegador:</strong> a tela mostra, mas não há um arquivo ou endereço direto para baixar.</li>
+        <li><strong>Falta de padrão:</strong> o mesmo fornecedor pode funcionar de jeitos diferentes em cada cidade.</li>
+        <li><strong>Falta de explicação:</strong> códigos e siglas sem dizer o que significam.</li>
+        <li><strong>Histórico curto</strong> e <strong>datas diferentes</strong> entre o portal, o Tribunal de Contas e as bases nacionais.</li>
+        <li><strong>Proteções técnicas</strong> (CAPTCHA, limite de consultas), que podem existir por segurança e não provam intenção de esconder.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-dir-tres">
+      <h2 id="t-dir-tres">Três jeitos de olhar a transparência</h2>
+      <ul>
+        <li><strong>Jurídica:</strong> o que a lei exige, de quem, em que prazo e com quais exceções.</li>
+        <li><strong>Informacional:</strong> se uma pessoa consegue encontrar, entender e conferir.</li>
+        <li><strong>Tecnológica:</strong> se os dados podem ser baixados, lidos por programas e guardados.</li>
+      </ul>
+      <p>Uma informação pode estar publicada e, mesmo assim, ser difícil de achar ou de reutilizar.</p>
+    </section>
+
+    <section aria-labelledby="t-dir-nao">
+      <h2 id="t-dir-nao">O que um teste sozinho não prova</h2>
+      <div class="rolagem-simples"><table class="tabela-simples">
+        <thead><tr><th scope="col">O que se viu</th><th scope="col">O que isso, sozinho, não prova</th></tr></thead>
+        <tbody>
+          <tr><td>Não foi encontrada API</td><td>Que a informação não exista ou que haja ilegalidade</td></tr>
+          <tr><td>O endereço deu erro (403, 404, 500)</td><td>Que o serviço não exista ou que a lei foi descumprida</td></tr>
+          <tr><td>O portal usa CAPTCHA</td><td>Intenção de esconder dados</td></tr>
+          <tr><td>Os dados estão só em PDF</td><td>Descumprimento automático da lei</td></tr>
+          <tr><td>O fornecedor do sistema é uma empresa</td><td>Irregularidade, nem que o dever passou para a empresa</td></tr>
+          <tr><td>A base tem campos pessoais</td><td>Que a base inteira deva ficar em segredo</td></tr>
+          <tr><td>A contratação não apareceu no PNCP</td><td>Que não foi publicada, sem conferir filtros e datas</td></tr>
+          <tr><td>Duas bases mostram valores diferentes</td><td>Fraude: pode ser etapa, data ou conceito diferente</td></tr>
+          <tr><td>O site estava fora do ar</td><td>Que está sempre fora do ar</td></tr>
+        </tbody>
+      </table></div>
+      <p>Por isso o Olho Mágico usa expressões proporcionais ao que foi visto, como “não localizado na consulta feita” ou “acesso automatizado não confirmado”, e não dá nota nem faz ranking de municípios.</p>
+    </section>
+
+    <section aria-labelledby="t-dir-pedir">
+      <h2 id="t-dir-pedir">Como pedir uma informação</h2>
+      <p>Se a informação não estiver publicada, qualquer pessoa pode fazer um pedido pela Lei de Acesso à Informação, no Serviço de Informação ao Cidadão (SIC) do órgão. Dicas:</p>
+      <ul>
+        <li>Diga o período e o tipo de informação.</li>
+        <li>Peça documentos, arquivos e relatórios que já existem, de preferência no formato digital em que estão guardados.</li>
+        <li>Não é preciso explicar o motivo do pedido.</li>
+        <li>Se houver negativa, peça o fundamento legal e a entrega parcial, só sem os campos protegidos.</li>
+        <li>Guarde o número do protocolo, o prazo e a resposta.</li>
+      </ul>
+      <p class="meta">Orientação oficial da CGU: <a href="https://www.gov.br/acessoainformacao/pt-br/lai-para-estados-e-municipios/lai_estados_municipios" target="_blank" rel="noopener noreferrer">LAI para Estados e Municípios</a>. Documento completo, com todas as referências: <a href="https://github.com/criscoser/olhomagico/blob/main/docs/FUNDAMENTO_JURIDICO.md" target="_blank" rel="noopener noreferrer">Fundamento jurídico do Olho Mágico</a>.</p>
+    </section>
+  </div><!-- fim da aba direitos -->
 </main>
     <!-- RODAPÉ: aviso sobre os dados, redes de quem idealizou o projeto (ícones desenhados aqui mesmo, sem carregar
          nada de fora) e o crédito. Os links abrem em outra aba e não passam de qual página a pessoa veio (noreferrer). -->

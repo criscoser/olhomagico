@@ -1,5 +1,5 @@
 /* MENU
-   - No computador (acima de 1024 px): menu RECOLHIDO (só ícones), que abre ao passar o mouse ou com o foco do teclado (só CSS).
+   - No computador (acima de 1024 px): cabeçalho no topo, com as seções numa linha; some ao tirar o mouse depois de rolar.
    - Até 1024 px: barra inferior com 5 atalhos; o botão "Mais" abre o corpo do menu como uma folha que sobe de baixo.
    Regras de acessibilidade:
      - o botão "Mais" informa se a folha está aberta (aria-expanded);
@@ -79,6 +79,36 @@ OBS.menu = (function () {
     });
     // Se a tela crescer (girar o tablet), o menu volta ao normal.
     larga.addEventListener('change', () => abrir(false));
+    cabecalhoQueSome();
+  }
+
+  /* CABEÇALHO QUE SOME (decisão do mantenedor em 03/10/2026), para sobrar mais área de leitura:
+     - computador: depois de rolar um pouco, some quando o mouse sai dele; volta ao levar o mouse ao topo da janela;
+     - celular: some ao rolar para baixo e volta ao rolar para cima.
+     Nunca some no topo da página, com a folha "Mais" aberta ou com o foco do teclado dentro dele. */
+  function cabecalhoQueSome() {
+    const lateral = $('lateral');
+    const LIMITE = 80;            // px rolados antes de poder sumir
+    let ultimoY = window.scrollY, mouseEmCima = false;
+    const medir = () => document.documentElement.style.setProperty('--alt-cabecalho', `${lateral.offsetHeight}px`);
+    const esconder = (sim) => {
+      const pode = sim && window.scrollY > LIMITE && !document.body.classList.contains('mais-aberto') && !lateral.contains(document.activeElement);
+      lateral.classList.toggle('cabecalho-oculto', pode);
+    };
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y <= LIMITE) esconder(false);
+      else if (larga.matches) { if (!mouseEmCima) esconder(true); }
+      else if (y > ultimoY + 4) esconder(true);
+      else if (y < ultimoY - 4) esconder(false);
+      ultimoY = y;
+    }, { passive: true });
+    lateral.addEventListener('mouseenter', () => { mouseEmCima = true; esconder(false); });
+    lateral.addEventListener('mouseleave', () => { mouseEmCima = false; esconder(true); });
+    document.addEventListener('mousemove', (ev) => { if (larga.matches && ev.clientY < 14) esconder(false); }, { passive: true });
+    lateral.addEventListener('focusin', () => esconder(false));
+    window.addEventListener('resize', medir);
+    medir();
   }
 
   /* "Atualização" no cabeçalho: a data da cópia mais recente entre as fontes (de dados/situacao.js).

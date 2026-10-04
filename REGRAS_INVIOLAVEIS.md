@@ -73,15 +73,25 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
 ## Decisões de design aprovadas (Etapas 2 a 7, out/2026) — implementadas
 
 - Arquitetura por perguntas: Gastos, Entradas, Pessoal, Contratos, Limites, Câmara (+ Buscar, Palavras e siglas,
-  Sobre e fontes, Apoie). Barra inferior até 1024 px (Início, Gastos, Pessoal, Buscar, Mais). Acima de 1024 px, menu
-  lateral RECOLHIDO (só ícones) que abre ao passar o mouse ou com o foco do teclado (decisão do mantenedor, 03/10/2026).
+  Leis e direitos, Sobre e fontes, Apoie). Barra inferior até 1024 px (Início, Gastos, Pessoal, Buscar, Mais). Acima de
+  1024 px, CABEÇALHO no topo em duas linhas (marca e ações; seções), que some ao tirar o mouse depois de rolar e volta
+  ao levar o mouse ao topo ou com o Tab; no celular some ao rolar para baixo e volta ao rolar para cima
+  (decisão do mantenedor, 03/10/2026; substitui o menu lateral).
 - Robô gera `dados/despesas-resumo.js` (13 meses × órgão × 3 etapas) para a página inicial não baixar ~800 KB.
-- Paleta **Uva e Ouro** (tema claro padrão, escuro opcional respeitando o sistema); só a fonte Atkinson Hyperlegible,
+- Paleta **azul, branco, verde, amarelo e vermelho** (decisão do mantenedor, 03/10/2026; substitui Uva e Ouro): azul
+  para estrutura e links, branco de fundo, verde nos botões de ação, amarelo para destaque e vermelho só para erro e
+  limite máximo da lei. O azul é mais escuro que o do portal oficial (#1358a4). Tema claro padrão, escuro opcional; só a fonte Atkinson Hyperlegible,
   hospedada no site; alvos de toque de 48px. Letras (decisão do mantenedor, 03/10/2026): títulos principais, frases
   principais e números em destaque com 16 px; todo o resto com 11 px. O controle "Tamanho da letra" (até 150%) fica.
 - Modelo de 3 camadas (frase → gráfico → números exatos e fonte); glossário único com ⓘ na primeira ocorrência.
 - Inclusão: botão Ouvir (só frase e título do gráfico; escondido sem voz pt-BR), tamanho da letra em 4 passos,
   compartilhar (WhatsApp, copiar link, outros apps; ficha de servidor compartilhada sem nome e sem salário).
-- Identidade: nome "Olho Mágico", sem slogan por enquanto, logo V3 (cacho em pontos roxos com um olho mágico dourado),
+- Identidade: nome "Olho Mágico", sem slogan por enquanto, logo V3 (cacho em pontos, hoje azul-céu, com um olho mágico amarelo),
   com versão própria para 16/32 px e versão com uvas lilás no tema escuro.
 - Plano numerado completo (itens 1–33) na conversa da Etapa 8: todos feitos em 03/10/2026.
+- Tela **Leis e direitos** (`#direitos`): resumo para o público do documento `docs/FUNDAMENTO_JURIDICO.md`
+  (material de orientação, não parecer jurídico). Sem acusação, sem ranking, linguagem proporcional à evidência.
+- Licença MIT (`LICENSE`) só para o código; dados e documentos das fontes seguem as regras de cada fonte.
+- Diagnóstico de 03/10/2026: fontes marcadas como "documentada" ou "observada" (Sobre e fontes). As propostas de que o
+  diagnóstico discordou do briefing (histórico em repositório separado, piloto, revisão em níveis, letra, coleta de
+  gastos por robô, ligação só por código) estão PARADAS até nova decisão do mantenedor.

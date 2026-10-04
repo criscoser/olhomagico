@@ -178,11 +178,11 @@ OBS.graficos = (function () {
     const legenda = [];
     [['alerta', p.limiteAlertaPct], ['prudencial', p.limitePrudencialPct], ['máximo', p.limiteMaximoPct]].forEach(([nome, v]) => {
       if (typeof v !== 'number') return;
-      const marca = el('div', 'medidor-marca'); marca.style.left = pos(v);
+      const marca = el('div', 'medidor-marca' + (nome === 'máximo' ? ' maximo' : '')); marca.style.left = pos(v);
       trilho.append(marca);
       legenda.push(`${nome} ${pct(v)}`);
     });
-    caixa.append(trilho, el('p', 'meta medidor-legenda', `Barra: gasto com pessoal (${pct(p.dtpPct)}). Traços: limites de ${legenda.join(', ')}.`));
+    caixa.append(trilho, el('p', 'meta medidor-legenda', `Barra: gasto com pessoal (${pct(p.dtpPct)}). Traços: limites de ${legenda.join(', ')} (o vermelho é o máximo).`));
     return caixa;
   }
 

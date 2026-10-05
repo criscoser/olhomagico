@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<!-- TESTES AUTOMÁTICOS das funções que, se erradas, gerariam número errado na tela.
+     Como usar: abra este arquivo no navegador. Cada linha mostra OK ou FALHOU. -->
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Testes</title></head>
+<body style="font-family:sans-serif"><h1>Testes</h1><ul id="saida"></ul>
+<script src="../js/config.js"></script>
+<script src="../js/utilitarios.js"></script>
+<script src="../js/siglas.js"></script>
+<script src="../js/fontes/despesas.js"></script>
+<script src="../js/agregacao.js"></script>
+<script src="../js/pessoal-regras.js"></script>
+<script src="../js/contas-regras.js"></script>
+<script src="../js/contratos-regras.js"></script>
+<script src="../js/exportar.js"></script>
+<script src="../js/transferencias-regras.js"></script>
+<script src="../js/busca-regras.js"></script>
+<script src="../js/historico.js"></script>
+<script src="../js/frases.js"></script>
+<script src="../js/receitas-regras.js"></script>
+<script src="../js/impostometro.js"></script>
+<script src="../js/metas-lista.js"></script>
+<script src="../js/metas-tela.js"></script>
+<script src="../js/ouvir.js"></script>
+<script src="../js/compartilhar.js"></script>
+<script src="../js/componentes/graficos.js"></script>
+<script src="../js/componentes/blocos.js"></script>
+<script src="../js/rotas.js"></script>
+<script src="../js/pix-regras.js"></script>
+<script src="../js/vendor/qrcodegen.js"></script>
+<script>
+  // Compara o resultado obtido com o esperado e escreve na página.
+  function teste(nome, obtido, esperado) {
+    const ok = JSON.stringify(obtido) === JSON.stringify(esperado);
+    const li = document.createElement('li');
+    li.textContent = (ok ? 'OK — ' : 'FALHOU — ') + nome + (ok ? '' : ` (obtido ${JSON.stringify(obtido)}, esperado ${JSON.stringify(esperado)})`);
+    li.style.color = ok ? 'green' : 'red';
+    document.getElementById('saida').append(li);
+  }
+  teste('numero converte texto', OBS.numero('2030.00'), 2030);
+  teste('numero aceita "0"', OBS.numero('0'), 0);
+  teste('numero rejeita texto inválido', OBS.numero('abc'), null);
+  teste('CPF é mascarado', OBS.tratarDocumento('123.456.789-01').texto, '***.456.789-**');
+  teste('CNPJ aparece formatado', OBS.tratarDocumento('12345678000190').texto, '12.345.678/0001-90');
+  teste('documento vazio', OBS.tratarDocumento('').tipo, 'Documento não informado');
+  teste('período de setembro/2026', OBS.periodoDoMes('2026-09').ini + ' a ' + OBS.periodoDoMes('2026-09').fim, '01/09/2026 a 30/09/2026');
+  teste('fevereiro de ano bissexto', OBS.periodoDoMes('2028-02').fim, '29/02/2028');
+  const r = OBS.agregar([
+    { nomeCredor: 'A', cpfCnpjCredor: '12345678000190', orgaoDescricao: 'X', valorEmpenhado: '100', valorLiquidado: '80', valorPago: '50' },
+    { nomeCredor: 'A', cpfCnpjCredor: '12.345.678/0001-90', orgaoDescricao: 'Y', valorEmpenhado: '10', valorLiquidado: '10', valorPago: '10' }
+  ]);
+  teste('junta o mesmo credor pelo documento', r.credores.length, 1);
+  teste('soma o pago do credor', r.credores[0].pago, 60);
+  teste('total pago', r.total.pago, 60);
+  teste('soma por secretaria (X=50, Y=10)', r.orgaos.map((o) => [o.nome, o.pago]), [['X', 50], ['Y', 10]]);
+  teste('credor sabe quem pagou', OBS.ordenar(r.credores[0].porOrgao), [['X', 50], ['Y', 10]]);
+  teste('secretaria sabe a quem pagou', r.orgaos[0].porCredor.get('12345678000190'), 50);
+  teste('origem não informada', r.fontes, [['(origem não informada)', 60]]);
+  const r2 = OBS.agregar([{ nomeCredor: 'B', cpfCnpjCredor: '', orgaoDescricao: 'X', valorEmpenhado: '100', valorAnulado: '20', valorLiquidado: '80', valorRetido: '5', valorPago: '75' }]);
+  // Mesmo CNPJ com nomes diferentes (caso real: instituto de previdência e a folha dos aposentados): nenhum nome some.
+  const r3 = OBS.agregar([
+    { nomeCredor: 'INSTITUTO', cpfCnpjCredor: '05002371000126', orgaoDescricao: 'X', valorEmpenhado: '10', valorLiquidado: '10', valorPago: '10' },
+    { nomeCredor: 'FOLHA APOSENTADOS', cpfCnpjCredor: '05.002.371/0001-26', orgaoDescricao: 'Y', valorEmpenhado: '30', valorLiquidado: '30', valorPago: '30' },
+    { nomeCredor: 'SÓ EMPENHO', cpfCnpjCredor: '11222333000144', orgaoDescricao: 'X', valorEmpenhado: '99', valorLiquidado: '0', valorPago: '0' },
+    { nomeCredor: 'ESTORNO', cpfCnpjCredor: '99888777000166', orgaoDescricao: 'X', valorEmpenhado: '-5', valorLiquidado: '-5', valorPago: '-5' }
+  ]);
+  teste('mesmo CNPJ: nome exibido é o de maior valor pago', r3.credores[0].nome, 'FOLHA APOSENTADOS');
+  teste('mesmo CNPJ: os outros nomes ficam guardados', r3.credores[0].outrosNomes, ['INSTITUTO']);
+  teste('"credores que receberam" não conta quem só teve empenho ou estorno', [r3.credores.length, r3.credoresQueReceberam], [3, 1]);
+  teste('total anulado', r2.total.anulado, 20);
+  teste('total retido', r2.total.retido, 5);
+  const v = OBS.fontes.despesas.validar([{ valorEmpenhado: '1', valorLiquidado: '1', valorPago: '1' }, { valorEmpenhado: '1', valorLiquidado: '1', valorPago: 'x' }]);
+  teste('validar separa linha inválida', [v.validas.length, v.descartadas.length], [1, 1]);
+  // ----- Lista de servidores (aba Servidores) -----
+  const L = OBS.pessoal.preparar([
+    { nome: 'JOÃO EXEMPLO', cargo: 'PROFESSOR', lotacao: 'SECRETARIA MUNICIPAL DE EDUCACAO', vinculo: 'Estatutário', salario: 4000 },
+    { nome: 'ANA MODELO', cargo: 'ASSESSOR DE GABINETE', lotacao: 'GABINETE DO PREFEITO', vinculo: 'Cargo Comissionado', salario: 6000 },
+    { nome: 'BIA TESTE', cargo: 'DIRETOR', lotacao: 'GABINETE DO PREFEITO', vinculo: 'Cargo Comissionado', salario: 9000 },
+    { nome: 'CAIO TESTE', cargo: 'SECRETARIO ESCOLAR', lotacao: 'ESCOLA', vinculo: 'Estatutário', salario: null },
+    { nome: 'DORA TESTE', cargo: 'SECRETÁRIO MUNICIPAL DE SAÚDE', lotacao: 'SAUDE', vinculo: 'Cargo Comissionado', salario: 16000 }
+  ]);
+  teste('normalizar tira acento e espaços', OBS.pessoal.normalizar(' JOÃO Ç '), 'joao c');
+  teste('busca sem acento acha JOÃO', OBS.pessoal.buscar(L, { termo: 'joao' }).map((s) => s.nome), ['JOÃO EXEMPLO']);
+  teste('busca com duas palavras em qualquer ordem', OBS.pessoal.buscar(L, { termo: 'gabinete ana' }).map((s) => s.nome), ['ANA MODELO']);
+  teste('filtro por vínculo', OBS.pessoal.buscar(L, { vinculo: 'Cargo Comissionado' }).length, 3);
+  teste('ordem por salário: sem salário vai para o fim', OBS.pessoal.buscar(L, { ordem: 'salario' }).map((s) => s.nome)[4], 'CAIO TESTE');
+  teste('soma ignora salário não informado', OBS.pessoal.somaSalarios(L), 35000);
+  teste('secretário municipal é político', OBS.pessoal.ehCargoPolitico(L[4]), true);
+  teste('secretário escolar NÃO é político', OBS.pessoal.ehCargoPolitico(L[3]), false);
+  teste('"prefeitura" NÃO é prefeito', OBS.pessoal.ehCargoPolitico({ cargo: 'AGENTE DA PREFEITURA' }), false);
+  teste('vice-prefeito é político', OBS.pessoal.ehCargoPolitico({ cargo: 'VICE-PREFEITO' }), true);
+  const C = OBS.pessoal.comissionadosPorSetor(L);
+  teste('comissionados: setor de maior soma primeiro', C.map((g) => [g.nome, g.pessoas.length, g.soma]), [['SAUDE', 1, 16000], ['GABINETE DO PREFEITO', 2, 15000]]);
+  teste('comissionados: maior salário primeiro no setor', C[1].pessoas.map((s) => s.nome), ['BIA TESTE', 'ANA MODELO']);
+  teste('explica o vínculo comissionado', OBS.pessoal.explicarVinculo('Cargo Comissionado').curto, 'Indicação (comissionado)');
+  teste('vínculo desconhecido fica sem explicação', OBS.pessoal.explicarVinculo('Outro vínculo'), null);
+  teste('filtro por setor combinado com vínculo', OBS.pessoal.buscar(L, { setor: 'GABINETE DO PREFEITO', vinculo: 'Cargo Comissionado' }).length, 2);
+  teste('busca sem filtros devolve todos', OBS.pessoal.buscar(L, {}).length, 5);
+  // ----- Casos extremos e dados incompletos -----
+  const vazio = OBS.agregar([]);
+  teste('lista vazia: totais zerados', [vazio.total.pago, vazio.credores.length, vazio.orgaos.length], [0, 0, 0]);
+  const incompleto = OBS.agregar([{ valorEmpenhado: '10', valorLiquidado: '5', valorPago: '5' }]);
+  teste('linha sem nomes: rótulos padrão', [incompleto.orgaos[0].nome, incompleto.credores[0].nome, incompleto.fontes[0][0]],
+    ['(órgão não informado)', '(sem nome)', '(origem não informada)']);
+  const negativo = OBS.agregar([{ nomeCredor: 'X', orgaoDescricao: 'A', valorEmpenhado: '-100', valorLiquidado: '0', valorPago: '-50' }]);
+  teste('valor negativo (estorno) entra na soma como veio', negativo.total.pago, -50);
+  teste('valor muito grande sem perder centavos', OBS.agregar([{ valorEmpenhado: '987654321.99', valorLiquidado: '0', valorPago: '987654321.99' }]).total.pago, 987654321.99);
+  teste('mês anterior em 31/03 é fevereiro', OBS.mesAnterior(new Date(2026, 2, 31)), '2026-02');
+  teste('mês anterior em janeiro é dezembro do ano anterior', OBS.mesAnterior(new Date(2026, 0, 15)), '2025-12');
+  // ----- Planilha CSV -----
+  teste('CSV: aspas dobradas', OBS.exportar.celula('a "b"'), '"a ""b"""');
+  teste('CSV: bloqueia fórmula (=)', OBS.exportar.celula('=SOMA(A1)'), "\"'=SOMA(A1)\"");
+  teste('CSV: bloqueia fórmula (+ e @)', [OBS.exportar.celula('+1'), OBS.exportar.celula('@x')], ["\"'+1\"", "\"'@x\""]);
+  teste('CSV: número com vírgula', OBS.exportar.numero(1234.5), '1234,50');
+  teste('CSV: valor inválido fica vazio', OBS.exportar.numero(null), '');
+  const csv = OBS.exportar.csvDespesas([{ orgaoDescricao: 'SAUDE', unidadeDescricao: 'U', fonteRecursoDescricao: 'F', nomeCredor: 'FULANO', cpfCnpjCredor: '12345678901',
+    valorEmpenhado: '10', valorAnulado: '0', valorLiquidado: '10', valorRetido: '0', valorPago: '10' }],
+    { ini: '01/09/2026', fim: '30/09/2026' }, { url: 'https://exemplo', consultadoEm: new Date(2026, 9, 1), descartadas: 0 });
+  teste('CSV: tem fonte e período no topo', csv.includes('"Período";"01/09/2026 a 30/09/2026"'), true);
+  teste('CSV: CPF sai mascarado', [csv.includes('12345678901'), csv.includes('***.456.789-**')], [false, true]);
+  // ----- Contas e limites (LRF) -----
+  const lim = { limiteAlertaPct: 48.6, limitePrudencialPct: 51.3, limiteMaximoPct: 54 };
+  teste('LRF: 41,78% está abaixo do alerta', OBS.contas.faixa(Object.assign({ dtpPct: 41.78 }, lim)).nivel, 0);
+  teste('LRF: 49% está acima do alerta', OBS.contas.faixa(Object.assign({ dtpPct: 49 }, lim)).nivel, 1);
+  teste('LRF: 52% está acima do prudencial', OBS.contas.faixa(Object.assign({ dtpPct: 52 }, lim)).nivel, 2);
+  teste('LRF: exatamente 54% conta como acima do máximo', OBS.contas.faixa(Object.assign({ dtpPct: 54 }, lim)).nivel, 3);
+  teste('LRF: sem números, sem faixa', OBS.contas.faixa({ dtpPct: null }), null);
+  teste('LRF: período mais recente', OBS.contas.maisRecente([{ ano: 2025, periodo: 3 }, { ano: 2026, periodo: 1 }, { ano: 2025, periodo: 1 }]), { ano: 2026, periodo: 1 });
+  teste('LRF: percentual em português', OBS.contas.pct(41.78), '41,78%');
+  // ----- Contratos e licitações -----
+  const K = OBS.contratos.preparar([
+    { fornecedor: 'ÁGUA LIMPA LTDA', fornecedorDoc: '11.222.333/0001-44', objeto: 'Limpeza', orgao: 'MUNICIPIO', valorGlobal: 100, dataAssinatura: '2026-01-10' },
+    { fornecedor: 'ÁGUA LIMPA LTDA', fornecedorDoc: '11.222.333/0001-44', objeto: 'Limpeza 2', orgao: 'FUNDO', valorGlobal: 300, dataAssinatura: '2026-03-10' },
+    { fornecedor: 'BETA SA', fornecedorDoc: '99.888.777/0001-66', objeto: 'Obra', orgao: 'MUNICIPIO', valorGlobal: 250, dataAssinatura: '2025-12-01' },
+    { fornecedor: 'SEM VALOR', objeto: 'X', orgao: 'MUNICIPIO', valorGlobal: null, dataAssinatura: null }
+  ], ['fornecedor', 'objeto', 'orgao']);
+  teste('contratos: busca sem acento', OBS.contratos.buscar(K, { termo: 'agua' }, 'valorGlobal', 'dataAssinatura').length, 2);
+  teste('contratos: mais recentes primeiro', OBS.contratos.buscar(K, {}, 'valorGlobal', 'dataAssinatura').map((c) => c.objeto)[0], 'Limpeza 2');
+  teste('contratos: maior valor primeiro, sem valor no fim', OBS.contratos.buscar(K, { ordem: 'valor' }, 'valorGlobal', 'dataAssinatura').map((c) => c.valorGlobal), [300, 250, 100, null]);
+  teste('contratos: consórcio intermunicipal não é órgão do município',
+    ['CONSORCIO PUBLICO INTERFEDERATIVO DE SAUDE - CISAMARP', 'Consórcio X', 'MUNICIPIO DE VIDEIRA', 'FUNDO MUNICIPAL DE SAUDE'].map((o) => OBS.contratos.ehConsorcio({ orgao: o })),
+    [true, true, false, false]);
+  teste('servidores: aposentados e pensionistas contam como inativos',
+    ['Aposentado', 'Pensionista do Tesouro', 'Aposentado (Complemento)', 'Estatutário', 'Cargo Comissionado'].map((v) => OBS.pessoal.ehInativo({ vinculo: v })),
+    [true, true, true, false, false]);
+  teste('contratos: filtro por órgão', OBS.contratos.buscar(K, { orgao: 'FUNDO' }, 'valorGlobal', 'dataAssinatura').length, 1);
+  teste('fornecedores: soma pelo CNPJ', OBS.contratos.fornecedores(K).slice(0, 2).map((f) => [f.nome, f.contratos, f.soma]), [['ÁGUA LIMPA LTDA', 2, 400], ['BETA SA', 1, 250]]);
+  teste('contar por campo', OBS.contratos.contar(K, 'orgao'), [['MUNICIPIO', 3], ['FUNDO', 1]]);
+  teste('data em português', OBS.contratos.data('2025-12-10T09:00:00'), '10/12/2025');
+  teste('URL usa barra pura nas datas', OBS.fontes.despesas.montarUrl('01/09/2026', '30/09/2026').includes('dataInicial=01/09/2026'), true);
+
+  // ===================== FASE 5 =====================
+  // ----- Utilitários novos -----
+  teste('dataBR', [OBS.dataBR('2026-03-05T10:00'), OBS.dataBR('x')], ['05/03/2026', '']);
+  teste('slug tira acento e símbolos', OBS.slug(' JOÃO  da Silva/ME '), 'joao-da-silva-me');
+  teste('resumirTexto corta numa palavra', OBS.resumirTexto('aaaa bbbb cccc dddd', 12), 'aaaa bbbb…');
+  teste('resumirTexto não mexe em texto curto', OBS.resumirTexto('curto', 12), 'curto');
+  // ----- Fichas de servidor: endereço estável e sem duplicar -----
+  const ids = OBS.pessoal.comIds([
+    { nome: 'ANA', cargo: 'PROFESSOR', desde: '03/2021' }, { nome: 'ANA', cargo: 'PROFESSOR', desde: '03/2021' }, { nome: 'Bia', cargo: 'X' }]);
+  teste('ficha: endereço vem de nome, cargo e admissão', ids[0].id, 'ana--professor--03-2021');
+  teste('ficha: registro repetido ganha --2', ids.map((s) => s.id).sort(), ['ana--professor--03-2021', 'ana--professor--03-2021--2', 'bia--x']);
+  const cmp = OBS.pessoal.comparacaoCargo([{ cargo: 'A', salario: 1 }, { cargo: 'A', salario: 5 }, { cargo: 'A', salario: 5 }, { cargo: 'B', salario: 9 }], { cargo: 'A', salario: 5 });
+  teste('comparação só com o mesmo cargo', cmp, { total: 3, maiores: 0, menores: 1, iguais: 2 });
+  teste('comparação sem salário', OBS.pessoal.comparacaoCargo([], { cargo: 'A', salario: null }), null);
+  // ----- Fornecedor: chave da ficha -----
+  teste('fornecedor com CNPJ: chave = 14 números', OBS.contratos.chaveFornecedor({ fornecedorDoc: '11.222.333/0001-44' }), '11222333000144');
+  teste('fornecedor pessoa física: chave pelo nome, nunca o CPF inteiro', OBS.contratos.chaveFornecedor({ fornecedor: 'José', fornecedorDoc: '***.456.789-**' }), 'n-jose-456789');
+  // ----- Transferências -----
+  const TR = [{ ano: 2025, mes: 1, tipo: 'FPM', valor: 100 }, { ano: 2025, mes: 1, tipo: 'AJUSTE', valor: -10 }, { ano: 2025, mes: 3, tipo: 'FPM', valor: 50 },
+    { ano: 2026, mes: 1, tipo: 'FPM', valor: 120 }, { ano: 2026, mes: 2, tipo: 'FUNDEB', valor: 30 }];
+  teste('transferências: anos do mais recente', OBS.transferencias.anos(TR), [2026, 2025]);
+  teste('transferências: mês sem dado fica null (não zero)', OBS.transferencias.porMes(TR, 2025).slice(0, 4), [90, null, 50, null]);
+  teste('transferências: negativo entra na soma', OBS.transferencias.acumulado(TR, 2025, 12), 140);
+  teste('transferências: comparação até o mesmo mês', [OBS.transferencias.acumulado(TR, 2026, 2), OBS.transferencias.acumulado(TR, 2025, 2)], [150, 90]);
+  teste('transferências: por tipo, maior primeiro', OBS.transferencias.porTipo(TR, 2025).map((x) => x.tipo), ['FPM', 'AJUSTE']);
+  teste('transferências: último mês', OBS.transferencias.ultimoMes(TR, 2026), 2);
+  teste('transferências: variação', [OBS.transferencias.variacao(150, 100), OBS.transferencias.variacao(1, 0)], [50, null]);
+  // ----- Despesa por área (DCA): nunca mistura etapas -----
+  const DCA = { funcoes: [{ codigo: '10', nome: 'Saúde', valores: { empenhado: 100, pago: 90 } }, { codigo: '12', nome: 'Educação', valores: { empenhado: 300 } }] };
+  teste('DCA: empenhado ordena e calcula a fatia', OBS.contas.funcoes(DCA, 'empenhado').map((f) => [f.nome, f.fatia]), [['Educação', 75], ['Saúde', 25]]);
+  teste('DCA: etapa sem valor fica de fora (não vira zero)', OBS.contas.funcoes(DCA, 'pago').map((f) => [f.nome, f.valor, f.fatia]), [['Saúde', 90, 100]]);
+  // ----- Educação (SIOPE) -----
+  const IND = (codigo, nome, valor) => ({ codigo, nome, valor });
+  teste('SIOPE: mínimo de 25% só no indicador 1.1 (MDE)', OBS.contas.minimoEducacao(IND('1.1', 'Percentual de aplicação das receitas de impostos e transferências vinculadas à educação em MDE (mínimo de 25% para estados, DF e municípios)', 28.08)),
+    { minimo: 25, base: 'Constituição Federal, art. 212', cumpre: true });
+  teste('SIOPE: mínimo de 70% só no indicador 1.2 (FUNDEB na remuneração)', OBS.contas.minimoEducacao(IND('1.2', 'Percentual de aplicação do FUNDEB na remuneração dos profissionais da educação (mínimo de 70%) - Inciso XXII', 84.95)).minimo, 70);
+  teste('SIOPE: indicadores que só CITAM MDE não ganham mínimo (aposentadorias, pessoal, o máximo do 1.3...)', [
+    IND('3.1', 'Percentual das despesas com aposentadorias e pensões da área educacional em relação às despesas totais com MDE', 0),
+    IND('3.2', 'Percentual das despesas com pessoal e encargos sociais da área educacional em relação à despesa total com MDE', 0),
+    IND('2.11', 'Percentual de despesas correntes em educação em relação à despesa total em MDE', 0),
+    IND('1.3', 'Percentual de aplicação do FUNDEB em despesas com MDE, que não remuneração dos profissionais da educação (máximo de 30%)', 11.44),
+    IND('8.1', 'Valor exigido de aplicação de impostos em MDE (Mínimo de 25%)', 65410131.76),
+    IND('9.9', 'Percentual de aplicação das receitas de impostos e transferências vinculadas à educação em MDE', 20)
+  ].map(OBS.contas.minimoEducacao), [null, null, null, null, null, null]);
+  teste('SIOPE: "Valor exigido ... (Mínimo de 25%)" é dinheiro, não percentual', ['Valor exigido de aplicação de impostos em MDE (Mínimo de 25%)',
+    'Superávit/Déficit do ente federado no exercício', 'Saldo financeiro do FUNDEB no exercício atual', 'Percentual das receitas do FUNDEB não aplicadas (máximo de 10%)']
+    .map(OBS.contas.tipoIndicador), ['moeda', 'moeda', 'moeda', 'pct']);
+  teste('SIOPE: só o 6º bimestre é ano fechado (antes disso não se compara com o mínimo)',
+    [4, 6].map((b) => OBS.contas.anoFechado({ ano: 2026, bimestre: b })), [false, true]);
+  teste('SIOPE: valor em reais não ganha mínimo percentual', OBS.contas.minimoEducacao({ nome: 'Valor aplicado em MDE (R$)', valor: 10 }), null);
+  teste('SIOPE: tipo do indicador pelo nome', ['Percentual X', 'Investimento por aluno', 'Número de matrículas'].map(OBS.contas.tipoIndicador), ['pct', 'moeda', 'numero']);
+  // ----- Entregas -----
+  const EN = [{ instituicao: 'P', entregavel: 'RGF', data: '2026-01-30' }, { instituicao: 'P', entregavel: 'RGF', data: '2026-05-30' }, { instituicao: 'C', entregavel: 'RGF', data: '2026-02-01' }];
+  teste('entregas: última de cada relatório', OBS.contas.ultimasEntregas(EN).map((r) => r.instituicao + r.data), ['P2026-05-30', 'C2026-02-01']);
+  teste('entregas: rótulo do período', [OBS.contas.rotuloPeriodo({ periodicidade: 'Q', periodo: 2 }), OBS.contas.rotuloPeriodo({ periodicidade: 'A', periodo: 1 }), OBS.contas.rotuloPeriodo({ periodicidade: 'M', periodo: 3 })], ['2º quadrimestre', 'anual', 'março']);
+  // ----- Gráficos -----
+  const fx = OBS.graficos.faixas([1000, 1500, 2000, 9000, 9999.99], 4);
+  teste('histograma: nenhum valor se perde', fx.reduce((t, f) => t + f.quantidade, 0), 5);
+  teste('histograma: o maior valor cai na última faixa', fx[fx.length - 1].quantidade >= 1 && fx[fx.length - 1].ate > 9999.99, true);
+  teste('histograma: lista vazia', OBS.graficos.faixas([null, undefined]), []);
+  teste('celular no modo computador é detectado', [
+    OBS.modoComputadorNoCelular({ larguraTela: 412, larguraPagina: 980, toque: true }),
+    OBS.modoComputadorNoCelular({ larguraTela: 412, larguraPagina: 412, toque: true }),
+    OBS.modoComputadorNoCelular({ larguraTela: 1366, larguraPagina: 1366, toque: false }),
+    OBS.modoComputadorNoCelular({ larguraTela: 800, larguraPagina: 1280, toque: true })], [true, false, false, false]);
+  teste('metas: fase atual é a primeira com pendência', OBS.metasTela.situacoes([
+    { fase: 1, itens: [{ alcancado: true }, { alcancado: true }] },
+    { fase: 2, itens: [{ alcancado: true }, { alcancado: false }] },
+    { fase: 3, itens: [{ alcancado: false }] }]).map((s) => s.situacao), ['concluida', 'atual', 'proxima']);
+  teste('metas: lista real tem 4 fases e só a 1ª é a atual', OBS.metasTela.situacoes(OBS.METAS).map((s) => s.situacao),
+    ['atual', 'proxima', 'proxima', 'proxima']);
+  teste('impostômetro: Videira é o padrão e só endereços da ACSP', [OBS.impostometro.endereco('municipio'), OBS.impostometro.endereco('brasil'), OBS.impostometro.endereco('outro')],
+    ['https://impostometro.com.br/widget/contador/sc?municipio=videira', 'https://impostometro.com.br/widget/contador/', null]);
+  teste('receitas: % do previsto com uma casa', [OBS.receitas.percentual(327884990.19, 431100972.64), OBS.receitas.percentual(5, 0), OBS.receitas.percentual(null, 10)], [76.1, null, null]);
+  const fraseRec = OBS.receitas.frase({ periodo: 'janeiro a agosto de 2026', total: { realizado: 327884990.19, previsto: 431100972.64 } });
+  teste('receitas: frase do ano', fraseRec.replace(/ /g, ' '), 'De janeiro a agosto de 2026, o Município de Videira recebeu R$ 327,9 milhões em receitas, 76,1% do previsto para o ano (R$ 431,1 milhões), segundo o relatório que ele mesmo enviou ao Tesouro Nacional.');
+  teste('receitas: frase sem opinião', OBS.frases.opiniao(fraseRec), null);
+  teste('receitas: sem previsão, a frase não inventa %', OBS.receitas.frase({ periodo: 'janeiro a fevereiro de 2026', total: { realizado: 10, previsto: null } }).includes('%'), false);
+  teste('números: decimal brasileiro', [OBS.receitas.decimal(384.127), OBS.receitas.decimal(null)], ['384,1', '—']);
+  teste('gráfico: eixo com passo redondo', OBS.graficos.eixo([46165401.23, 30000000, 12000000]), { base: 0, topo: 60000000, marcas: [0, 20000000, 40000000, 60000000] });
+  teste('gráfico: eixo com negativo', OBS.graficos.eixo([-5, 10, null]), { base: -5, topo: 10, marcas: [-5, 0, 5, 10] });
+  teste('gráfico: eixo sem valores', OBS.graficos.eixo([null]), { base: 0, topo: 1, marcas: [0, 1] });
+  teste('gráfico: frase do maior e do menor', OBS.graficos.extremos([{ titulo: 'agosto', valor: 10 }, { titulo: 'setembro', valor: 30 }, { titulo: 'outubro', valor: null }], (n) => `R$ ${n}`),
+    'Maior valor: setembro, R$ 30. Menor valor: agosto, R$ 10.');
+  teste('gráfico: sem frase se todos iguais', OBS.graficos.extremos([{ rotulo: 'a', valor: 5 }, { rotulo: 'b', valor: 5 }], String), '');
+  teste('valor curto', [OBS.graficos.moedaCurta(3622769.83), OBS.graficos.moedaCurta(980000), OBS.graficos.moedaCurta(-2500000)], ['R$ 3,6 mi', 'R$ 980 mil', '-R$ 2,5 mi']);
+  // ----- Vários meses (evolução e pagamentos de um fornecedor) -----
+  teste('12 meses atravessam o ano', OBS.historico.meses('2026-02', 3), ['2025-12', '2026-01', '2026-02']);
+  teste('rótulo curto do mês', OBS.historico.rotulo('2026-03'), 'mar/26');
+  const HIS = [{ anoMes: '2026-01', linhas: [
+    { nomeCredor: 'EMPRESA', cpfCnpjCredor: '11.222.333/0001-44', orgaoDescricao: 'SAUDE', valorEmpenhado: '10', valorLiquidado: '8', valorPago: '5' },
+    { nomeCredor: 'EMPRESA', cpfCnpjCredor: '99888777000166', orgaoDescricao: 'SAUDE', valorEmpenhado: '1', valorLiquidado: '1', valorPago: '1' }] },
+    { anoMes: '2026-02', erro: 'falha' }];
+  teste('evolução: etapas separadas e mês com erro fica null', OBS.historico.totaisPorMes(HIS).map((m) => [m.empenhado, m.liquidado, m.pago]), [[11, 9, 6], [null, null, null]]);
+  teste('fornecedor: junta só pelo CNPJ, nunca pelo nome', OBS.historico.doCredor(HIS, '11222333000144')[0].pago, 5);
+  // ----- Pesquisa geral -----
+  teste('pesquisa: CNPJ com pontuação vira números', OBS.buscaGlobal.palavras('11.222.333/0001'), ['112223330001']);
+  teste('pesquisa: ignora letra solta', OBS.buscaGlobal.palavras('a joão'), ['joao']);
+  const PG = OBS.buscaGlobal.procurar('joao prof', { servidores: [{ _busca: 'joao silva professor' }, { _busca: 'joao silva motorista' }], fornecedores: null });
+  teste('pesquisa: todas as palavras precisam aparecer', [PG.servidores.length, PG.fornecedores.length], [1, 0]);
+  teste('pesquisa: acha fornecedor pelo CNPJ digitado', OBS.buscaGlobal.procurar('11.222.333/0001-44', { f: [{ _busca: 'x', _digitos: '11222333000144' }] }).f.length, 1);
+  // ----- Endereços (rotas) -----
+  teste('rota de ficha', OBS.rotas.ler('#contrato/83039842000184-2-000001%2F2025'), { nome: 'contrato', resto: '83039842000184-2-000001/2025' });
+  teste('rota vazia vai para o início', OBS.rotas.ler(''), { nome: 'inicio', resto: '' });
+  teste('rota malformada não quebra', OBS.rotas.ler('#busca/%E0%A4%A'), { nome: 'busca', resto: '' });
+  // ----- Planilha genérica -----
+  const csv2 = OBS.exportar.csvTabela({ titulo: 'T', fonte: 'F', periodo: '2025' }, [{ titulo: 'Nome', valor: (l) => l.n }, { titulo: 'Valor', tipo: 'moeda', valor: (l) => l.v }], [{ n: '=x', v: 1.5 }]);
+  teste('planilha genérica: fonte, proteção de fórmula e número', [csv2.includes('"Fonte";"F"'), csv2.includes("\"'=x\";1,50")], [true, true]);
+
+  // ===================== GUIA TÉCNICO DE UI/UX =====================
+  teste('paginação: página do meio', OBS.paginar(45, 2, 20), { pagina: 2, paginas: 3, inicio: 20, fim: 40 });
+  teste('paginação: última página incompleta', OBS.paginar(45, 3, 20), { pagina: 3, paginas: 3, inicio: 40, fim: 45 });
+  teste('paginação: página além do fim volta para a última', OBS.paginar(45, 9, 20).pagina, 3);
+  teste('paginação: lista vazia tem 1 página', OBS.paginar(0, 1, 20), { pagina: 1, paginas: 1, inicio: 0, fim: 0 });
+  teste('link seguro: aceita https e #', [OBS.urlSegura('https://pncp.gov.br/x'), OBS.urlSegura('#servidores')], ['https://pncp.gov.br/x', '#servidores']);
+  teste('link seguro: recusa javascript: e vazio', [OBS.urlSegura('javascript:alert(1)'), OBS.urlSegura(''), OBS.urlSegura('//x.com')], [null, null, null]);
+  const RD = [
+    { orgaoDescricao: 'SAUDE', unidadeDescricao: 'HOSPITAL', fonteRecursoDescricao: 'SUS', nomeCredor: 'Clínica Ção', cpfCnpjCredor: '11222333000144' },
+    { orgaoDescricao: 'SAUDE', unidadeDescricao: 'POSTO', fonteRecursoDescricao: 'Próprios', nomeCredor: 'Fulano', cpfCnpjCredor: '12345678901' },
+    { orgaoDescricao: 'OBRAS', unidadeDescricao: 'VIAS', fonteRecursoDescricao: 'Próprios', nomeCredor: 'Construtora', cpfCnpjCredor: '99.888.777/0001-66' }];
+  teste('despesas: filtros combinados', OBS.filtrarDespesas(RD, { orgao: 'SAUDE', fonte: 'Próprios' }).map((l) => l.nomeCredor), ['Fulano']);
+  teste('despesas: credor sem acento', OBS.filtrarDespesas(RD, { credor: 'clinica cao' }).length, 1);
+  teste('despesas: CNPJ digitado com pontos', OBS.filtrarDespesas(RD, { credor: '99.888.777' }).map((l) => l.nomeCredor), ['Construtora']);
+  teste('despesas: CPF NUNCA é pesquisável', OBS.filtrarDespesas(RD, { credor: '456789' }).length, 0);
+  teste('despesas: sem filtros devolve tudo', OBS.filtrarDespesas(RD, {}).length, 3);
+  teste('servidores: filtro por cargo', OBS.pessoal.buscar(L, { cargo: 'PROFESSOR' }).map((s) => s.nome), ['JOÃO EXEMPLO']);
+  teste('servidores: homônimos continuam separados', OBS.pessoal.comIds([{ nome: 'ANA', cargo: 'A' }, { nome: 'ANA', cargo: 'B' }]).map((x) => x.id), ['ana--a', 'ana--b']);
+  teste('rota de despesas com mês', OBS.rotas.ler('#gastos/2026-09'), { nome: 'gastos', resto: '2026-09' });
+  teste('CSV de despesas registra os filtros', OBS.exportar.csvDespesas([], { ini: '01/09/2026', fim: '30/09/2026' },
+    { url: 'https://x', consultadoEm: new Date(2026, 9, 1), descartadas: 0, filtros: 'secretaria = SAUDE' }).includes('"Filtros aplicados";"secretaria = SAUDE"'), true);
+// SIGLAS: só marca palavra inteira, nunca altera o texto e não confunde siglas curtas com nomes de empresas.
+  const siglasDe = (t, o) => OBS.siglas.encontrar(t, o).map((a) => t.slice(a.inicio, a.fim));
+  teste('siglas: acha FPM em "FPM 1%"', siglasDe('FPM 1%'), ['FPM']);
+  teste('siglas: LC e ADO25 em "LC 176/2020 (ADO25)"', siglasDe('LC 176/2020 (ADO25)'), ['LC', 'ADO25']);
+  teste('siglas: só palavra inteira', siglasDe('FUNDEBX XFPM CPFS'), []);
+  teste('siglas: várias na mesma frase', siglasDe('aplicação em MDE (mínimo de 25%) e VAAT - FUNDEB'), ['MDE', 'VAAT', 'FUNDEB']);
+  teste('siglas: MF só em "MGI/MF/CGU"', [siglasDe('Portaria Conjunta MGI/MF/CGU'), siglasDe('MF COMERCIO LTDA')], [['MGI', 'MF', 'CGU'], []]);
+  teste('siglas: LC só antes de número', siglasDe('LC TRANSPORTES LTDA'), []);
+  teste('siglas: partidos não são marcados sozinhos', siglasDe('PL MDB PSD PDT'), []);
+  teste('siglas: partidos marcados quando a tela pede', siglasDe('PL', { todas: true }), ['PL']);
+  teste('siglas: "União" nunca vira sigla', siglasDe('União', { todas: true }), []);
+  teste('siglas: siglas sem repetição', new Set(OBS.siglas.LISTA.map((s) => s.sigla)).size, OBS.siglas.LISTA.length);
+  teste('siglas: todas têm nome e explicação', OBS.siglas.LISTA.concat(OBS.siglas.TERMOS).every((s) => (s.nome || s.termo) && s.texto), true);
+  teste('siglas: busca sem acento', OBS.siglas.filtrar(OBS.siglas.TERMOS, 'inexigibilidade lei').map((t) => t.termo), ['Inexigibilidade']);
+  teste('siglas: endereço da sigla', OBS.siglas.slug('ADO 25'), 'ado-25');
+  teste('rota da aba de siglas', OBS.rotas.ler('#siglas/sigla-fpm'), { nome: 'siglas', resto: 'sigla-fpm' });
+  teste('rotas: endereços antigos (links compartilhados) levam às telas novas',
+    ['#servidores', '#servidores/lista', '#contas', '#contas/transferencias', '#contas/beneficios', '#contas/areas', '#contas/educacao', '#siglas/sigla-fpm']
+      .map(OBS.rotas.redirecionar),
+    ['#pessoal', '#pessoal/lista', '#limites', '#entradas/transferencias', '#entradas/beneficios', '#gastos/areas', '#limites/educacao', '#glossario/sigla-fpm']);
+  teste('rotas: endereços novos ficam como estão', ['#gastos/2026-09', '#pessoal', '#contratos', '#contasx', ''].map(OBS.rotas.redirecionar), [null, null, null, null, null]);
+  // ----- Gerador de frases (linguagem simples, sem opinião, sujeito certo) -----
+  const F0 = OBS.frases;
+  // Nos testes, o espaço que não quebra linha (usado depois de "R$") é comparado como espaço comum.
+  const semNbsp = (x) => (typeof x === 'string' ? x.replace(/ /g, ' ') : x);
+  const F = Object.fromEntries(Object.entries(F0).map(([k, f]) => [k, typeof f === 'function' ? (...a) => semNbsp(f(...a)) : f]));
+  teste('frases: reais por extenso', [46165401.23, 1500000, 1999999, 2000000, 980000.4, 233594.31, 1004.99, 999.5, -70670.44, 2.5e9, 1e9]
+    .map(F.reais), ['R$ 46,2 milhões', 'R$ 1,5 milhão', 'R$ 2 milhões', 'R$ 2 milhões', 'R$ 980 mil', 'R$ 234 mil', 'R$ 1 mil',
+    'R$ 999,50', '−R$ 71 mil', 'R$ 2,5 bilhões', 'R$ 1 bilhão']);
+  teste('frases: percentual junto a limite mantém as casas da fonte (53,98% não vira 54%)', [F.pct(53.98), F.pct(24.96), F.pct(54)], ['53,98%', '24,96%', '54%']);
+  teste('frases: gasto do mês fala do MUNICÍPIO e põe o período primeiro', F.gastoDoMes({ anoMes: '2026-09', pago: 46165401.23 }),
+    'Em setembro de 2026, o Município de Videira pagou R$ 46,2 milhões.');
+  teste('frases: mês em andamento diz que é parcial na própria frase', F.gastoDoMes({ anoMes: '2026-10', pago: 233594.31, parcial: true }),
+    'Até agora em outubro de 2026 (o mês ainda não terminou), o Município de Videira pagou R$ 234 mil.');
+  teste('frases: sem dado não vira "R$ 0"', F.gastoDoMes({ anoMes: '2026-11', pago: 0, vazio: true }), 'A fonte ainda não publicou os gastos de novembro de 2026.');
+  teste('frases: gasto com pessoal é da PREFEITURA e é DECLARADO', F.limitePessoal({ rotulo: '2º quadrimestre de 2026', dtpPct: 43.77, limiteMaximoPct: 54 }),
+    'No 2º quadrimestre de 2026, a Prefeitura declarou ao Tesouro um gasto com pessoal de 43,77% da receita corrente líquida. O limite máximo da lei é 54%.');
+  teste('frases: pessoal do Município, com aposentados e pensionistas', F.pessoal({ registros: 3049, comissionados: 110, inativos: 663 }),
+    'A lista de pessoal do Município tem 3.049 registros, incluindo 663 de aposentados e pensionistas. 110 são cargos de indicação (comissionados).');
+  teste('frases: pauta futura é "marcada para", passada é "de"', [
+    F.pautaCamara({ titulo: 'Pauta da 31ª Sessão', data: '2026-10-06 19:15:00' }, new Date(2026, 9, 3)),
+    F.pautaCamara({ titulo: 'Pauta da 30ª Sessão', data: '2026-09-29 19:15:00' }, new Date(2026, 9, 3))],
+    ['A pauta mais recente publicada pela Câmara é “Pauta da 31ª Sessão”, marcada para 06/10/2026.',
+     'A pauta mais recente publicada pela Câmara é “Pauta da 30ª Sessão”, de 29/09/2026.']);
+  teste('frases: detector de opinião', [F.opiniao('o gasto foi muito alto'), F.opiniao('Só R$ 2 mil'), F.opiniao('alta de 12,4%'), F.opiniao('pagou R$ 2 mil')],
+    ['muito', 'só', null, null]);
+  teste('frases: NENHUMA frase gerada tem palavra de opinião', [
+    F.gastoDoMes({ anoMes: '2026-09', pago: 1 }), F.gastoDoMes({ anoMes: '2026-10', pago: 1, parcial: true }), F.gastoDoMes({ anoMes: '2026-10', vazio: true }),
+    F.transferencias(2026, 9, 96038059.66), F.pessoal({ registros: 1, comissionados: 1, inativos: 1 }), F.contratos({ contratos: 1, valorGlobal: 1 }),
+    F.limitePessoal({ rotulo: 'x', dtpPct: 1, limiteMaximoPct: 54 }), F.pautaCamara({ titulo: 'Pauta', data: '2026-10-06 20:30:00' })
+  ].map(F.opiniao).filter(Boolean), []);
+  teste('frases: nenhuma frase do Município chama os gastos de "Prefeitura"', /Prefeitura/.test(F.gastoDoMes({ anoMes: '2026-09', pago: 1 }) + F.contratos({ contratos: 1, valorGlobal: 1 }) + F.pessoal({ registros: 1 })), false);
+  // ----- Botão "Ouvir": texto preparado para a voz -----
+  const fala = (t) => OBS.ouvir.paraFala(t);
+  teste('ouvir: dinheiro por extenso vira "de reais"', [fala('pagou R$ 46,2 milhões.'), fala('R$ 1,5 milhão'), fala('R$ 980 mil'), fala('−R$ 71 mil')],
+    ['pagou 46,2 milhões de reais.', '1,5 milhão de reais', '980 mil reais', 'menos 71 mil reais']);
+  teste('ouvir: valor exato com centavos', [fala('Valor exato: R$ 46.165.401,23.'), fala('R$ 999,00')], ['Valor exato: 46.165.401 reais e 23 centavos.', '999 reais']);
+  teste('ouvir: percentual vira "por cento"', fala('gasto de 43,77% da receita'), 'gasto de 43,77 por cento da receita');
+  teste('ouvir: sigla vira o nome completo', fala('recebeu do FPM'), 'recebeu do Fundo de Participação dos Municípios');
+  teste('ouvir: fala dividida por frases e em pedaços de até 200 letras',
+    [OBS.ouvir.pedacos('Primeira frase. Segunda frase!').length, OBS.ouvir.pedacos('a'.repeat(150) + ', ' + 'b'.repeat(150)).every((p) => p.length <= 200)], [2, true]);
+  teste('mês futuro não aparece: ano atual só até o mês de hoje; anos passados com 12 meses',
+    [OBS.mesesDisponiveis(2026, new Date(2026, 9, 3)), OBS.mesesDisponiveis('2026', new Date(2026, 9, 3)), OBS.mesesDisponiveis(2025, new Date(2026, 9, 3)), OBS.mesesDisponiveis(2026, new Date(2026, 0, 1))],
+    [10, 10, 12, 1]);
+  // ----- Compartilhar (WhatsApp): a mensagem se sustenta sozinha, longe do site -----
+  const CP = OBS.compartilhar;
+  teste('compartilhar: endereço oficial completo com o "#" da tela', CP.enderecoDaTela('#gastos/2026-09'), 'https://criscoser.github.io/olhomagico/#gastos/2026-09');
+  const msgGasto = CP.montarTexto({ titulo: 'Para onde vai o dinheiro?', frase: 'Em setembro de 2026, o Município de Videira pagou R$ 46,2 milhões.',
+    exato: 'Valor exato: R$ 46.165.401,23.', data: '03/10/2026', url: 'https://criscoser.github.io/olhomagico/#gastos/2026-09' });
+  teste('compartilhar: mensagem com frase, valor exato, data, link e aviso de que não é oficial', msgGasto,
+    '*Para onde vai o dinheiro?*\nEm setembro de 2026, o Município de Videira pagou R$ 46,2 milhões.\nValor exato: R$ 46.165.401,23.\n\n' +
+    'Fonte: dados públicos oficiais (a origem de cada número está no link). Consultado em 03/10/2026.\n' +
+    'Veja os detalhes: https://criscoser.github.io/olhomagico/#gastos/2026-09\n\nOlho Mágico, portal independente (não é site oficial da Prefeitura).');
+  const msgServidor = CP.textoFichaServidor('PROFESSOR', '03/10/2026', 'https://x/#servidor/fulano--professor');
+  teste('compartilhar: ficha de servidor sem nome e sem salário (só o cargo)', [msgServidor.includes('Cargo: PROFESSOR.'), /R\$/.test(msgServidor), /sal[aá]rio/i.test(msgServidor), msgServidor.includes('não é site oficial')],
+    [true, false, false, true]);
+  teste('compartilhar: valor exato inteiro (os pontos de milhar fazem parte do número)', [
+    CP.valorExato('Valor exato: R$ 46.165.401,23. 22 órgãos pagaram 717 credores.'), CP.valorExato('Valor exato: R$ 999,50.'),
+    CP.valorExato('Valor exato: −R$ 70.670,44.'), CP.valorExato('sem valor aqui')],
+    ['Valor exato: R$ 46.165.401,23.', 'Valor exato: R$ 999,50.', 'Valor exato: −R$ 70.670,44.', '']);
+  teste('compartilhar: mensagem sem palavra de opinião', [OBS.frases.opiniao(msgGasto), OBS.frases.opiniao(msgServidor)], [null, null]);
+  // ----- Resumo diário das despesas (dados/despesas-resumo.js) -----
+  const RESUMO = { meses: [
+    { anoMes: '2026-08', registros: 10, parcial: false, credoresQueReceberam: 7, total: { empenhado: 3, liquidado: 2, pago: 1 } },
+    { anoMes: '2026-09', registros: 0, parcial: false, credoresQueReceberam: 0, total: { empenhado: 0, liquidado: 0, pago: 0 } },
+    { anoMes: '2026-10', registros: 5, parcial: true, credoresQueReceberam: 2, total: { empenhado: 9, liquidado: 8, pago: 7 } }] };
+  teste('resumo: totais por mês, separados e com mês parcial marcado', OBS.historico.doResumo(RESUMO, ['2026-08', '2026-10']),
+    [{ anoMes: '2026-08', empenhado: 3, liquidado: 2, pago: 1, vazio: false, parcial: false, credoresQueReceberam: 7 },
+     { anoMes: '2026-10', empenhado: 9, liquidado: 8, pago: 7, vazio: false, parcial: true, credoresQueReceberam: 2 }]);
+  teste('resumo: mês sem registros fica "vazio" (não vira zero sem aviso)', OBS.historico.doResumo(RESUMO, ['2026-09'])[0].vazio, true);
+  teste('resumo: faltou um mês -> null (o site consulta ao vivo)', OBS.historico.doResumo(RESUMO, ['2026-07', '2026-08']), null);
+  teste('resumo: arquivo ausente -> null', OBS.historico.doResumo(null, ['2026-08']), null);
+  // ----- Pix: o código só vale se CRC, chave, conta, moeda, país e nome baterem (senão, falha fechada) -----
+  const PIX = OBS.config.PIX_COPIA_E_COLA;
+  const ESPERADO = { chave: OBS.config.PIX_CHAVE, recebedor: OBS.config.PIX_RECEBEDOR };
+  const comCrc = (semCrc) => semCrc + OBS.pix.crc16(semCrc);   // refaz o CRC (como faria quem quisesse enganar)
+  teste('Pix: CRC16 do exemplo do padrão ("123456789" -> 29B1)', OBS.pix.crc16('123456789'), '29B1');
+  teste('Pix: o código configurado é válido', OBS.pixCodigoValido(), { ok: true });
+  teste('Pix: o código configurado contém a chave configurada', PIX.includes(OBS.config.PIX_CHAVE), true);
+  teste('Pix: CRC alterado falha', OBS.pix.validar(PIX.slice(0, -1) + (PIX.endsWith('0') ? '1' : '0'), ESPERADO).ok, false);
+  teste('Pix: uma letra trocada no meio falha (CRC)', OBS.pix.validar(PIX.replace('SAO PAULO', 'SAO PAULA'), ESPERADO).ok, false);
+  teste('Pix: outra chave, mesmo com CRC refeito, falha',
+    OBS.pix.validar(comCrc(PIX.slice(0, -4).replace(OBS.config.PIX_CHAVE, 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')), ESPERADO).motivo,
+    'a chave do código é diferente da chave configurada');
+  teste('Pix: outro nome, mesmo com CRC refeito, falha',
+    OBS.pix.validar(comCrc(PIX.slice(0, -4).replace('5913TIAGO C COSER', '5913FULANO D TALL')), ESPERADO).motivo,
+    'o nome do recebedor é diferente do configurado');
+  teste('Pix: código cortado falha', OBS.pix.validar(PIX.slice(0, 60), ESPERADO).ok, false);
+  teste('Pix: código vazio falha', OBS.pix.validar('', ESPERADO).ok, false);
+  teste('Pix: chave configurada diferente do código falha', OBS.pix.validar(PIX, { chave: 'outra', recebedor: ESPERADO.recebedor }).ok, false);
+  teste('Pix: estrutura quebrada falha', OBS.pix.lerCampos('0002019'), null);
+  // ----- QR Code: o desenho do Pix tem de ser IDÊNTICO ao da biblioteca original (Nayuki, Python), conferido bit a bit -----
+  const qrPix = OBS.qr.gerar(PIX, 'M');
+  const linhasQr = []; let escurosQr = 0;
+  for (let y = 0; y < qrPix.tamanho; y++) { let s = ''; for (let x = 0; x < qrPix.tamanho; x++) { const m = qrPix.modulo(x, y); s += m ? '1' : '0'; if (m) escurosQr++; } linhasQr.push(s); }
+  const fnv = (texto) => { let h = 0x811c9dc5; for (let i = 0; i < texto.length; i++) { h ^= texto.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); };
+  teste('QR do Pix: versão, nível e máscara iguais aos da referência', [qrPix.versao, qrPix.nivel, qrPix.mascara, qrPix.tamanho], [8, 'M', 2, 49]);
+  teste('QR do Pix: mesmos módulos da referência (impressão digital)', [escurosQr, fnv(linhasQr.join('|'))], [1220, '2eb6f035']);
+  teste('QR: texto vazio e acentos viram bytes UTF-8 corretos', [OBS.qr.utf8(''), OBS.qr.utf8('ã€')], [[], [0xC3, 0xA3, 0xE2, 0x82, 0xAC]]);
+</script></body></html>

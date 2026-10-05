@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<!-- ESTRUTURA DA PÁGINA: só o "esqueleto" (textos e caixas). O visual fica em css/estilo.css
+     e o comportamento em js/. Os scripts são carregados NA ORDEM abaixo, porque um depende do outro. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- POLÍTICA DE SEGURANÇA (CSP): o navegador só aceita scripts, estilos e letras deste próprio site
+     e só conversa com a API oficial de Videira. Se alguém conseguir injetar código, ele não roda.
+     Trusted Types: scripts só podem ser carregados pela política "olhomagico" (js/fontes/arquivos.js), que aceita
+     apenas os arquivos de dados do próprio site. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src https://videira.atende.net; frame-src https://impostometro.com.br; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types olhomagico">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Olho Mágico — Para onde vai o dinheiro público de Videira?</title>
+<!-- DESCRIÇÃO e PRÉVIA DE COMPARTILHAMENTO: é o texto que aparece no Google e quando o link
+     é enviado no WhatsApp/Facebook. Se trocar o nome do site, troque aqui também. -->
+<meta name="description" content="Olho Mágico: portal independente que mostra, em palavras simples, quanto o Município de Videira/SC pagou, a quem, e quem trabalha nele. Dados de fontes públicas oficiais.">
+<meta property="og:title" content="Olho Mágico — Para onde vai o dinheiro público de Videira?">
+<meta property="og:description" content="Quanto o Município de Videira pagou, a quem e por qual órgão, em linguagem simples. Portal independente, não é site oficial.">
+<!-- IMAGEM DE PRÉVIA (1200x630) que aparece ao enviar o link no WhatsApp/Facebook. O endereço precisa ser completo. -->
+<meta property="og:image" content="https://criscoser.github.io/olhomagico/img/previa.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logo do Olho Mágico (cacho de uvas com um olho mágico) e o texto: Gastos, contratos e servidores de Videira (SC), com a fonte oficial de cada número. Portal independente, não é site oficial.">
+<meta property="og:url" content="https://criscoser.github.io/olhomagico/">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta name="theme-color" content="#FAF8F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16111D" media="(prefers-color-scheme: dark)">
+<!-- ÍCONE DA ABA: logo V3 simplificado (cacho de uvas em pontos + olho mágico dourado). O arquivo troca as cores
+     sozinho quando a aba do navegador está no modo escuro. -->
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<!-- LETRA: "Atkinson Hyperlegible" (criada para ser fácil de ler), hospedada no próprio site (css/tipografia/).
+     O "preload" pede a letra normal logo no começo, junto com o CSS. -->
+<link rel="preload" href="css/tipografia/atkinson-hyperlegible-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+<!-- Aviso para quem estiver com JavaScript desligado (sem ele o site não consegue buscar os dados). -->
+<noscript><p class="sem-js">Este site precisa de JavaScript ligado para buscar os dados. Você também pode consultar direto o <a href="https://videira.atende.net/transparencia/">Portal da Transparência de Videira</a>.</p></noscript>
+
+<!-- Atalho para quem usa teclado: pula o menu e vai direto ao conteúdo. -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- ESTRUTURA GERAL (AppShell): menu lateral à esquerda (no computador, sempre aberto) e conteúdo à direita.
+     No celular e no tablet (até 1024 px): barra INFERIOR com 5 atalhos (Início, Gastos, Pessoal, Buscar, Mais);
+     "Mais" abre o corpo deste mesmo menu como uma folha que sobe de baixo (todas as seções, apoio e ajustes). -->
+<div class="app">
+  <!-- MENU LATERAL: no computador fica sempre aberto, com o nome de cada seção escrito (ninguém precisa adivinhar ícone).
+       No celular, o topo mostra só a marca, e o corpo do menu vira a folha "Mais" da barra inferior. -->
+  <aside class="lateral" id="lateral" aria-label="Menu do site">
+    <div class="lateral-topo">
+      <!-- MARCA: logo V3 (cacho de uvas em pontos, com um olho mágico dourado no lugar de uma uva).
+           Versão simplificada (própria para 16/32 px). No menu, que é escuro nos dois temas, as uvas são lilás.
+           Desenho feito no próprio HTML, sem imagem extra. -->
+      <p class="marca"><a href="#inicio">
+        <svg class="logo" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <g class="logo-uva"><circle cx="8" cy="4.6" r="2.2"/><circle cx="12.2" cy="4.6" r="2.2"/><circle cx="5.9" cy="8.4" r="2.2"/><circle cx="10.1" cy="8.4" r="2.2"/><circle cx="8" cy="12.2" r="2.2"/></g>
+          <circle class="logo-aro" cx="3.8" cy="4.6" r="2.6"/><circle class="logo-lente" cx="3.8" cy="4.6" r="1.2"/>
+        </svg><span class="marca-texto rotulo"><span id="nomeSite">Olho Mágico</span><small>Transparência pública</small></span></a></p>
+      <!-- IMPOSTÔMETRO (js/impostometro.js): sempre aberto, com a lista para escolher Videira (padrão), SC ou Brasil.
+           Contador oficial da ACSP (impostometro.com.br), mostrando só a faixa dos números. -->
+      <div class="impostometro-topo oculto" id="impostometroTopo">
+        <div class="impostometro-nome">
+          <span class="impostometro-cabeca">
+            <label for="escolhaImpostometro" class="impostometro-rotulo">Impostômetro · estimativa da ACSP</label>
+            <button type="button" class="impostometro-ajuda" id="ajudaImpostometro" aria-expanded="false" aria-controls="infoImpostometro" aria-label="O que é este contador?">ⓘ</button>
+          </span>
+          <select id="escolhaImpostometro" class="impostometro-escolha">
+            <option value="municipio">Videira</option>
+            <option value="estado">Santa Catarina</option>
+            <option value="brasil">Brasil</option>
+          </select>
+        </div>
+        <div class="impostometro-faixa" id="impostometroFaixa"></div>
+        <!-- Explicação do contador (abre no ⓘ): é estimativa da ACSP; o valor oficial está na aba Entradas. -->
+        <div class="impostometro-info oculto" id="infoImpostometro" role="note">
+          <p><strong>Este contador é uma estimativa da Associação Comercial de São Paulo (ACSP), não o valor oficial.</strong>
+            Para o que ainda não foi divulgado, a ACSP projeta a partir dos anos anteriores, por isso o número pode ficar diferente do real.</p>
+          <p id="impostometroExplica" aria-live="polite"></p>
+          <p><a href="#entradas/receitas">Ver o valor oficial declarado pela Prefeitura</a> · <a href="https://impostometro.com.br/home/metodologiaimpostometro" target="_blank" rel="noopener noreferrer">Metodologia da ACSP</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="lateral-corpo" id="lateralCorpo">
+      <!-- MENU: cada link muda o fim do endereço (#inicio, #gastos...); o arquivo js/rotas.js mostra a tela certa.
+           Os ícones são só enfeite (aria-hidden); o nome de cada seção está sempre no texto do link. -->
+      <nav class="menu" id="menuPrincipal" aria-label="Seções do site">
+        <a class="aba" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span class="rotulo">Início</span></a>
+        <a class="aba" href="#municipio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/></svg><span class="rotulo">Município</span></a>
+        <a class="aba" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span class="rotulo">Gastos</span></a>
+        <a class="aba" href="#pessoal"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span class="rotulo">Pessoal</span></a>
+        <a class="aba" href="#contratos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/><path d="M9 13h8M9 17h6"/></svg><span class="rotulo">Contratos</span></a>
+        <a class="aba" href="#entradas"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg><span class="rotulo">Entradas</span></a>
+        <a class="aba" href="#limites"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg><span class="rotulo">Limites da lei</span></a>
+        <a class="aba" href="#camara"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M2 21h20"/><path d="M9 21v-6h6v6"/><path d="M12 2v2"/></svg><span class="rotulo">Câmara</span></a>
+        <a class="aba" href="#glossario"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 7h6M9 10.5h4"/></svg><span class="rotulo">Palavras e siglas</span></a>
+        <a class="aba" href="#direitos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v17M6 21h12M4 7h16"/><path d="M7 7l-3 6a3 3 0 0 0 6 0z"/><path d="M17 7l-3 6a3 3 0 0 0 6 0z"/></svg><span class="rotulo">Leis e direitos</span></a>
+        <a class="aba" href="#sobre"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="rotulo">Sobre e fontes</span></a>
+      </nav>
+      <!-- RODAPÉ DO MENU: apoio (só aparece com chave Pix em js/config.js) e tema claro/escuro. -->
+      <div class="lateral-rodape">
+        <button type="button" class="item-lateral oculto" id="btnApoio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="rotulo">Apoie o projeto</span></button>
+        <!-- TAMANHO DA LETRA: 4 passos (100%, 115%, 130%, 150%), por cima do tamanho que a pessoa já usa no aparelho. -->
+        <div class="controle-letra" role="group" aria-labelledby="rotuloLetra">
+          <span id="rotuloLetra" class="rotulo-letra">Tamanho da letra</span>
+          <button type="button" class="item-letra" id="letraMenor" aria-label="Diminuir a letra">A−</button>
+          <span id="letraValor" class="valor-letra" aria-live="polite">100%</span>
+          <button type="button" class="item-letra" id="letraMaior" aria-label="Aumentar a letra">A+</button>
+        </div>
+        <button type="button" class="item-lateral" id="btnTema"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><span class="rotulo" id="btnTemaTexto">Usar tema escuro</span></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <!-- CABEÇALHO DA PÁGINA: contexto, pesquisa geral e data da última atualização das cópias. -->
+    <header class="topo">
+      <div class="topo-texto">
+        <p class="topo-titulo">Portal de transparência: Videira / SC</p>
+        <p class="topo-sub">Dados públicos organizados para consulta e verificação</p>
+      </div>
+      <!-- PESQUISA GERAL: procura ao mesmo tempo em servidores, fornecedores, contratos e licitações. -->
+      <form class="busca-topo" id="formBusca" role="search">
+        <label for="campoBusca" class="visualmente-oculto">Pesquisar em servidores, fornecedores, contratos e licitações</label>
+        <input type="search" id="campoBusca" placeholder="Nome, empresa, CNPJ ou contrato" autocomplete="off" enterkeyhint="search">
+        <button type="submit">Pesquisar</button>
+      </form>
+      <a class="atualizacao" id="atualizacao" href="#sobre/situacao">Atualização: verificando</a>
+    </header>
+
+<main class="wrap" id="conteudo" tabindex="-1">
+  <!-- AVISO DE INDEPENDÊNCIA (texto definido no guia do projeto). -->
+  <p class="aviso-independente" role="note"><strong>Portal independente.</strong> Os dados são organizados a partir de fontes públicas oficiais. Consulte sempre os documentos originais.</p>
+  <!-- ================= INÍCIO: painel com os principais números (cada quadro só aparece se houver dado) ================= -->
+  <div id="aba-inicio">
+    <!-- ABERTURA: nome do projeto e os dois caminhos mais usados. -->
+    <section class="abertura" aria-label="Apresentação">
+      <p class="abertura-titulo">Olho Mágico</p>
+      <p class="abertura-lema">Transparência não é favor, é obrigação!</p>
+      <p class="abertura-frase">Publicar uma informação não é o mesmo que torná-la acessível. Transparência de verdade é quando o cidadão consegue encontrar, entender e fiscalizar.</p>
+      <p class="abertura-sub">Para onde vai o dinheiro público de Videira, em palavras simples.</p>
+      <div class="abertura-acoes">
+        <a class="botao-verde" href="#gastos">Ver os gastos</a>
+        <a class="botao-contorno" href="#busca">Pesquisar um nome</a>
+      </div>
+    </section>
+    <!-- VIDEIRA EM NÚMEROS: população, área, PIB e receita do ano (js/municipio-tela.js). Some se não houver dado. -->
+    <section class="faixa-numeros oculto" id="faixaNumeros" aria-label="Videira em números"></section>
+    <h1 class="titulo-pagina">Videira em 6 perguntas</h1>
+    <p class="sub sub-centro">Respostas curtas, cada uma com o período e a fonte oficial. Toque em uma pergunta para ver os detalhes e os números exatos.</p>
+    <div id="inicioEstado" role="status" aria-live="polite"></div>
+    <!-- CARTÕES-PERGUNTA (js/inicio-tela.js): um por pergunta, na mesma ordem do menu. Usam só as cópias diárias
+         (arquivos pequenos): a página inicial não consulta a API de ~800 KB. -->
+    <div class="cartoes-pergunta" id="cartoesPergunta"></div>
+    <!-- FAIXA "SOBRE": o que é o projeto, com o logo em destaque e o caminho para as leis e as fontes. -->
+    <section class="faixa-sobre" aria-labelledby="t-faixa-sobre">
+      <div class="faixa-sobre-arte" aria-hidden="true">
+        <svg viewBox="0 0 16 16" focusable="false"><g class="logo-uva"><circle cx="8" cy="4.6" r="2.2"/><circle cx="12.2" cy="4.6" r="2.2"/><circle cx="5.9" cy="8.4" r="2.2"/><circle cx="10.1" cy="8.4" r="2.2"/><circle cx="8" cy="12.2" r="2.2"/></g><circle class="logo-aro" cx="3.8" cy="4.6" r="2.6"/><circle class="logo-lente" cx="3.8" cy="4.6" r="1.2"/></svg>
+      </div>
+      <div>
+        <p class="faixa-sobre-pre">Olho Mágico</p>
+        <h2 class="faixa-sobre-titulo" id="t-faixa-sobre">Dinheiro público, em palavras simples</h2>
+        <p>Um portal independente, feito por um cidadão videirense, que organiza os dados oficiais de transparência do município: quanto foi pago, a quem, quem trabalha para a cidade e o que foi contratado. Cada número tem período e fonte, para qualquer pessoa conferir. Saber essas informações é um direito garantido por lei.</p>
+        <p><a class="botao-verde" href="#direitos">Conheça seus direitos</a></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= PESQUISA GERAL (resultado) ================= -->
+  <div id="vista-busca" class="oculto">
+    <h1 id="buscaTitulo" class="titulo-pagina">Pesquisa</h1>
+    <div class="sub" id="buscaResumoGeral" aria-live="polite"></div>
+    <div id="buscaResultados"></div>
+  </div>
+
+  <!-- ================= FICHA DE DETALHE (servidor, fornecedor ou contrato), montada por js/fichas.js ================= -->
+  <div id="vista-ficha" class="oculto"></div>
+
+  <!-- ================= GASTOS DA PREFEITURA (busca ao vivo na API de despesas) ================= -->
+  <div id="aba-gastos" class="oculto">
+  <h1 class="titulo-pagina">Para onde vai o dinheiro?</h1>
+  <p class="sub">Quanto o Município de Videira pagou em cada mês, a quem e por qual órgão.</p>
+  <!-- FORMULÁRIO: o cidadão escolhe o mês. O JavaScript (main.js) escuta o envio. -->
+  <!-- Duas listas (mês e ano) em vez do campo de calendário: o campo "month" não funciona no Firefox nem no Safari. -->
+  <form class="controles" id="form">
+    <div>
+      <label for="selMes">Mês</label>
+      <select id="selMes"></select>
+    </div>
+    <div>
+      <label for="selAno">Ano</label>
+      <select id="selAno"></select>
+    </div>
+    <button type="submit">Ver os gastos</button>
+  </form>
+  <!-- ATALHOS: os 6 meses completos mais recentes, um toque cada (js/main.js). O mês na tela fica marcado. -->
+  <nav class="atalhos-meses" id="atalhosMeses" aria-label="Meses recentes"></nav>
+
+  <!-- MENSAGENS: "carregando", "erro" e "sem dados" aparecem aqui. aria-live faz leitores de tela anunciarem. -->
+  <div id="estado" role="status" aria-live="polite">Escolha um mês e toque em “Ver os gastos”.</div>
+
+  <!-- RESULTADO: começa escondido e só aparece quando há dados. -->
+  <div id="resultado" class="oculto">
+    <!-- RESUMO: a frase principal e a fonte logo abaixo. (O "valor por morador" foi removido por decisão do projeto.) -->
+    <p class="frase" id="frase"></p>
+    <p class="nota" id="notaFrase"></p>
+    <p class="fonte-linha" id="fonteLinha"></p>
+    <!-- ORIGEM DA INFORMAÇÃO (componente js/origem.js) e botão para baixar a planilha. -->
+    <div id="origemGastos"></div>
+    <p class="acoes"><button type="button" class="sec" id="baixarCsv">Baixar estes dados (planilha CSV)</button></p>
+    <p class="dica">Dica: toque em uma secretaria ou em um nome para ver os detalhes.</p>
+
+    <!-- 1) SECRETARIAS: lista clicável. Ao tocar, abre quem recebeu, setores e origem do dinheiro. -->
+    <section aria-labelledby="t-orgaos">
+      <h2 id="t-orgaos">Para onde foi o dinheiro?</h2>
+      <p class="sub">Quanto cada órgão do município pagou no mês: secretarias da Prefeitura, Câmara, autarquias (como o SAMAE e o instituto de previdência), fundação e fundos. A porcentagem mostra a fatia de cada uma no total.</p>
+      <ul class="lista" id="orgaos"></ul>
+    </section>
+
+    <!-- EVOLUÇÃO: os 12 meses até o mês escolhido (uma consulta por mês, só quando a pessoa pedir). -->
+    <section aria-labelledby="t-evolucao" id="sec-evolucao">
+      <h2 id="t-evolucao">Como foi nos meses anteriores?</h2>
+      <p class="sub">Compare o mês escolhido com os 11 anteriores. Os totais vêm da cópia diária (leve). Para meses fora dela, o site consulta o portal mês a mês (cerca de 800 KB cada).</p>
+      <div class="filtros">
+        <div><label for="etapaEvolucao">Etapa</label>
+          <select id="etapaEvolucao"><option value="pago">Pago</option><option value="liquidado">Liquidado</option><option value="empenhado">Empenhado</option></select></div>
+        <div class="filtro-botao"><button type="button" id="btnEvolucao">Carregar os 12 meses</button></div>
+      </div>
+      <p class="meta" id="evolucaoEstado" role="status" aria-live="polite"></p>
+      <div id="evolucaoConteudo"></div>
+    </section>
+
+    <!-- 2) CREDORES: lista clicável, com busca e filtro por secretaria. -->
+    <section aria-labelledby="t-credores" id="secCredores">
+      <h2 id="t-credores">Quem recebeu?</h2>
+      <p class="sub">“Credor” é quem recebe o pagamento (empresa, entidade ou pessoa). Vai do maior valor para o menor. Estar no topo não quer dizer que algo está errado: só indica o maior valor.</p>
+      <div class="busca">
+        <label for="filtro">Procurar um nome</label>
+        <input type="search" id="filtro" autocomplete="off">
+      </div>
+      <!-- Aparece quando a pessoa escolhe "ver todos os credores desta secretaria". -->
+      <p class="chip oculto" id="chipOrgao"><span id="chipTexto"></span> <button type="button" class="sec mini" id="limparOrgao">Ver todas as secretarias</button></p>
+      <ul class="lista" id="credores"></ul>
+      <p><button type="button" class="sec" id="maisCredores">Mostrar mais</button></p>
+    </section>
+
+    <!-- REGISTROS DO MÊS: cada linha da fonte, com filtros combináveis (FilterBar) e tabela paginada (DataTable).
+         A planilha baixada respeita os filtros escolhidos. -->
+    <section aria-labelledby="t-registros" id="sec-registros">
+      <h2 id="t-registros">Registros do mês</h2>
+      <p class="sub">Cada linha é um total publicado pela fonte para uma combinação de secretaria, setor, origem do dinheiro e credor. Combine os filtros e baixe só o que ficou na tela.</p>
+      <div class="filtros">
+        <div><label for="regOrgao">Secretaria (órgão)</label><select id="regOrgao"><option value="">Todas</option></select></div>
+        <div><label for="regUnidade">Setor (unidade)</label><select id="regUnidade"><option value="">Todos</option></select></div>
+        <div><label for="regFonte">Origem do dinheiro</label><select id="regFonte"><option value="">Todas</option></select></div>
+        <div><label for="regCredor">Credor (nome ou CNPJ)</label><input type="search" id="regCredor" autocomplete="off"></div>
+        <div class="filtro-botao"><button type="button" class="sec" id="regLimpar">Limpar filtros</button></div>
+      </div>
+      <div class="chips" id="regChips"></div>
+      <div id="regTabela"></div>
+      <p><button type="button" class="sec" id="regCsv">Baixar os registros filtrados (planilha CSV)</button></p>
+    </section>
+
+    <!-- 3) ORIGEM DO DINHEIRO: fontes de recurso. -->
+    <section aria-labelledby="t-fontes">
+      <h2 id="t-fontes">De onde veio o dinheiro?</h2>
+      <p class="sub">A Prefeitura usa dinheiro de “caixas” diferentes: impostos da cidade, verbas que vêm do Estado ou da União para saúde e educação, e outras. Aqui está quanto saiu de cada uma.</p>
+      <ul class="lista" id="fontes"></ul>
+      <p><button type="button" class="sec" id="maisFontes">Mostrar todas</button></p>
+    </section>
+
+    <!-- 4) EXPLICAÇÃO DOS 3 PASSOS (empenhado, liquidado, pago) + ajustes. -->
+    <section aria-labelledby="t-etapas">
+      <h2 id="t-etapas">Como o dinheiro público é gasto?</h2>
+      <p class="sub">Todo gasto passa por 3 passos. O mesmo gasto aparece nos três, por isso <strong>não some os valores</strong>. Um gasto pode ser reservado num mês e pago em outro, então às vezes o valor pago é maior que o reservado.</p>
+      <div class="etapas" id="etapas"></div>
+      <!-- AJUSTES: dois campos que a fonte também publica (anulado e retido), exibidos para não escondermos nada. -->
+      <h3>Ajustes que a fonte também publica</h3>
+      <p class="nota-titulo">Valores que a fonte publica além das três etapas: <strong>anulado</strong> (reserva de dinheiro que foi cancelada; já vem descontado do empenhado) e <strong>retido</strong> (parte do pagamento descontada e enviada a outro destino, como impostos). Aparecem para nada ficar escondido; não se somam às etapas acima.</p>
+      <div class="etapas" id="ajustes"></div>
+    </section>
+
+    <!-- ATALHOS PARA O PORTAL: o detalhe (pagamento por pagamento, salários) existe no portal oficial,
+         mas é protegido contra acesso automático. Então levamos a pessoa até lá, com um passo a passo. -->
+    <section aria-labelledby="t-detalhes">
+      <h2 id="t-detalhes">Quer ver mais detalhes?</h2>
+      <p class="sub">Alguns detalhes só podem ser consultados direto no portal oficial. Veja como encontrar.</p>
+
+      <h3>Em que cada pagamento foi feito</h3>
+      <p>Lista pagamento por pagamento, com o número do empenho e da licitação.</p>
+      <ol class="passos">
+        <li>Abra a tela de <a id="lnkPagamentos" target="_blank" rel="noopener">Pagamentos no portal oficial</a>.</li>
+        <li>Em “Data” e “Até”, escolha o período (por exemplo, o mês que você consultou aqui).</li>
+        <li>Toque em consultar e procure o nome do credor na lista.</li>
+      </ol>
+
+      <h3>Quanto ganha cada servidor</h3>
+      <p>A aba <a href="#pessoal">Pessoal</a> mostra nome, cargo, setor e salário-base do pessoal do município (inclusive aposentados e pensionistas do instituto de previdência). O valor completo de cada mês (com gratificações e descontos) está no portal oficial:</p>
+      <ol class="passos">
+        <li>Abra a <a id="lnkSalarios" target="_blank" rel="noopener">Relação Funcionário x Salário no portal oficial</a>.</li>
+        <li>Escolha o mês (competência) e, se quiser, filtre pelo nome ou pelo cargo.</li>
+      </ol>
+
+      <p class="meta">Por que não mostramos isso aqui? O portal protege essas duas telas contra acesso automático, e este site respeita essa proteção. Por isso, pedimos à Prefeitura, pela Lei de Acesso à Informação, que publique esses dados em formato aberto.</p>
+    </section>
+
+    <section aria-labelledby="t-fonte">
+      <h2 id="t-fonte">De onde vêm esses dados?</h2>
+      <p class="nota-titulo">A origem exata dos números desta tela: qual sistema oficial foi consultado, quando e para qual período.</p>
+      <p id="fonte"></p>
+      <h3>O que esta página ainda não mostra</h3>
+      <p>Só as despesas do mês escolhido. Ainda não aparecem: o orçamento previsto, os “restos a pagar” e as diárias de viagem. O que a Prefeitura recebe (receitas) está em <a href="#entradas">De onde vem o dinheiro?</a>. Parte disso pode ser consultada no portal oficial (veja “Quer ver mais detalhes?”). Salários-base, contratos e licitações estão nas abas <a href="#pessoal">Pessoal</a> e <a href="#contratos">Contratos</a>.</p>
+      <h3>O que significam essas palavras?</h3>
+      <p>Credor, órgão, empenhado, liquidado, pago, fonte de recurso, restos a pagar e outras palavras estão explicadas, com exemplos, em <a href="#glossario">Palavras e siglas</a>. Toque no sinal ⓘ ao lado de uma palavra para ver o significado ali mesmo.</p>
+    </section>
+  </div>
+
+    <section aria-labelledby="t-areas" id="sec-areas" class="oculto">
+      <h2 id="t-areas">No ano fechado: em que áreas o dinheiro foi gasto</h2>
+      <p class="sub">Despesa por “função” (a grande área: saúde, educação, urbanismo...), das contas anuais enviadas ao Tesouro. Toque em uma área para ver como ela se divide.</p>
+      <!-- Explica a diferença entre os números do mês (API de despesas) e os do ano por área (DCA). Fatos conferidos na
+           auditoria de 03/10/2026: a soma de 2025 da API, sem os pagamentos intraorçamentários, bate ao centavo com a DCA. -->
+      <details class="explica-diferenca">
+        <summary>Por que o total do mês e o total do ano por área não batem?</summary>
+        <p>São dois jeitos de olhar o mesmo dinheiro, e os números não precisam bater:</p>
+        <ul>
+          <li><strong>Agrupamento diferente.</strong> No mês, o gasto aparece por <em>órgão</em> (por exemplo, Fundo Municipal de Saúde). No ano, por <em>área</em> (por exemplo, Saúde). Um órgão pode gastar em mais de uma área.</li>
+          <li><strong>Pagamentos entre os próprios órgãos.</strong> O total do mês inclui pagamentos de um órgão do município para outro (por exemplo, contribuições das secretarias ao instituto de previdência). O total por área do ano não inclui esses pagamentos internos.</li>
+          <li><strong>Momento diferente.</strong> O total do mês é uma cópia diária da contabilidade. O do ano é a declaração entregue ao Tesouro depois que o ano fecha.</li>
+        </ul>
+        <p>Conferimos com os dados de 2025: somando os 12 meses e tirando os pagamentos entre os próprios órgãos, o valor pago bate ao centavo com o declarado ao Tesouro (R$ 339.350.747,32).</p>
+      </details>
+      <div class="filtros">
+        <div><label for="anoDca">Ano</label><select id="anoDca"></select></div>
+        <div><label for="etapaDca">Etapa</label><select id="etapaDca"><option value="empenhado">Empenhado</option><option value="liquidado">Liquidado</option><option value="pago">Pago</option></select></div>
+      </div>
+      <p class="frase-media" id="dcaFrase"></p>
+      <ul class="lista" id="dcaLista"></ul>
+      <p><button type="button" class="sec" id="csvDca">Baixar este ano (planilha CSV)</button></p>
+      <div id="dcaOrigem"></div>
+      <div id="areasDesatualizado"></div>
+    </section>
+  </div><!-- fim da aba de gastos -->
+
+  <!-- ================= SERVIDORES (cópia diária da lista oficial, feita pelo robô) =================
+       Os dados vêm de dados/pessoal.js, gerado uma vez por dia por ferramentas/fontes/pessoal.py. -->
+  <div id="aba-pessoal" class="oculto">
+    <h1 class="titulo-pagina">Quem trabalha para o município?</h1>
+    <p class="aviso-pessoas"><strong>Nomes e valores aqui são informações públicas, não acusações.</strong> O Olho Mágico é <span class="realce">contra qualquer ameaça ou violência</span> contra servidores ou qualquer pessoa. <a href="#sobre/responsabilidade">Leia o aviso</a>.</p>
+    <div id="pessoalLimite"></div>
+    <div id="pessoalEstado" role="status" aria-live="polite"></div>
+    <div id="pessoalDesatualizado"></div>
+    <div id="pessoalConteudo" class="oculto">
+      <!-- PESQUISA DE SERVIDOR (EmployeeSearch): busca sem diferença de acentos e maiúsculas, filtros e tabela paginada.
+           Cada nome abre a ficha do registro. -->
+      <section aria-labelledby="t-busca" id="sec-lista" class="pesquisa-servidor">
+        <h2 id="t-busca">Pesquisar servidor</h2>
+        <p class="nota-titulo">Procure qualquer registro da lista oficial de servidores pelo nome, pelo cargo ou pelo setor. Cada resultado abre uma ficha com cargo, vínculo, setor e salário-base.</p>
+        <form class="linha-busca" id="formServidor" role="search">
+          <label for="buscaServidor" class="visualmente-oculto">Nome, cargo ou setor do servidor</label>
+          <input type="search" id="buscaServidor" placeholder="Digite o nome, o cargo ou o setor" autocomplete="off">
+          <button type="submit">Pesquisar</button>
+        </form>
+        <div class="filtros">
+          <div><label for="filtroCargo">Cargo</label><select id="filtroCargo"><option value="">Todos</option></select></div>
+          <div><label for="filtroVinculo">Vínculo</label><select id="filtroVinculo"><option value="">Todos</option></select></div>
+          <div><label for="filtroSetor">Setor (lotação)</label><select id="filtroSetor"><option value="">Todos</option></select></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparFiltros">Limpar filtros</button></div>
+        </div>
+        <div class="chips" id="chipsServidores"></div>
+        <!-- O id NÃO pode ser "pessoal": o link #pessoal pularia direto para esta lista. -->
+        <div id="listaServidores"></div>
+      </section>
+
+      <p class="frase" id="pessoalFrase"></p>
+      <p class="nota" id="pessoalNota"></p>
+      <div id="origemPessoal"></div>
+      <!-- NÚMEROS-RESUMO: montados por js/pessoal-tela.js -->
+      <div class="numeros" id="pessoalNumeros"></div>
+
+      <!-- DESTAQUE: prefeito, vice e secretários. Só aparece se esses cargos estiverem na lista. -->
+      <section aria-labelledby="t-politicos" id="secPoliticos" class="oculto">
+        <h2 id="t-politicos">Cargos de prefeito, vice-prefeito e secretário municipal</h2>
+        <p class="sub">Registros cujo cargo, na lista oficial, tem um desses nomes. O filtro olha só o nome do cargo. Toque no nome para abrir a ficha.</p>
+        <div id="politicos"></div>
+      </section>
+
+      <div class="duas-colunas">
+        <!-- VÍNCULOS: efetivo, temporário, comissionado... -->
+        <section aria-labelledby="t-vinculos">
+          <h2 id="t-vinculos">Tipos de vínculo</h2>
+          <p class="sub">Efetivos, temporários, cargos de indicação e outros. Toque em “Ver na lista” para filtrar.</p>
+          <ul class="lista" id="vinculos"></ul>
+        </section>
+        <!-- DISTRIBUIÇÃO DOS SALÁRIOS-BASE: quantos registros em cada faixa. -->
+        <section aria-labelledby="t-faixas">
+          <h2 id="t-faixas">Quantos registros em cada faixa de salário-base</h2>
+          <p class="sub">Cada coluna é uma faixa de valor. Salário-base não é o que a pessoa recebe no mês.</p>
+          <div id="faixasSalario"></div>
+        </section>
+      </div>
+
+      <!-- COMISSIONADOS: cargos de indicação, agrupados por setor (lista clicável). -->
+      <section aria-labelledby="t-comissionados">
+        <h2 id="t-comissionados">Cargos de indicação (comissionados) por setor</h2>
+        <p class="sub" id="comissionadosResumo"></p>
+        <ul class="lista" id="comissionados"></ul>
+      </section>
+
+      <section aria-labelledby="t-sobre-lista">
+        <h2 id="t-sobre-lista">Sobre esta lista</h2>
+        <p class="nota-titulo">O que os números desta tela significam, o que foi deixado de fora de propósito e por quê.</p>
+        <h3>O que é salário-base?</h3>
+        <p>É o valor-base do cargo. O que a pessoa recebe de fato no mês pode ser maior (gratificações, adicionais, horas extras) ou menor (descontos). O valor completo está na <a id="lnkSalarios2" target="_blank" rel="noopener">Relação Funcionário x Salário do portal oficial</a>.</p>
+        <h3>O que não mostramos, e por quê</h3>
+        <p>A fonte também publica CPF parcial, matrícula, horário, local de trabalho e se a pessoa está afastada. Não mostramos esses dados: eles não ajudam a fiscalizar e poderiam servir para localizar alguém ou revelar uma licença de saúde. Por isso também não há planilha para baixar com a lista inteira.</p>
+        <h3>Quem não está aqui</h3>
+        <p class="nota-titulo">Pessoas que trabalham para o município mas não aparecem nesta lista, e o motivo.</p>
+        <p id="pessoalAusentes"></p>
+      </section>
+    </div>
+  </div><!-- fim da aba de pessoal -->
+
+  <!-- ================= CONTRATOS E LICITAÇÕES (PNCP, cópia diária) ================= -->
+  <div id="aba-contratos" class="oculto">
+    <h1 class="titulo-pagina">O que foi comprado e contratado?</h1>
+    <p class="sub sub-centro">Contratos e licitações que os órgãos do Município publicaram no Portal Nacional de Contratações Públicas (PNCP), o site oficial onde toda compra pública precisa aparecer. Valores são os previstos no contrato, não o que já foi pago.</p>
+    <div id="contratosEstado" role="status" aria-live="polite"></div>
+    <div id="contratosDesatualizado"></div>
+    <div id="contratosConteudo" class="oculto">
+      <p class="frase" id="contratosFrase"></p>
+      <p class="nota" id="contratosNota"></p>
+      <div id="origemContratos"></div>
+      <div class="numeros" id="contratosNumeros"></div>
+
+      <div class="duas-colunas">
+        <section aria-labelledby="t-fornecedores" id="sec-fornecedores">
+          <h2 id="t-fornecedores">Quem mais tem contratos</h2>
+          <p class="sub">Soma do “valor global” (o valor total previsto no contrato, que não é o que já foi pago). Estar no topo não indica irregularidade. Toque no nome para abrir a ficha.</p>
+          <div id="listaFornecedores"></div>
+        </section>
+        <section aria-labelledby="t-modalidades">
+          <h2 id="t-modalidades">Como foi a escolha do fornecedor</h2>
+          <p class="sub">Licitações e compras por modalidade. Dispensa e inexigibilidade são compras sem disputa entre fornecedores, que a lei permite em casos específicos.</p>
+          <div id="graficoModalidades"></div>
+        </section>
+      </div>
+
+      <section aria-labelledby="t-lista-contratos" id="sec-contratos">
+        <h2 id="t-lista-contratos">Contratos</h2>
+        <p class="nota-titulo">Cada contrato assinado: com quem, para quê, por quanto e por quanto tempo. Use os filtros para procurar por fornecedor, CNPJ, objeto ou órgão.</p>
+        <div class="filtros">
+          <div><label for="buscaContrato">Fornecedor, CNPJ ou objeto</label><input type="search" id="buscaContrato" autocomplete="off"></div>
+          <div><label for="filtroOrgaoContrato">Órgão</label><select id="filtroOrgaoContrato"><option value="">Todos</option></select></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparContratos">Limpar filtros</button></div>
+        </div>
+        <div class="chips" id="chipsContratos"></div>
+        <div id="listaContratos"></div>
+        <p><button type="button" class="sec" id="csvContratos">Baixar estes contratos (planilha CSV)</button></p>
+      </section>
+
+      <section aria-labelledby="t-compras" id="sec-compras">
+        <h2 id="t-compras">Licitações e compras</h2>
+        <p class="nota-titulo">Cada processo de compra publicado: o que se quis comprar e de que forma o fornecedor foi escolhido (modalidade, como pregão ou dispensa). Uma licitação pode virar um ou mais contratos.</p>
+        <div class="filtros">
+          <div><label for="buscaCompra">Objeto</label><input type="search" id="buscaCompra" autocomplete="off"></div>
+          <div><label for="filtroModalidade">Modalidade</label><select id="filtroModalidade"><option value="">Todas</option></select></div>
+          <div><label for="filtroOrgaoCompra">Órgão</label><select id="filtroOrgaoCompra"><option value="">Todos</option></select></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparCompras">Limpar filtros</button></div>
+        </div>
+        <div class="chips" id="chipsCompras"></div>
+        <div id="listaCompras"></div>
+        <p><button type="button" class="sec" id="csvCompras">Baixar estas licitações (planilha CSV)</button></p>
+      </section>
+    </div>
+  </div><!-- fim da aba de contratos -->
+
+  <!-- ================= ENTRADAS: "De onde vem o dinheiro?" (Tesouro Nacional e CGU, cópias diárias) =================
+       Cada seção só aparece se a fonte dela tiver dados (as seções são desenhadas por js/contas-tela.js). -->
+  <div id="aba-entradas" class="oculto">
+    <h1 class="titulo-pagina">De onde vem o dinheiro?</h1>
+    <p class="nota">Quanto o Município recebe (impostos da cidade, repasses da União e do Estado e outras receitas) e o dinheiro federal que chega a Videira. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos”.</p>
+    <nav class="sumario oculto" id="sumarioEntradas" aria-label="Seções desta página"></nav>
+    <div id="entradasEstado" role="status" aria-live="polite"></div>
+    <div id="entradasDesatualizado"></div>
+
+    <!-- RECEITAS DO MUNICÍPIO: do Relatório Resumido da Execução Orçamentária (RREO), cópia diária (dados/rreo.js). -->
+    <section aria-labelledby="t-receitas" id="sec-receitas" class="oculto">
+      <h2 id="t-receitas">Quanto o Município recebe</h2>
+      <p class="sub">Todas as receitas da Prefeitura no ano: impostos cobrados pela cidade (como IPTU e ISS), repasses da União e do Estado, rendimentos e outras. “Previsto” é o que o orçamento esperava para o ano; “recebido” é o que já entrou.</p>
+      <p class="frase-media" id="receitasFrase"></p>
+      <p class="valor-exato" id="receitasExato"></p>
+      <div id="receitasTabela"></div>
+      <div id="receitas12"></div>
+      <div id="receitasOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-transf" id="sec-transferencias" class="oculto">
+      <h2 id="t-transf">Dinheiro que a União repassa ao município</h2>
+      <p class="sub">Transferências obrigatórias pela Constituição, como o Fundo de Participação dos Municípios (FPM) e o FUNDEB. Não incluem convênios nem emendas parlamentares.</p>
+      <div class="filtros">
+        <div><label for="anoTransf">Ano</label><select id="anoTransf"></select></div>
+        <div><label for="tipoTransf">Tipo</label><select id="tipoTransf"><option value="">Todos os tipos</option></select></div>
+      </div>
+      <p class="frase-media" id="transfFrase"></p>
+      <p class="valor-exato" id="transfExato"></p>
+      <div id="transfGrafico"></div>
+      <details><summary>Ver os números exatos (por tipo de transferência)</summary><div id="transfTabela"></div></details>
+      <p><button type="button" class="sec" id="csvTransf">Baixar este ano (planilha CSV)</button></p>
+      <div id="transfOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-convenios" id="sec-convenios" class="oculto">
+      <h2 id="t-convenios">Convênios com o Governo Federal</h2>
+      <p class="sub">Acordos em que um órgão federal repassa dinheiro para um projeto em Videira (obras, equipamentos, programas). “Valor” é o total combinado; “liberado” é quanto já saiu. Os dois não se somam.</p>
+      <div class="numeros" id="conveniosNumeros"></div>
+      <div class="filtros">
+        <div><label for="buscaConvenio">Objeto, órgão ou convenente</label><input type="search" id="buscaConvenio" autocomplete="off"></div>
+        <div><label for="situacaoConvenio">Situação</label><select id="situacaoConvenio"><option value="">Todas</option></select></div>
+      </div>
+      <div class="chips" id="chipsConvenios"></div>
+      <div id="conveniosTabela"></div>
+      <p><button type="button" class="sec" id="csvConvenios">Baixar os convênios filtrados (planilha CSV)</button></p>
+      <div id="conveniosOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-beneficios" id="sec-beneficios" class="oculto">
+      <h2 id="t-beneficios">Benefícios federais pagos em Videira</h2>
+      <p class="sub">Total pago por mês às famílias de Videira pelo Bolsa Família e pelo Benefício de Prestação Continuada (BPC). São totais do município: nenhuma pessoa é identificada. <strong>Esse dinheiro é pago direto às famílias pelo Governo Federal: não passa pelo caixa da Prefeitura.</strong></p>
+      <div class="filtros"><div><label for="programaBeneficio">Programa</label><select id="programaBeneficio"></select></div></div>
+      <p class="frase-media" id="beneficioFrase"></p>
+      <div id="beneficioGrafico"></div>
+      <details><summary>Ver os números exatos (cada mês)</summary><div id="beneficioTabela"></div></details>
+      <div id="beneficiosOrigem"></div>
+    </section>
+  </div><!-- fim da aba de entradas -->
+
+  <!-- ================= LIMITES: "O que a lei exige, e onde o município está?" (SICONFI e SIOPE, cópias diárias) =================
+       Os números são os DECLARADOS pelo município; o site só os compara com os limites e mínimos da lei. -->
+  <div id="aba-limites" class="oculto">
+    <h1 class="titulo-pagina">O que a lei exige, e onde o município está?</h1>
+    <p class="nota">Relatórios que o próprio município declara ao Governo Federal, comparados com os limites e mínimos da lei. Cada número mostra o seu período. Nada aqui muda com o mês escolhido em “Gastos”.</p>
+    <nav class="sumario oculto" id="sumarioLimites" aria-label="Seções desta página"></nav>
+    <div id="limitesEstado" role="status" aria-live="polite"></div>
+    <div id="limitesDesatualizado"></div>
+
+    <section aria-labelledby="t-lrf" id="sec-pessoal" class="oculto">
+      <h2 id="t-lrf">Gasto com pessoal e os limites da LRF</h2>
+      <p class="sub">A Lei de Responsabilidade Fiscal limita quanto da receita a Prefeitura e a Câmara podem gastar com pessoal (salários, encargos, aposentadorias).</p>
+      <div id="contasConteudo" class="duas-colunas"></div>
+      <details><summary>O que significam os limites?</summary>
+        <p>A conta é feita sobre a “receita corrente líquida”, que é o dinheiro que entra de forma regular (impostos e repasses), descontadas algumas transferências.</p>
+        <ul>
+          <li><strong>Limite de alerta:</strong> o Tribunal de Contas avisa o município.</li>
+          <li><strong>Limite prudencial:</strong> o município passa a ter restrições, como não poder criar cargos ou dar aumentos.</li>
+          <li><strong>Limite máximo:</strong> o município precisa reduzir o gasto e pode sofrer sanções.</li>
+        </ul>
+        <p class="meta">Os percentuais e limites são os que o próprio município declarou ao Tesouro Nacional no Relatório de Gestão Fiscal. O site não recalcula.</p>
+      </details>
+    </section>
+
+    <section aria-labelledby="t-educacao" id="sec-educacao" class="oculto">
+      <h2 id="t-educacao">Gastos com educação</h2>
+      <p class="sub">Indicadores que o município declara ao FNDE (Ministério da Educação) no SIOPE. Quando há um mínimo exigido por lei, ele aparece ao lado.</p>
+      <div id="siopeDestaques" class="numeros"></div>
+      <details><summary>Ver todos os indicadores (números exatos)</summary><div id="siopeTabela"></div></details>
+      <div id="siopeOrigem"></div>
+    </section>
+
+    <section aria-labelledby="t-entregas" id="sec-entregas" class="oculto">
+      <h2 id="t-entregas">Relatórios enviados ao Tesouro</h2>
+      <p class="sub">Quando a Prefeitura e a Câmara enviaram, pela última vez, cada relatório obrigatório. O site mostra só o que a fonte informa: não avalia se o envio foi no prazo.</p>
+      <div id="entregasTabela"></div>
+      <div id="entregasOrigem"></div>
+    </section>
+  </div><!-- fim da aba de limites -->
+
+  <!-- ================= CÂMARA DE VEREADORES (API de dados abertos da Câmara, cópia diária) ================= -->
+  <div id="aba-camara" class="oculto">
+    <h1 class="titulo-pagina">O que faz a Câmara de Vereadores?</h1>
+    <p class="aviso-pessoas"><strong>Nomes e valores aqui são informações públicas, não acusações.</strong> O Olho Mágico é <span class="realce">contra qualquer ameaça ou violência</span> contra servidores ou qualquer pessoa. <a href="#sobre/responsabilidade">Leia o aviso</a>.</p>
+    <p class="sub">Quem são os vereadores de Videira e o que a Câmara colocou em pauta. Dados publicados pela própria Câmara.</p>
+    <div id="camaraEstado" role="status" aria-live="polite"></div>
+    <div id="camaraDesatualizado"></div>
+    <div id="camaraConteudo" class="oculto">
+      <div id="origemCamara"></div>
+      <section aria-labelledby="t-vereadores" id="sec-vereadores">
+        <h2 id="t-vereadores">Vereadores em exercício</h2>
+        <p class="sub" id="vereadoresResumo"></p>
+        <ul class="cartoes-pessoas" id="listaVereadores"></ul>
+        <p class="meta">Salários e folha de pagamento da Câmara: <a id="lnkFolhaCamara" target="_blank" rel="noopener noreferrer">folhas publicadas pela Câmara</a> (arquivos da própria Câmara).</p>
+      </section>
+      <section aria-labelledby="t-pautas" id="sec-pautas">
+        <h2 id="t-pautas">Pautas das sessões</h2>
+        <p class="nota-titulo">A lista de assuntos que a Câmara marcou para votar ou discutir em cada sessão, publicada pela própria Câmara. A pauta mostra o que estava previsto, não o resultado das votações.</p>
+        <div class="filtros">
+          <div><label for="buscaPauta">Procurar na pauta</label><input type="search" id="buscaPauta" autocomplete="off"></div>
+          <div class="filtro-botao"><button type="button" class="sec" id="limparPauta">Limpar</button></div>
+        </div>
+        <div id="listaPautas"></div>
+      </section>
+    </div>
+  </div><!-- fim da aba da Câmara -->
+
+  <!-- ================= SIGLAS E TERMOS =================
+       Lista em js/siglas.js. data-sem-siglas: aqui as siglas não viram "tocáveis" (a explicação já está ao lado). -->
+  <div id="aba-glossario" class="oculto" data-sem-siglas>
+    <h1 class="titulo-pagina">Palavras e siglas</h1>
+    <p class="sub">O que significam as siglas e as palavras técnicas que aparecem no site, com exemplos e os cuidados na leitura. Em qualquer tela, toque no sinal ⓘ ao lado de uma sigla ou palavra para ver o significado ali mesmo.</p>
+    <div class="filtros">
+      <div><label for="buscaSigla">Procurar sigla ou termo</label><input type="search" id="buscaSigla" autocomplete="off"></div>
+      <div class="filtro-botao"><button type="button" class="sec" id="limparSigla">Limpar</button></div>
+    </div>
+    <p class="meta" id="siglasResumo" role="status" aria-live="polite"></p>
+    <section aria-labelledby="t-lista-siglas" id="sec-lista-siglas">
+      <h2 id="t-lista-siglas">Siglas</h2>
+      <p class="nota-titulo">Abreviações que aparecem nos dados oficiais (como FPM, RGF, LRF), com o significado e um exemplo.</p>
+      <div class="glossario" id="listaSiglas"></div>
+    </section>
+    <section aria-labelledby="t-lista-termos" id="sec-lista-termos">
+      <h2 id="t-lista-termos">Termos</h2>
+      <p class="nota-titulo">Palavras técnicas das contas públicas (como empenhado, liquidado, pago), explicadas em linguagem simples.</p>
+      <div class="glossario" id="listaTermos"></div>
+    </section>
+  </div><!-- fim da aba de palavras e siglas -->
+
+  <!-- ================= SOBRE E METODOLOGIA =================
+       Texto fixo: explica o projeto, como ler os números, como cada um é calculado e de onde vem. -->
+  <div id="aba-sobre" class="oculto">
+    <h1 class="titulo-pagina">Sobre e fontes</h1>
+    <p class="sub sub-centro">O que é o Olho Mágico, de onde vêm os dados, como eles são tratados e o que ainda falta.</p>
+    <!-- AVISO DE RESPONSABILIDADE E NÃO VIOLÊNCIA (decisão do mantenedor, 04/10/2026). Link no rodapé: #sobre/responsabilidade -->
+    <section aria-labelledby="t-responsabilidade" id="sec-responsabilidade" class="aviso-forte">
+      <h2 id="t-responsabilidade">Informação não é acusação. Violência, nunca.</h2>
+      <p><strong>O Olho Mágico não tem o intuito de acusar nem de absolver ninguém.</strong> Ele organiza informações públicas, com a fonte de cada dado, para que qualquer pessoa possa consultar e conferir. Um gasto, um salário ou um contrato mostrado aqui não é, por si só, sinal de irregularidade.</p>
+      <p class="aviso-forte-destaque"><span class="realce">O Olho Mágico é completamente contra qualquer forma de violência.</span> Não apoia, não incentiva e não endossa ameaças, agressões, perseguição, assédio, ofensas ou qualquer ato violento ou criminoso contra servidores públicos, agentes políticos ou qualquer outra pessoa.</p>
+      <p><strong>Ameaçar, perseguir ou agredir alguém é crime.</strong> Quem usar as informações deste site para isso responde pelos próprios atos. <strong>O Olho Mágico não se responsabiliza por ações tomadas por usuários</strong> a partir das informações aqui apresentadas.</p>
+      <p>Se você tiver uma dúvida ou uma suspeita, use os canais oficiais:</p>
+      <ul>
+        <li>a Ouvidoria da Prefeitura ou da Câmara;</li>
+        <li>um pedido de acesso à informação (veja <a href="#direitos">Leis e direitos</a>);</li>
+        <li>o Tribunal de Contas do Estado de Santa Catarina;</li>
+        <li>o Ministério Público.</li>
+      </ul>
+      <p><strong>Fiscalizar é um direito. Fazer isso com respeito e dentro da lei é responsabilidade de todos.</strong></p>
+    </section>
+
+    <!-- POR QUE O OLHO MÁGICO EXISTE: texto do mantenedor (04/10/2026), explica como o projeto nasceu e por quê. -->
+    <section aria-labelledby="t-porque" class="texto-sobre">
+      <h2 id="t-porque">Olho Mágico: a informação pública precisa ser compreendida por todos</h2>
+      <h3>Transparência não deveria ser um trabalho de investigação.</h3>
+      <p>O dinheiro público pertence à sociedade. Cada imposto, taxa e contribuição arrecadada deve ser administrada com responsabilidade e transparência. E todo cidadão tem o direito de saber como esse dinheiro está sendo utilizado.</p>
+      <p>No Brasil, esse direito está previsto na Constituição Federal e regulamentado, entre outras normas, pela Lei de Acesso à Informação (Lei nº 12.527/2011) e pela Lei de Responsabilidade Fiscal, modificada pela Lei Complementar nº 131/2009.</p>
+      <p>Essas leis estabelecem que informações de interesse público devem ser disponibilizadas à população. A Lei de Acesso à Informação também determina requisitos importantes para os portais oficiais, como ferramentas de pesquisa, linguagem de fácil compreensão, possibilidade de baixar relatórios e acesso automatizado a dados em formatos abertos.</p>
+      <p>Mas existe uma diferença entre disponibilizar uma informação e permitir que qualquer pessoa consiga encontrá-la, entendê-la e utilizá-la.</p>
+      <p>É justamente nesse problema que nasce o <strong>Olho Mágico</strong>.</p>
+
+      <h3>O problema: a informação existe, mas nem sempre é fácil encontrá-la.</h3>
+      <p>Quem já tentou consultar os gastos de uma prefeitura, descobrir quanto foi pago em diárias a vereadores, verificar contratos públicos ou entender a folha de pagamento de um órgão sabe que essa tarefa pode ser muito mais difícil do que deveria.</p>
+      <p>Muitas vezes, o cidadão precisa acessar diferentes páginas, navegar por menus pouco intuitivos, selecionar filtros, descobrir nomes técnicos, abrir documentos separados, baixar planilhas e tentar compreender informações que não foram organizadas pensando na facilidade de consulta.</p>
+      <p>Em alguns casos, os dados estão espalhados por diferentes sistemas e fornecedores de tecnologia. Em outros, são apresentados em formatos difíceis de pesquisar, comparar ou reutilizar.</p>
+      <p>E há uma dificuldade ainda maior: conseguir acesso técnico aos próprios dados.</p>
+
+      <h3>O desafio de acessar os dados públicos.</h3>
+      <p>Uma das bases do Olho Mágico é buscar informações diretamente nas fontes oficiais, sempre que tecnicamente possível. Para isso, procuramos utilizar APIs.</p>
+      <p><strong>Mas o que é uma API?</strong> API é a sigla em inglês para <em>Application Programming Interface</em>, ou Interface de Programação de Aplicações. Em termos simples, é um meio padronizado pelo qual um programa consegue solicitar informações a outro sistema e receber esses dados automaticamente.</p>
+      <p>Imagine que uma prefeitura tenha um sistema com milhares de registros de despesas. Uma API permite que outro programa solicite informações específicas, como despesas de determinado período, fornecedor ou categoria, sem que uma pessoa precise abrir cada página manualmente. Isso facilita a atualização, a organização e a consulta dos dados.</p>
+      <p>O problema é que nem todos os sistemas públicos oferecem APIs documentadas, abertas e acessíveis. Em determinadas situações, encontramos endpoints públicos sem documentação, sistemas que exigem tokens ou sessões, formatos diferentes para cada fornecedor, limites de consulta, mecanismos de proteção e dados disponibilizados apenas por meio de páginas, relatórios ou arquivos para download. Isso torna o trabalho muito mais complexo.</p>
+
+      <h3>Informações que exigem atenção especial</h3>
+      <ul>
+        <li><strong>Despesas públicas:</strong> identificar empenhos, liquidações, pagamentos, fornecedores, objetos e datas, sem confundir essas etapas.</li>
+        <li><strong>Folha de pagamento e pessoal:</strong> localizar dados sobre servidores, cargos, remunerações e vínculos, respeitando os limites legais de privacidade e proteção de dados.</li>
+        <li><strong>Diárias e despesas de parlamentares:</strong> identificar beneficiários, valores, datas, destinos, justificativas e documentos relacionados, quando essas informações estiverem disponíveis.</li>
+        <li><strong>Contratos e licitações:</strong> relacionar processos, fornecedores, valores, prazos, aditivos e pagamentos.</li>
+        <li><strong>Receitas e transferências:</strong> compreender de onde vêm os recursos e como são registrados.</li>
+      </ul>
+      <p>Cada órgão pode utilizar uma plataforma diferente, com estruturas, nomenclaturas e formas de acesso próprias. Por isso, não existe uma solução única que funcione automaticamente para todos. O trabalho exige investigação técnica, documentação, validação e atualização constante.</p>
+      <p>O Olho Mágico não tenta contornar autenticações, CAPTCHAs ou mecanismos de segurança. Quando uma informação não pode ser obtida de maneira adequada, isso precisa ser identificado e documentado, e não escondido.</p>
+
+      <h3>Nossa proposta: simplificar o acesso à informação.</h3>
+      <p>O Olho Mágico é um projeto independente, comunitário e de código aberto que busca reunir, organizar e apresentar informações públicas de maneira mais clara e acessível. Nossa intenção não é substituir os portais oficiais, mas facilitar o caminho até as informações que eles disponibilizam.</p>
+      <p>Queremos que qualquer pessoa consiga consultar, por exemplo:</p>
+      <ul>
+        <li>Quanto a administração pública gastou.</li>
+        <li>Quem recebeu pagamentos com dinheiro público.</li>
+        <li>Quais contratos foram firmados.</li>
+        <li>Quanto foi destinado a diárias e viagens de parlamentares.</li>
+        <li>Quais informações estão disponíveis sobre servidores e remunerações.</li>
+        <li>Como receitas, despesas e recursos públicos estão registrados.</li>
+      </ul>
+      <p>Em vez de obrigar o cidadão a conhecer o funcionamento de vários sistemas diferentes, queremos apresentar essas informações em uma experiência mais organizada, com explicações, fontes e referências para consulta.</p>
+      <p>Não queremos que transparência seja privilégio de quem entende de contabilidade, tecnologia ou administração pública. Queremos que qualquer pessoa possa acessar os dados e compreender o que está vendo.</p>
+
+      <h3>A lei estabelece o direito. A tecnologia pode aproximar esse direito das pessoas.</h3>
+      <p>A legislação brasileira já estabelece importantes obrigações de transparência. A Lei de Acesso à Informação, inclusive, prevê que os portais oficiais ofereçam mecanismos de pesquisa, linguagem compreensível e formatos que facilitem a análise dos dados.</p>
+      <p>Entretanto, a existência dessas exigências não significa que todos os portais tenham uma experiência simples, uniforme e verdadeiramente acessível ao cidadão.</p>
+      <p>O Olho Mágico acredita que disponibilizar arquivos e páginas não deve ser o ponto final da transparência. A informação precisa ser encontrável, compreensível, verificável e útil.</p>
+      <p>A simplificação que buscamos não é um favor, nem deveria depender da boa vontade de alguém. É uma forma de aproximar a prática da transparência de sua finalidade: permitir que a sociedade acompanhe e fiscalize a administração pública.</p>
+      <p>E, além da obrigação legal, existe uma questão de responsabilidade e honestidade com a população. Uma administração pública comprometida com a transparência deve se preocupar não apenas em publicar informações, mas também em permitir que as pessoas consigam utilizá-las.</p>
+
+      <h3>Independência, responsabilidade e participação.</h3>
+      <p>O Olho Mágico é um projeto independente. Não pertence a partidos políticos, candidatos ou grupos de governo. Nosso compromisso é com o acesso à informação, a documentação das fontes e a possibilidade de fiscalização pela sociedade.</p>
+      <p>Não queremos condenar pessoas ou instituições sem evidências. Queremos apresentar informações verificáveis, indicar suas origens, explicar suas limitações e permitir que cada cidadão tire suas próprias conclusões.</p>
+      <p>As informações podem apresentar diferenças de atualização, cobertura ou disponibilidade conforme a fonte oficial. Por isso, buscamos identificar as origens dos dados e deixar claras as limitações de cada consulta.</p>
+      <p>O projeto também acredita na participação da comunidade. Sugestões, correções, questionamentos e contribuições são importantes, desde que possam ser analisados e validados.</p>
+
+      <h3>O Olho Mágico também depende de você.</h3>
+      <p>Um portal de transparência só cumpre seu verdadeiro propósito quando as pessoas o utilizam.</p>
+      <p class="frase-media">Consulte. Pesquise. Questione. Compartilhe.</p>
+      <p>Se encontrar uma informação incompleta, procure a fonte original. Se encontrar uma inconsistência, documente. Se tiver dúvidas, pergunte. Se identificar uma dificuldade no acesso aos dados, cobre explicações dos responsáveis.</p>
+      <p>Utilize os canais oficiais, faça pedidos de acesso à informação quando necessário e acompanhe as respostas. Não importa se você é estudante, trabalhador, empresário, servidor público ou simplesmente alguém interessado no que acontece na sua cidade.</p>
+      <p class="frase-media">O dinheiro público é de todos. A transparência também deve ser.</p>
+      <p><strong>Olho Mágico: porque acompanhar o que é público é um direito de todos.</strong></p>
+      <p><a href="#metas">Veja as metas do projeto</a> · <a href="#direitos">Conheça seus direitos</a></p>
+    </section>
+
+    <section aria-labelledby="t-sobre">
+      <h2 id="t-sobre">Sobre o Olho Mágico</h2>
+      <p>O Olho Mágico é um portal <strong>independente</strong> e gratuito que organiza informações públicas da Prefeitura de Videira (SC) para que qualquer pessoa consiga entendê-las e conferi-las.</p>
+      <ul>
+        <li>Não é um site oficial da Prefeitura nem da Câmara.</li>
+        <li>Todos os dados vêm de fontes públicas oficiais. Em caso de diferença, <strong>a fonte oficial prevalece</strong>.</li>
+        <li>Pode haver atraso entre a publicação oficial e o que aparece aqui.</li>
+        <li>O projeto busca ser imparcial: mostra fatos e fontes, sem julgar pessoas.</li>
+        <li>O código do site é aberto: qualquer pessoa pode conferir como cada número é calculado.</li>
+      </ul>
+      <p>Este projeto é idealizado por um <strong>cidadão brasileiro, videirense</strong>.</p>
+    </section>
+
+    <section aria-labelledby="t-interpretar">
+      <h2 id="t-interpretar">Como interpretar os dados</h2>
+      <p class="nota-titulo">Cuidados para ler os números sem tirar conclusões erradas.</p>
+      <ul>
+        <li><strong>Valor alto não é irregularidade.</strong> Uma folha de pagamento ou um hospital custam muito por natureza. Os números mostram fatos, não culpa.</li>
+        <li><strong>Empenhado, liquidado e pago são etapas da mesma despesa.</strong> Não some os três.</li>
+        <li><strong>Salário-base não é o que a pessoa recebe no mês.</strong> O valor recebido pode ser maior (gratificações, adicionais) ou menor (descontos).</li>
+        <li><strong>Um mês sozinho conta pouco.</strong> Alguns pagamentos se concentram em certos meses (13º salário, etapas de obras). Compare meses diferentes antes de tirar conclusões.</li>
+        <li><strong>Na dúvida, confira na fonte.</strong> Toda informação tem a caixa “Origem da informação”, com o link oficial.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-metodo">
+      <h2 id="t-metodo">Metodologia</h2>
+      <p class="nota-titulo">Como cada informação é obtida e calculada: de qual sistema, com que frequência e com quais regras.</p>
+      <h3>Gastos da Prefeitura</h3>
+      <ul>
+        <li>A consulta é feita <strong>na hora</strong>, pelo seu navegador, na API de Dados Abertos (Contabilidade), para o mês escolhido (do dia 1 ao último dia).</li>
+        <li>A API entrega totais por órgão, unidade, fonte de recurso e credor. Os totais do site são a <strong>soma simples</strong> desses valores, sem nenhum ajuste.</li>
+        <li>Um credor que aparece em vários órgãos é somado <strong>pelo CPF ou CNPJ</strong> (ou pelo nome, quando não há documento). Nomes parecidos não são juntados.</li>
+        <li>Linhas com valores que não são números são <strong>ignoradas e contadas</strong>: o site avisa quantas foram.</li>
+        <li>As porcentagens são calculadas sobre o total <strong>pago</strong> no mês.</li>
+      </ul>
+      <h3>Servidores e salários</h3>
+      <ul>
+        <li>A lista vem da API de Pessoal e é <strong>copiada uma vez por dia</strong> por um robô (código em <code>ferramentas/atualizar_pessoal.py</code>). A data da cópia aparece na aba.</li>
+        <li>Inclui quem está trabalhando ou afastado (opção padrão da API). Cada <strong>registro é um vínculo (matrícula)</strong>: quem tem dois cargos aparece duas vezes.</li>
+        <li>Mostramos o <strong>salário-base</strong> publicado pela fonte. A soma dos salários-base não é o custo da folha.</li>
+        <li>O destaque de prefeito, vice-prefeito e secretário municipal é filtrado <strong>só pelo nome do cargo</strong> na lista oficial.</li>
+      </ul>
+      <h3>Contratos e licitações</h3>
+      <ul>
+        <li>Cópia diária do PNCP: licitações e compras publicadas com o código IBGE de Videira (4219309) nos últimos 12 meses, e os contratos do CNPJ de cada órgão que apareceu nelas.</li>
+        <li>Itens repetidos são removidos pelo número de controle do PNCP. Cada item tem link para o registro oficial.</li>
+        <li>“Maiores fornecedores” soma o <strong>valor global</strong> (previsto) dos contratos, juntando pelo CNPJ. Não é o valor pago.</li>
+      </ul>
+      <h3>Entradas e limites da lei</h3>
+      <ul>
+        <li><strong>Gasto com pessoal:</strong> cópia diária do Relatório de Gestão Fiscal (RGF) enviado pelo município ao SICONFI (Tesouro Nacional), para a Prefeitura e para a Câmara.</li>
+        <li><strong>Repasses da União:</strong> cópia diária das transferências constitucionais (FPM, FUNDEB, ITR e outras) publicadas pelo Tesouro Nacional, por mês e por tipo. A comparação com o ano anterior usa sempre os mesmos meses. Valores negativos (ajustes) entram como a fonte publica.</li>
+        <li><strong>Despesa por área:</strong> Declaração de Contas Anuais (DCA, Anexo I-E). Empenhado, liquidado e pago aparecem separados; as porcentagens são sobre a soma das áreas na mesma etapa.</li>
+        <li><strong>Educação:</strong> indicadores declarados ao SIOPE (FNDE). O mínimo legal só aparece quando o nome do indicador deixa claro qual é (25% em manutenção e desenvolvimento do ensino; 70% do FUNDEB na remuneração dos profissionais).</li>
+        <li><strong>Relatórios enviados:</strong> extrato de entregas do SICONFI. O site não avalia prazos.</li>
+        <li>Mostramos os percentuais e limites como estão no relatório. A faixa (abaixo ou acima do alerta, do prudencial e do máximo) é uma comparação direta com esses limites.</li>
+        <li>Fontes diferentes podem mostrar valores diferentes, porque usam períodos e critérios contábeis diferentes. Isso não indica, por si só, erro ou irregularidade.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-fichas">
+      <h2 id="t-fichas">Fichas e pesquisa geral</h2>
+      <p class="nota-titulo">Como funcionam as páginas de detalhe (de um servidor, de um fornecedor, de um contrato) e a caixa de pesquisa do topo.</p>
+      <ul>
+        <li>A <strong>ficha de servidor</strong> é de um <strong>registro</strong> (vínculo) da lista oficial, não de uma pessoa. O endereço dela é montado com nome, cargo e mês de admissão; se a pessoa mudar de cargo, o endereço muda.</li>
+        <li>A <strong>ficha de fornecedor</strong> junta os contratos do PNCP e os pagamentos da Prefeitura <strong>só pelo CNPJ</strong>. Nomes parecidos nunca são juntados, e pessoas físicas não têm os pagamentos procurados.</li>
+        <li>Cada ficha diz o que existe nela, o que está só no portal oficial e o que não tem fonte aberta.</li>
+        <li>A pesquisa geral procura, ao mesmo tempo, em servidores, fornecedores, contratos e licitações. Nome igual não quer dizer mesma pessoa ou empresa.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-situacao" id="sec-situacao">
+      <h2 id="t-situacao">Situação das fontes</h2>
+      <p class="sub">Quando cada conjunto de dados foi copiado pela última vez. Cada fonte é atualizada separadamente: se uma falhar, as outras seguem normais.</p>
+      <ul id="listaSituacao"></ul>
+    </section>
+
+    <section aria-labelledby="t-fontes-oficiais">
+      <h2 id="t-fontes-oficiais">Fontes oficiais usadas</h2>
+      <p class="nota-titulo">Os sistemas oficiais de onde vem cada dado do site, com o link para conferir direto na fonte.</p>
+      <ul>
+        <li><a href="https://videira.atende.net/transparencia/item/api-de-dados-abertos-contabilidade" target="_blank" rel="noopener">API de Dados Abertos (Contabilidade)</a>: gastos por mês.</li>
+        <li><a href="https://videira.atende.net/api/transparencia-pessoal-funcionarios" target="_blank" rel="noopener">API de Pessoal</a>: lista de servidores, cargos e salários-base.</li>
+        <li><a href="https://pncp.gov.br" target="_blank" rel="noopener">PNCP: Portal Nacional de Contratações Públicas</a>: licitações, compras e contratos (cada item com link para o registro oficial).</li>
+        <li><a href="https://siconfi.tesouro.gov.br/" target="_blank" rel="noopener">SICONFI (Tesouro Nacional)</a>: Relatório de Gestão Fiscal (gasto com pessoal e limites da LRF), contas anuais (despesa por área) e extrato de entregas.</li>
+        <li><a href="https://www.tesourotransparente.gov.br/" target="_blank" rel="noopener">Tesouro Nacional, transferências constitucionais</a>: repasses obrigatórios da União ao município.</li>
+        <li><a href="https://www.fnde.gov.br/siope" target="_blank" rel="noopener">SIOPE (FNDE)</a>: indicadores de gastos com educação.</li>
+        <li><a href="https://siconfi.tesouro.gov.br/" target="_blank" rel="noopener">Relatório Resumido da Execução Orçamentária (RREO, no SICONFI)</a>: receitas previstas e recebidas pelo Município no ano.</li>
+        <li><a href="https://impostometro.com.br/" target="_blank" rel="noopener">Impostômetro (ACSP)</a>: contador oficial da Associação Comercial de São Paulo, com a estimativa dos tributos municipais (no topo da página: Videira, Santa Catarina ou Brasil).</li>
+        <li><a href="https://sidra.ibge.gov.br/" target="_blank" rel="noopener">IBGE (SIDRA)</a>: população (Censo 2022 e estimativa anual), área, densidade e PIB do município (tabelas 4714, 6579 e 5938).</li>
+        <li><a href="https://portaldatransparencia.gov.br/" target="_blank" rel="noopener">Portal da Transparência do Governo Federal (CGU)</a>: convênios federais com Videira e totais mensais do Bolsa Família e do BPC (consulta com chave de acesso, guardada só no robô).</li>
+        <li><a href="https://www.camaravideira.sc.gov.br/dadosabertos" target="_blank" rel="noopener">Dados abertos da Câmara de Videira</a>: vereadores em exercício e pautas das sessões (consulta com token, guardado só no robô).</li>
+        <li><a href="https://videira.atende.net/transparencia/item/pagamentos" target="_blank" rel="noopener">Consulta de Pagamentos</a>: cada pagamento, com empenho e licitação (só no portal oficial).</li>
+        <li><a href="https://videira.atende.net/transparencia/item/relacao-funcionario-x-salario" target="_blank" rel="noopener">Relação Funcionário x Salário</a>: remuneração completa de cada mês (só no portal oficial).</li>
+      </ul>
+      <p class="meta">As duas consultas “só no portal oficial” são protegidas contra acesso automático, e este site respeita essa proteção.</p>
+    </section>
+
+    <!-- COMO CADA FONTE É ACESSADA: separa o que tem documentação oficial do que só foi visto em uso.
+         Atualizar a data quando a conferência for refeita. -->
+    <section aria-labelledby="t-acesso-fontes">
+      <h2 id="t-acesso-fontes">Como cada fonte é acessada</h2>
+      <p>Nem toda fonte tem documentação oficial publicada. Para não tratar tudo como igual, separamos: <strong>documentada</strong> (há manual ou página oficial explicando o acesso) e <strong>observada</strong> (funciona e é usada todo dia, mas não localizamos documentação oficial). Conferência feita em 03/10/2026.</p>
+      <div class="rolagem-simples"><table class="tabela-simples">
+        <thead><tr><th scope="col">Fonte</th><th scope="col">Documentação</th><th scope="col">Acesso</th></tr></thead>
+        <tbody>
+          <tr><td>Gastos (API de Dados Abertos do portal)</td><td>Documentada</td><td>Aberto, até 10 consultas por minuto</td></tr>
+          <tr><td>Pessoal (API de Pessoal do portal)</td><td>Observada</td><td>Aberto</td></tr>
+          <tr><td>PNCP (contratações e contratos)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>SICONFI (contas e relatórios fiscais)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>Tesouro Nacional (transferências)</td><td>Observada</td><td>Aberto</td></tr>
+          <tr><td>SIOPE (educação)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>Portal da Transparência federal (CGU)</td><td>Documentada</td><td>Com chave de acesso, guardada só no robô</td></tr>
+          <tr><td>Câmara de Videira</td><td>Observada</td><td>Com token, guardado só no robô</td></tr>
+          <tr><td>Receitas (RREO, no SICONFI)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>IBGE (SIDRA)</td><td>Documentada</td><td>Aberto</td></tr>
+          <tr><td>Impostômetro (ACSP)</td><td>Widget oficial; a API só existe por convênio</td><td>Contador da própria ACSP, sempre aberto no topo da página</td></tr>
+        </tbody>
+      </table></div>
+      <p class="meta">Código-fonte sob licença MIT. A licença vale só para o código: os dados, documentos e imagens das fontes oficiais seguem as regras de cada fonte.</p>
+    </section>
+
+    <section aria-labelledby="t-privacidade">
+      <h2 id="t-privacidade">Privacidade</h2>
+      <p>Pagamentos da Prefeitura e nomes, cargos e salários de servidores são <strong>informações públicas</strong> pela Lei de Acesso à Informação (Lei 12.527/2011). Mesmo assim, mostramos só o necessário:</p>
+      <ul>
+        <li>CPF de pessoa física aparece mascarado. Matrícula, horário, local de trabalho e afastamentos não são mostrados nem guardados.</li>
+        <li>O site não tem cadastro, não usa cookies de rastreamento e não guarda o que você pesquisa.</li>
+        <li>As letras do site ficam no próprio site: abrir o Olho Mágico não envia o seu endereço de internet ao Google.</li>
+        <li>A única exceção é o Impostômetro no topo da página: para mostrar o contador, seu navegador se conecta ao site da Associação Comercial de São Paulo (impostometro.com.br), que pode usar cookies.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-falta">
+      <h2 id="t-falta">O que ainda não está aqui</h2>
+      <p>Remuneração mensal completa e diárias de cada servidor (só no portal oficial, com proteção contra acesso automático), orçamento de despesas por programa, restos a pagar, obras, emendas parlamentares, e os projetos de lei e votações da Câmara. Só vão aparecer quando houver uma fonte oficial que possa ser consultada e conferida, sem números inventados.</p>
+    </section>
+  </div><!-- fim da aba sobre -->
+
+  <!-- ================= MUNICÍPIO: "Como é Videira?" (IBGE, cópia diária em dados/ibge.js; js/municipio-tela.js) ================= -->
+  <div id="aba-municipio" class="oculto">
+    <h1 class="titulo-pagina">Como é Videira?</h1>
+    <p class="sub sub-centro">Quantas pessoas moram aqui, o tamanho do território e quanto a cidade produz. Cada número mostra o seu ano e a sua fonte.</p>
+    <div id="municipioEstado" role="status" aria-live="polite"></div>
+    <div id="municipioDesatualizado"></div>
+    <div id="municipioConteudo"></div>
+  </div><!-- fim da aba município -->
+
+  <!-- ================= METAS DO PROJETO (js/metas-tela.js; lista em js/metas-lista.js) ================= -->
+  <div id="aba-metas" class="oculto">
+    <h1 class="titulo-pagina">Metas do projeto</h1>
+    <p class="sub sub-centro">O Olho Mágico começa em Videira e quer chegar ao país inteiro. Cada fase tem o que precisa e um valor aproximado. Cada meta alcançada ganha um ✓ verde.</p>
+    <p class="aviso-juridico">Valores aproximados, para planejamento (pesquisados em 04/10/2026). Os marcados como “estimativa” são faixas de mercado, não orçamentos. Para contribuir, toque em <strong>Apoie o projeto</strong>.</p>
+    <div id="metasLista"></div>
+  </div><!-- fim da aba metas -->
+
+  <!-- ================= LEIS E DIREITOS =================
+       Resumo do documento completo docs/FUNDAMENTO_JURIDICO.md (03/10/2026). Material de orientação, não parecer jurídico. -->
+  <div id="aba-direitos" class="oculto">
+    <h1 class="titulo-pagina">Por que você tem direito a estas informações?</h1>
+    <p class="sub sub-centro">As leis que garantem o acesso aos dados públicos e os motivos pelos quais, mesmo assim, eles ainda são difíceis de encontrar.</p>
+    <p class="aviso-juridico">Este resumo é material de orientação, não parecer jurídico. A aplicação de cada lei depende do órgão, do tipo de informação, das leis locais e da data dos fatos. Ninguém deve ser acusado com base só neste texto.</p>
+
+    <section aria-labelledby="t-dir-pergunta">
+      <h2 id="t-dir-pergunta">A pergunta do Olho Mágico</h2>
+      <p>Não basta perguntar se o órgão publicou alguma coisa. Importa também saber se a informação está onde deveria, se dá para encontrá-la sem conhecer o nome do sistema, se dá para entender, baixar em formato reutilizável, ligar a despesa ao empenho, ao pagamento, ao contrato e ao fornecedor, e se o histórico continua acessível.</p>
+      <p>Ter um portal não garante tudo isso. E uma dificuldade técnica isolada também não prova, sozinha, que alguém descumpriu a lei.</p>
+    </section>
+
+    <section aria-labelledby="t-dir-leis">
+      <h2 id="t-dir-leis">As leis, em poucas palavras</h2>
+      <p class="nota-titulo">O que cada lei garante sobre o acesso às informações públicas, com o link para o texto oficial.</p>
+      <ul class="leis">
+        <li><h3>Constituição Federal</h3>
+          <p>Todos têm direito de receber informações dos órgãos públicos (art. 5º, XXXIII). A publicidade é princípio da administração pública (art. 37). A administração deve permitir a consulta à documentação do governo (art. 216, § 2º).</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Lei de Acesso à Informação (12.527/2011)</h3>
+          <p>O órgão deve publicar, sem que ninguém peça, despesas, repasses, licitações, contratos e obras (art. 8º). Os sites oficiais devem ter busca, relatórios em formatos abertos, acesso automatizado em formato legível por máquina, dados atualizados e acessibilidade (art. 8º, § 3º).</p>
+          <p>Qualquer pessoa pode pedir uma informação sem dizer o motivo (art. 10). A resposta vem na hora ou em até 20 dias, prorrogáveis por mais 10 com justificativa (art. 11).</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2011/lei/l12527.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Lei de Responsabilidade Fiscal (LC 101/2000 e LC 131/2009)</h3>
+          <p>Planos, orçamentos, prestações de contas e relatórios fiscais devem ser divulgados também pela internet (art. 48). A execução da despesa deve ser mostrada no momento em que acontece, com o bem ou serviço, quem recebeu e, quando houver, a licitação (art. 48-A).</p>
+          <p>Empenhado, liquidado e pago são etapas diferentes: um valor empenhado ainda não foi pago.</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp101.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Licitações e Contratos (14.133/2021)</h3>
+          <p>Os atos da licitação são públicos (art. 13). Editais, contratos e aditivos devem ser divulgados no Portal Nacional de Contratações Públicas, o PNCP (arts. 54, 94 e 174), que deve oferecer os dados em formato aberto.</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Lei Geral de Proteção de Dados (13.709/2018)</h3>
+          <p>Protege dados pessoais, mas não revoga a Lei de Acesso à Informação. As duas valem juntas: cada campo é avaliado, e uma base com alguns dados pessoais não fica inteira em segredo por causa deles.</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+        <li><h3>Governo Digital (14.129/2021)</h3>
+          <p>Trata de dados abertos: bases não pessoais públicas como regra, legíveis por máquina, descritas, atualizadas e com histórico (art. 29). Vale diretamente para o governo federal; estados e municípios precisam adotá-la por norma própria (art. 2º).</p>
+          <p><a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14129.htm" target="_blank" rel="noopener noreferrer">Texto oficial</a></p></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-dir-dificil">
+      <h2 id="t-dir-dificil">Por que ainda é difícil encontrar os dados</h2>
+      <p>São causas possíveis, a serem demonstradas caso a caso, não acusações:</p>
+      <ul>
+        <li><strong>Sistemas separados:</strong> contabilidade, folha, licitações e portal podem ser sistemas diferentes, que não se conversam.</li>
+        <li><strong>Dependência de fornecedores:</strong> a empresa contratada define formato, exportação e documentação. Isso não transfere a ela o dever do órgão.</li>
+        <li><strong>PDF e imagem:</strong> bons para ler, ruins para pesquisar, comparar e reutilizar.</li>
+        <li><strong>Dados só pelo navegador:</strong> a tela mostra, mas não há um arquivo ou endereço direto para baixar.</li>
+        <li><strong>Falta de padrão:</strong> o mesmo fornecedor pode funcionar de jeitos diferentes em cada cidade.</li>
+        <li><strong>Falta de explicação:</strong> códigos e siglas sem dizer o que significam.</li>
+        <li><strong>Histórico curto</strong> e <strong>datas diferentes</strong> entre o portal, o Tribunal de Contas e as bases nacionais.</li>
+        <li><strong>Proteções técnicas</strong> (CAPTCHA, limite de consultas), que podem existir por segurança e não provam intenção de esconder.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="t-dir-tres">
+      <h2 id="t-dir-tres">Três jeitos de olhar a transparência</h2>
+      <p class="nota-titulo">Uma informação pode cumprir a lei e, mesmo assim, ser difícil de achar ou de usar. Por isso a transparência é vista de três lados.</p>
+      <ul>
+        <li><strong>Jurídica:</strong> o que a lei exige, de quem, em que prazo e com quais exceções.</li>
+        <li><strong>Informacional:</strong> se uma pessoa consegue encontrar, entender e conferir.</li>
+        <li><strong>Tecnológica:</strong> se os dados podem ser baixados, lidos por programas e guardados.</li>
+      </ul>
+      <p>Uma informação pode estar publicada e, mesmo assim, ser difícil de achar ou de reutilizar.</p>
+    </section>
+
+    <section aria-labelledby="t-dir-nao">
+      <h2 id="t-dir-nao">O que um teste sozinho não prova</h2>
+      <p class="nota-titulo">Exemplos de situações que parecem suspeitas, mas que sozinhas não provam nada. Servem para evitar acusações sem prova.</p>
+      <div class="rolagem-simples"><table class="tabela-simples">
+        <thead><tr><th scope="col">O que se viu</th><th scope="col">O que isso, sozinho, não prova</th></tr></thead>
+        <tbody>
+          <tr><td>Não foi encontrada API</td><td>Que a informação não exista ou que haja ilegalidade</td></tr>
+          <tr><td>O endereço deu erro (403, 404, 500)</td><td>Que o serviço não exista ou que a lei foi descumprida</td></tr>
+          <tr><td>O portal usa CAPTCHA</td><td>Intenção de esconder dados</td></tr>
+          <tr><td>Os dados estão só em PDF</td><td>Descumprimento automático da lei</td></tr>
+          <tr><td>O fornecedor do sistema é uma empresa</td><td>Irregularidade, nem que o dever passou para a empresa</td></tr>
+          <tr><td>A base tem campos pessoais</td><td>Que a base inteira deva ficar em segredo</td></tr>
+          <tr><td>A contratação não apareceu no PNCP</td><td>Que não foi publicada, sem conferir filtros e datas</td></tr>
+          <tr><td>Duas bases mostram valores diferentes</td><td>Fraude: pode ser etapa, data ou conceito diferente</td></tr>
+          <tr><td>O site estava fora do ar</td><td>Que está sempre fora do ar</td></tr>
+        </tbody>
+      </table></div>
+      <p>Por isso o Olho Mágico usa expressões proporcionais ao que foi visto, como “não localizado na consulta feita” ou “acesso automatizado não confirmado”, e não dá nota nem faz ranking de municípios.</p>
+    </section>
+
+    <section aria-labelledby="t-dir-pedir">
+      <h2 id="t-dir-pedir">Como pedir uma informação</h2>
+      <p>Se a informação não estiver publicada, qualquer pessoa pode fazer um pedido pela Lei de Acesso à Informação, no Serviço de Informação ao Cidadão (SIC) do órgão. Dicas:</p>
+      <ul>
+        <li>Diga o período e o tipo de informação.</li>
+        <li>Peça documentos, arquivos e relatórios que já existem, de preferência no formato digital em que estão guardados.</li>
+        <li>Não é preciso explicar o motivo do pedido.</li>
+        <li>Se houver negativa, peça o fundamento legal e a entrega parcial, só sem os campos protegidos.</li>
+        <li>Guarde o número do protocolo, o prazo e a resposta.</li>
+      </ul>
+      <p class="meta">Orientação oficial da CGU: <a href="https://www.gov.br/acessoainformacao/pt-br/lai-para-estados-e-municipios/lai_estados_municipios" target="_blank" rel="noopener noreferrer">LAI para Estados e Municípios</a>. Documento completo, com todas as referências: <a href="https://github.com/criscoser/olhomagico/blob/main/docs/FUNDAMENTO_JURIDICO.md" target="_blank" rel="noopener noreferrer">Fundamento jurídico do Olho Mágico</a>.</p>
+    </section>
+  </div><!-- fim da aba direitos -->
+</main>
+    <!-- RODAPÉ: aviso sobre os dados, redes de quem idealizou o projeto (ícones desenhados aqui mesmo, sem carregar
+         nada de fora) e o crédito. Os links abrem em outra aba e não passam de qual página a pessoa veio (noreferrer). -->
+    <footer><div class="wrap">
+  <p class="rodape-aviso"><strong>O Olho Mágico não condena nem absolve ninguém e é <span class="realce">contra qualquer forma de violência</span>.</strong> Dúvidas e suspeitas devem ir aos canais oficiais. <a href="#sobre/responsabilidade">Leia o aviso completo</a>.</p>
+  <p class="rodape-credito">Este projeto é idealizado por um <strong>cidadão brasileiro, videirense</strong>.</p>
+  <p class="rodape-metas"><a href="#metas">Metas do projeto</a> · <a href="#sobre">Por que o Olho Mágico existe</a></p>
+</div></footer>
+  </div><!-- fim .principal -->
+
+  <!-- BARRA INFERIOR (só no celular e no tablet): os 4 caminhos mais usados e "Mais", que abre o menu completo.
+       Fica perto do polegar e com o nome escrito em cada atalho. -->
+  <nav class="barra-inferior" aria-label="Atalhos">
+    <a class="aba-inferior" href="#inicio"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Início</span></a>
+    <a class="aba-inferior" href="#gastos"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-4v4"/><circle cx="16.5" cy="14" r="1.5"/></svg><span>Gastos</span></a>
+    <a class="aba-inferior" href="#pessoal"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 5.8"/></svg><span>Pessoal</span></a>
+    <a class="aba-inferior" href="#busca"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Buscar</span></a>
+    <button type="button" class="aba-inferior" id="btnMenu" aria-expanded="false" aria-controls="lateralCorpo"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span id="btnMenuTexto">Mais</span></button>
+  </nav>
+</div><!-- fim .app -->
+
+<!-- CAIXA DE APOIO (decisão do mantenedor, 04/10/2026): e-mail em destaque (doações, sugestões e por que apoia) e,
+     para quem prefere doar direto, o QR Code do Pix e o botão "Copiar código Pix". O código Pix vem de js/config.js e
+     é CONFERIDO por js/pix-regras.js: se não combinar, nada de Pix aparece ("falha fechada"). -->
+<dialog id="dlgApoio" class="apoio" aria-labelledby="tApoio">
+  <h2 id="tApoio">Apoie o projeto</h2>
+  <p>Quer contribuir com o Olho Mágico, com doações ou sugestões? Escreva para o e-mail abaixo e conte <strong>por que você está apoiando</strong> o projeto.</p>
+  <p class="apoio-email"><span id="apoioEmail"></span> <button type="button" class="sec" id="copiarEmail">Copiar e-mail</button></p>
+  <div id="pixDados" class="apoio-pix">
+    <p class="apoio-pix-titulo">Se preferir doar direto, use o QR Code do Pix:</p>
+    <!-- QR Code: desenhado no navegador A PARTIR do código Pix (js/apoio.js): os dois nunca divergem. -->
+    <figure class="apoio-qr oculto" id="apoioQr"><figcaption class="meta">No app do banco: Pix → Ler QR Code.</figcaption></figure>
+    <button type="button" class="apoio-principal" id="copiarCodigo">Copiar código Pix (para pagar pelo celular)</button>
+    <p class="meta">No celular: toque no botão acima e, no app do banco, escolha <strong>Pix Copia e Cola</strong>.</p>
+    <p class="aviso-recebedor"><strong>Antes de pagar, confira se você está no endereço oficial: <span id="pixSite"></span>.</strong>
+      Se o site tiver outro endereço, não pague: a página pode ser falsa.</p>
+  </div>
+  <p class="meta">O apoio é voluntário: não dá acesso a nada e não muda o que o site mostra. O site não registra quem contribuiu.</p>
+  <p><a href="#metas" id="apoioMetas">Veja as metas do projeto e para onde vai o apoio</a></p>
+  <p class="meta" id="pixMsg" role="status" aria-live="polite"></p>
+  <p><button type="button" class="sec" id="fecharApoio">Fechar</button></p>
+</dialog>
+
+
+
+<!-- SCRIPTS (ordem importa): config -> utilitários -> fontes -> regras (sem tela) -> componentes -> telas -> rotas -> início -->
+<script src="js/config.js"></script>
+<script src="js/utilitarios.js"></script>
+<script src="js/siglas.js"></script>
+<script src="js/fontes/despesas.js"></script>
+<script src="js/fontes/arquivos.js"></script>
+<script src="js/fontes/pessoal.js"></script>
+<script src="js/agregacao.js"></script>
+<script src="js/pessoal-regras.js"></script>
+<script src="js/contratos-regras.js"></script>
+<script src="js/contas-regras.js"></script>
+<script src="js/transferencias-regras.js"></script>
+<script src="js/busca-regras.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/frases.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/origem.js"></script>
+<script src="js/exportar.js"></script>
+<script src="js/interface.js"></script>
+<script src="js/componentes/graficos.js"></script>
+<script src="js/componentes/tabela.js"></script>
+<script src="js/componentes/filtros.js"></script>
+<script src="js/componentes/blocos.js"></script>
+<script src="js/componentes/menu.js"></script>
+<script src="js/impostometro.js"></script>
+<script src="js/metas-lista.js"></script>
+<script src="js/metas-tela.js"></script>
+<script src="js/pix-regras.js"></script>
+<script src="js/vendor/qrcodegen.js"></script>
+<script src="js/apoio.js"></script>
+<script src="js/pessoal-tela.js"></script>
+<script src="js/contratos-tela.js"></script>
+<script src="js/receitas-regras.js"></script>
+<script src="js/municipio-tela.js"></script>
+<script src="js/contas-tela.js"></script>
+<script src="js/inicio-tela.js"></script>
+<script src="js/busca-tela.js"></script>
+<script src="js/fichas.js"></script>
+<script src="js/camara-tela.js"></script>
+<script src="js/situacao-tela.js"></script>
+<script src="js/rotas.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

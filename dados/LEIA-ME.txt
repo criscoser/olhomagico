@@ -1,0 +1,13 @@
+# Esta pasta recebe os arquivos gerados pelos robôs (ferramentas/atualizar.py):
+  pessoal.js         lista de servidores (API de Pessoal da Prefeitura)
+  siconfi.js         gasto com pessoal e limites da LRF (Tesouro Nacional)
+  pncp.js            licitações e contratos (PNCP)
+  transferencias.js  repasses constitucionais da União (Tesouro Nacional)
+  dca.js             despesa por área nas contas anuais (SICONFI)
+  entregas.js        relatórios enviados ao Tesouro (SICONFI)
+  siope.js           indicadores de educação (SIOPE, FNDE)
+  situacao.js        situação de cada fonte (última cópia válida, última tentativa, erro, resumo)
+
+- No GitHub, o robô roda sozinho todo dia e publica o site com os arquivos novos.
+- No seu computador, para testar: python ferramentas/atualizar.py
+- NÃO envie para o GitHub os .js gerados no seu computador: o robô gera os dele.

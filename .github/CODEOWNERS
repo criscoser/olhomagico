@@ -1,0 +1,19 @@
+# DONOS DO CÓDIGO: quem precisa revisar mudanças em cada parte do projeto.
+#
+# Hoje o projeto tem UM mantenedor, e o GitHub não deixa ninguém aprovar o próprio pull request.
+# Por isso este arquivo ainda NÃO bloqueia nada: ele passa a valer quando houver um segundo mantenedor
+# e a regra "Require review from Code Owners" for ligada na branch main.
+# Os caminhos abaixo são os mais sensíveis: o Pix, a página, a publicação e os robôs.
+
+*                         @criscoser
+
+# Pix e segurança da página (trocar a chave Pix desviaria dinheiro)
+/js/config.js             @criscoser
+/js/apoio.js              @criscoser
+/js/pix-regras.js         @criscoser
+/js/vendor/               @criscoser
+/index.html               @criscoser
+
+# Publicação e robôs (podem mudar o que vai para o ar)
+/.github/                 @criscoser
+/ferramentas/             @criscoser

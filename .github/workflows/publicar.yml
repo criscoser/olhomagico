@@ -1,0 +1,89 @@
+# ROBÔ DE PUBLICAÇÃO DO OLHO MÁGICO: roda no GitHub, de graça.
+# Todo dia (e sempre que você mudar o código), ele:
+#   1) roda os testes (se algum falhar, NÃO publica);
+#   2) recupera os arquivos de dados que já estão no site (a última versão válida de cada fonte);
+#   3) atualiza cada fonte SEPARADAMENTE (se uma falhar, a versão anterior dela é mantida);
+#   4) publica o site no GitHub Pages.
+# Os dados NÃO são guardados no repositório: vão só para o site publicado (sem histórico de cópias antigas).
+name: Atualizar e publicar o site
+
+on:
+  schedule:
+    - cron: "17 9 * * *"   # todo dia às 09:17 UTC = 06:17 em Brasília
+  workflow_dispatch:        # cria o botão "Run workflow" na aba Actions
+  push:
+    branches: [main]        # publica de novo quando você muda o código
+
+# Permissões mínimas: ler o código e publicar no Pages. Nada além disso.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:              # nunca duas publicações ao mesmo tempo
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    # Teto da publicação diária (hoje leva de 15 a 45 min). Sem ele, o GitHub só para em 6 horas.
+    timeout-minutes: 120
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+    steps:
+      # As ações abaixo estão FIXADAS pelo código exato (SHA) de cada versão: assim ninguém consegue
+      # trocar o conteúdo delas por baixo. Para atualizar, troque o SHA pelo da versão nova.
+      - name: Baixar o código do site
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false   # não deixa a senha temporária do GitHub guardada na máquina do robô
+
+      - name: Rodar os testes (site e robôs)
+        run: |
+          node testes/rodar_testes.js
+          python3 -m unittest discover -s testes -p "test_*.py"
+
+      - name: Recuperar a última versão publicada dos dados
+        # Baixa do próprio site os arquivos de ontem. Se uma fonte falhar hoje, o de ontem continua valendo.
+        # SEGURANÇA: os arquivos baixados vão para "recuperados/" e NÃO são usados como vieram. O script lê cada um
+        # como dado puro e o regrava do zero em "dados/": qualquer código que não seja dado é descartado.
+        # (Sem isso, um arquivo adulterado publicado uma vez se perpetuaria a cada publicação.)
+        run: |
+          mkdir -p dados recuperados
+          SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          for f in $(python3 ferramentas/recuperar.py --lista); do
+            curl -fsSL --max-time 60 "$SITE/dados/$f" -o "recuperados/$f" || rm -f "recuperados/$f"
+          done
+          python3 ferramentas/recuperar.py recuperados dados
+
+      - name: Atualizar as fontes de dados (cada uma separadamente)
+        # As chaves vêm do cofre do GitHub (Settings -> Secrets and variables -> Actions).
+        # O GitHub esconde o valor delas no registro; o robô também troca qualquer chave por *** nas mensagens.
+        # Se uma chave não estiver cadastrada, a fonte dela é só pulada.
+        env:
+          CGU_CHAVE: ${{ secrets.CGU_CHAVE }}
+          CAMARA_TOKEN: ${{ secrets.CAMARA_TOKEN }}
+        run: python3 ferramentas/atualizar.py || echo "::warning::Alguma fonte falhou hoje; a versão anterior dela foi mantida. Veja o resumo acima."
+
+      - name: Montar a pasta do site (só o que vai para o ar)
+        run: |
+          mkdir _site
+          cp -r index.html css js dados img _site/
+
+      - name: Conferir o Pix que vai para o ar
+        # ÚLTIMO passo antes de enviar: compara o código Pix de _site com a impressão digital guardada FORA do
+        # repositório (Secret PIX_SHA256). Se for diferente, o site NÃO é publicado (fica a versão anterior no ar).
+        env:
+          PIX_SHA256: ${{ secrets.PIX_SHA256 }}
+        run: python3 ferramentas/conferir_pix.py _site
+
+      - name: Enviar a pasta para o GitHub Pages
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+      - name: Publicar
+        id: publicacao
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -1,0 +1,53 @@
+# MONITOR DO PIX PUBLICADO: a cada 6 horas, baixa o js/config.js QUE ESTÁ NO AR e confere o código Pix com a
+# impressão digital guardada no Secret PIX_SHA256. Se for diferente (ou se o site não responder), abre uma
+# issue de alerta no repositório (o GitHub avisa por e-mail). Não abre outra se já houver uma aberta.
+# Limite: está na mesma conta do GitHub; quem invadir a conta pode desligá-lo. Por isso também vale um monitor
+# FORA do GitHub (passo a passo em REGRAS_INVIOLAVEIS.md / conversa do plano, seção 3.5).
+name: Monitorar o Pix publicado
+
+on:
+  schedule:
+    - cron: "41 */6 * * *"   # a cada 6 horas (minuto 41)
+  workflow_dispatch:          # botão "Run workflow" na aba Actions
+
+# Só lê o código e pode abrir issues. Nada além disso.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  monitorar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Baixar o código (só para usar o script de conferência)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Baixar o config publicado e conferir o Pix
+        env:
+          PIX_SHA256: ${{ secrets.PIX_SHA256 }}
+        run: |
+          SITE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          mkdir -p publicado/js
+          curl -fsSL --max-time 60 "$SITE/js/config.js?conferencia=$(date +%s)" -o publicado/js/config.js
+          python3 ferramentas/conferir_pix.py publicado
+
+      - name: Abrir alerta (issue) se a conferência falhou
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REGISTRO: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITULO="ALERTA: o Pix do site publicado não confere"
+          ABERTAS=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$TITULO in:title" --json number --jq 'length')
+          if [ "$ABERTAS" = "0" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITULO" --body "A conferência automática do Pix falhou: o código Pix publicado é diferente do registrado no Secret PIX_SHA256, ou o site não respondeu.
+
+          **O que fazer agora:** abra o site, toque em Apoie o projeto e confira se a chave é a oficial. Se não for, troque a senha da conta do GitHub, revise os últimos commits e as Actions, e corrija o js/config.js.
+
+          Registro desta verificação: $REGISTRO"
+          else
+            echo "Já existe uma issue de alerta aberta; não abro outra."
+          fi

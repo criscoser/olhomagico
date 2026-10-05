@@ -1,0 +1,60 @@
+# TESTES EM PULL REQUEST: roda os mesmos testes da publicação sempre que alguém abre ou atualiza um PR.
+# Serve para a regra da branch "main" (Settings -> Rules -> Rulesets): com "Require status checks to pass"
+# apontando para o teste "testes", nada entra na main sem os testes verdes.
+# Este workflow NÃO publica nada e NÃO tem acesso a segredos.
+name: Testes
+
+on:
+  pull_request:
+  push:
+    branches: [main]        # também a cada mudança publicada, para o resultado ficar visível na aba Actions
+  workflow_dispatch:        # cria o botão "Run workflow" na aba Actions
+
+# Só lê o código. Nada além disso.
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    timeout-minutes: 20
+    name: testes            # nome da verificação que aparece no PR (é este que a regra da main exige)
+    runs-on: ubuntu-latest
+    steps:
+      # Ação FIXADA pelo código exato (SHA), igual à do workflow de publicação.
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Rodar os testes (site e robôs)
+        run: |
+          node testes/rodar_testes.js
+          python3 -m unittest discover -s testes -p "test_*.py"
+
+  # O QR Code do Pix tem de ser LIDO de volta igual ao código configurado, por um leitor de verdade (zbar),
+  # como faria o app de um banco. A imagem é desenhada pelo MESMO código do site (testes/qr_png.js).
+  qr:
+    timeout-minutes: 10
+    name: qr-pix-legivel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Instalar o leitor de QR (zbar, do repositório do Ubuntu)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zbar-tools
+
+      - name: Ler o QR do Pix e comparar com o código configurado
+        run: |
+          ESPERADO=$(node testes/qr_png.js qr-pix.png)
+          LIDO=$(zbarimg --raw -q qr-pix.png)
+          if [ "$LIDO" = "$ESPERADO" ]; then
+            echo "QR lido e igual ao código Pix configurado."
+          else
+            echo "::error::O QR Code lido é diferente do código Pix configurado."
+            exit 1
+          fi

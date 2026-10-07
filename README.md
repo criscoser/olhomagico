@@ -112,6 +112,7 @@ O projeto adota critérios estritos de anonimização e minimização de dados e
 
 - **Fluxo de Fornecedores**: CPFs de pessoas físicas sofrem processo de mascaramento dinâmico em tela. Para anonimização total na camada de apresentação, configure `MOSTRAR_NOME_PESSOA_FISICA: false` em `js/config.js`.
 - **Fluxo de Pessoal**: Limita-se à exibição de dados estritamente institucionais (Nome, Cargo, Lotação, Vínculo e Salário-Base). Informações sensíveis como número de matrícula, CPF, horários específicos de ponto eletrônico ou históricos de afastamentos por motivos de saúde **não são capturados ou armazenados**.
+- **Cruzamento de dados (auditoria)**: o cruzamento de pessoas entre fontes oficiais é feito **só por CPF**, dentro do robô Python (nunca no navegador). A chave de ligação é um HMAC-SHA256 do CPF com segredo guardado no Secret `CPF_SALT`; o CPF puro nunca é gravado em arquivo, log, `dados/` ou git. Só o resultado é publicado, com CPF mascarado (`***.456.789-**`) e links para as fontes oficiais. O CPF não é pesquisável pelo público. **Nunca** se liga pessoas só pelo nome (homônimos). Coincidência é um fato registrado, não uma acusação: sem adjetivos e sem ranking. Detalhes em `REGRAS_INVIOLAVEIS.md`.
 
 ---
 

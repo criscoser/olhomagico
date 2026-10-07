@@ -179,10 +179,13 @@ Estas regras protegem as pessoas e a credibilidade do projeto. **Não as remova 
 1. **Os dados aparecem exatamente como a fonte oficial publica.** Nunca altere, arredonde para "parecer
    melhor" ou complete valores que faltam. Quando um dado não existir, a tela diz que está indisponível,
    e nunca mostra zero ou um valor inventado.
-2. **Privacidade:** nunca exiba nem guarde CPF, matrícula, horário, local de trabalho ou situação de
-   afastamento de servidores. **CPF nunca pode ser pesquisável.**
-3. **Nunca ligue pessoas de fontes diferentes pelo nome.** Homônimos existem, e ligar a pessoa errada é
-   acusar um inocente em público. Empresas só são ligadas pelo CNPJ.
+2. **Privacidade:** nunca exiba matrícula, horário, local de trabalho ou situação de afastamento de
+   servidores. O CPF completo nunca aparece na tela, em links, no CSV, em `dados/`, em logs ou no git.
+   **CPF nunca pode ser pesquisável.**
+3. **Cruzamento de pessoas: só por CPF, nunca pelo nome.** Homônimos existem, e ligar a pessoa errada é
+   acusar um inocente em público. O cruzamento por CPF roda só no robô Python, usando um HMAC-SHA256 do CPF
+   com segredo no Secret `CPF_SALT` (o CPF puro nunca é gravado). Só o resultado é publicado, com CPF
+   mascarado e links das fontes. Coincidência é fato, não acusação. Empresas são ligadas pelo CNPJ.
 4. **Respeite as fontes:** não tente burlar captcha ou bloqueio contra robôs, e respeite os pedidos de
    "espere um pouco" (HTTP 429). Os robôs já fazem isso; não diminua as pausas.
 5. **Chaves e tokens** só em variáveis de ambiente ou no cofre do GitHub.

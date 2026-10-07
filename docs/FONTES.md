@@ -35,7 +35,7 @@ Legenda: **Integrada** = já usada no site · **Validada** = testada com dados r
 ## Onde discordo da missão (e o que proponho)
 
 1. **"Ficha completa do servidor" com remuneração bruta, líquida e diárias.** Hoje não existe fonte aberta para isso em Videira: a remuneração completa e os pagamentos estão atrás de captcha, e os servidores da CGU são federais. Construir essa ficha agora seria uma tela vazia. **Proposta:** a ficha mostra o que existe (dados funcionais e salário-base) e declara o que falta. O resto depende do pedido pela LAI.
-2. **Associação de pessoas entre fontes.** As fontes abertas não compartilham matrícula nem CPF, então só sobraria o nome, e a própria missão proíbe tratar nome igual como identidade. Um cruzamento errado vira acusação injusta. **Proposta:** não cruzar pessoas por enquanto. Cruzar só **órgãos e empresas por CNPJ** (Prefeitura × PNCP × despesas), que é seguro.
+2. **Associação de pessoas entre fontes.** Nome igual não é identidade (homônimos), e um cruzamento errado vira acusação injusta. **Proposta:** cruzar pessoas **só por CPF**, e só quando as duas fontes oficiais trouxerem o documento (hoje só a API de despesas traz CPF; a base de servidores de Videira não traz, então falta achar uma fonte com CPF). O cruzamento roda no robô, com HMAC-SHA256 do CPF (Secret `CPF_SALT`), e só o resultado é publicado, com CPF mascarado e links das fontes. Sem CPF nas duas fontes, não há ligação. **Órgãos e empresas** continuam sendo cruzados por **CNPJ** (Prefeitura × PNCP × despesas).
 3. **Arquivo grande de servidores.** O arquivo atual (estimado em menos de 1 MB, que o servidor compacta) é aceitável. Se crescer, divido por letra inicial.
 
 ## Arquitetura proposta (simples, sem banco de dados)

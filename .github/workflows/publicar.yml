@@ -71,13 +71,6 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html css js dados img _site/
-          # MODO MANUTENÇÃO: se existir o arquivo MANUTENCAO.ativa na raiz do repositório, a página inicial vira a
-          # página de manutenção. Os dados continuam sendo atualizados por trás (a recuperação de ontem depende deles).
-          # Para voltar ao normal: apague o arquivo MANUTENCAO.ativa e publique de novo.
-          if [ -f MANUTENCAO.ativa ]; then
-            cp manutencao.html _site/index.html
-            echo "::warning::MODO MANUTENÇÃO LIGADO: o site mostra a página de manutenção (apague MANUTENCAO.ativa para desligar)."
-          fi
 
       - name: Conferir o Pix que vai para o ar
         # ÚLTIMO passo antes de enviar: compara o código Pix de _site com a impressão digital guardada FORA do

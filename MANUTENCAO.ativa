@@ -1,2 +1,0 @@
-Enquanto este arquivo existir, o site publicado mostra a página de manutenção (manutencao.html).
-Para voltar ao normal: apague este arquivo e publique de novo (push no main ou "Run workflow" na aba Actions).

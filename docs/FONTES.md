@@ -35,7 +35,7 @@ Legenda: **Integrada** = já usada no site · **Validada** = testada com dados r
 ## Onde discordo da missão (e o que proponho)
 
 1. **"Ficha completa do servidor" com remuneração bruta, líquida e diárias.** Hoje não existe fonte aberta para isso em Videira: a remuneração completa e os pagamentos estão atrás de captcha, e os servidores da CGU são federais. Construir essa ficha agora seria uma tela vazia. **Proposta:** a ficha mostra o que existe (dados funcionais e salário-base) e declara o que falta. O resto depende do pedido pela LAI.
-2. **Associação de pessoas entre fontes.** Nome igual não é identidade (homônimos), e um cruzamento errado vira acusação injusta. **Proposta:** cruzar pessoas **só por CPF**, e só quando as duas fontes oficiais trouxerem o documento (hoje só a API de despesas traz CPF; a base de servidores de Videira não traz, então falta achar uma fonte com CPF). O cruzamento roda no robô, com HMAC-SHA256 do CPF (Secret `CPF_SALT`), e só o resultado é publicado, com CPF mascarado e links das fontes. Sem CPF nas duas fontes, não há ligação. **Órgãos e empresas** continuam sendo cruzados por **CNPJ** (Prefeitura × PNCP × despesas).
+2. **Associação de pessoas entre fontes.** Nome igual não é identidade (homônimos), e um cruzamento errado vira acusação injusta. **Proposta:** cruzar pessoas **só por CPF**, e só quando as duas fontes oficiais trouxerem o documento (hoje a API de despesas traz o CPF completo dos credores pessoa física, e a base de servidores de Videira traz o CPF **mascarado**, só os 6 dígitos do meio, como `***.456.789-**`; o quadro societário da Receita usa a mesma máscara). Seis dígitos não identificam uma pessoa com certeza (há só 1 milhão de combinações, então coincidências ao acaso acontecem), por isso uma coincidência parcial **não é ligação**: serve apenas para revisão interna, nunca para publicação. Para ligação forte é preciso CPF completo nas duas fontes (por exemplo, via pedido pela LAI). O cruzamento roda no robô, com HMAC-SHA256 do CPF (Secret `CPF_SALT`), e só o resultado é publicado, com CPF mascarado e links das fontes. Sem CPF nas duas fontes, não há ligação. **Órgãos e empresas** continuam sendo cruzados por **CNPJ** (Prefeitura × PNCP × despesas).
 3. **Arquivo grande de servidores.** O arquivo atual (estimado em menos de 1 MB, que o servidor compacta) é aceitável. Se crescer, divido por letra inicial.
 
 ## Arquitetura proposta (simples, sem banco de dados)
@@ -114,7 +114,7 @@ Observações: no SIOPE o município usa o código IBGE **sem o dígito final** 
 | SICONFI, extrato de entregas | `fontes/entregas.py` | `entregas.js` | Início e Contas públicas |
 | SIOPE, indicadores | `fontes/siope.py` (do 6º bimestre para trás, fica o mais recente) | `siope.js` | Início e Contas públicas |
 
-**Ainda NÃO integrada:** SIOPE, remuneração nominal (precisa de decisão sobre publicar nomes; e não pode ser ligada às fichas de servidor, porque não tem CPF nem matrícula).
+**Ainda NÃO integrada:** SIOPE, remuneração nominal (precisa de decisão sobre publicar nomes; e não pode ser ligada às fichas de servidor, porque a fonte de remuneração não traz um identificador que ligue com segurança: sem CPF completo nem matrícula comum às duas fontes, só sobraria o nome).
 
 **Telas novas:** Início (quadros com período e fonte), pesquisa geral, fichas de servidor (registro), fornecedor (contratos + pagamentos de 12 meses pelo CNPJ) e contrato (vigência e licitação de origem), tabelas ordenáveis, filtros com chips, gráficos de colunas e histograma, evolução de 12 meses nos gastos.
 

@@ -12,9 +12,19 @@ Android de entrada e internet 3G/4G instável. O mantenedor é estudante: expliq
 1. **Nunca mostrar informação falsa.** O design muda a APRESENTAÇÃO, nunca o DADO. Não alterar, arredondar de
    forma enganosa, reinterpretar ou omitir dados sobre servidores e sobre a Prefeitura. Toda simplificação mantém
    o caminho (no máximo um toque) até o valor exato e a fonte oficial.
-2. **Nunca exibir CPF, matrícula, horário, local de trabalho ou afastamento.** CPF não é pesquisável. A API de
-   despesas entrega o CPF completo: ele fica só na memória, sempre mascarado na tela, em links e no CSV.
-3. **Não cruzar pessoas entre fontes pelo nome.** Fornecedor só por CNPJ. Não usar "reais por habitante".
+2. **Nunca EXPOR CPF, matrícula, horário, local de trabalho ou afastamento.** O CPF completo nunca aparece na
+   tela, em links, no CSV, nos arquivos de `dados/`, em logs ou no histórico do git. CPF não é pesquisável pelo
+   público. A API de despesas entrega o CPF completo: ele fica só na memória e é sempre mascarado na saída.
+3. **Cruzamento de pessoas entre fontes: PERMITIDO por CPF, PROIBIDO só pelo nome.**
+   - É permitido (e faz parte da missão de auditoria) cruzar CPFs que vêm de fontes oficiais (credores da
+     despesa, servidores, sócios de fornecedores, contratos etc.) para encontrar coincidências.
+   - O cruzamento roda só no robô Python (GitHub Actions ou máquina do mantenedor). A chave de ligação é um
+     HMAC-SHA256 do CPF (só dígitos) com segredo guardado no Secret `CPF_SALT`; o CPF puro nunca é gravado.
+   - Só o RESULTADO é publicado ("o credor X também consta como servidor em Y, fonte A e fonte B"), com CPF
+     mascarado (`***.456.789-**`) ou omitido, e com o link para as duas fontes oficiais.
+   - Nome igual NUNCA é tratado como mesma pessoa (homônimos). Sem documento nas duas fontes, não há ligação.
+   - Coincidência é fato, não acusação: sem adjetivo, sem ranking, com o aviso de que pode haver explicação legal.
+   Fornecedor pessoa jurídica continua sendo ligado só por CNPJ. Não usar "reais por habitante".
 4. **O site não pode parecer oficial:** sem brasão, sem as cores da Prefeitura (o portal oficial usa azul
    `#1358a4`; o brasão tem amarelo, vermelho, verde e cachos de uva realistas) e com o aviso de independência visível.
 5. **Manter:** a CSP atual (sem script ou estilo embutido), nenhuma dependência pesada ou externa, o site funcionando
